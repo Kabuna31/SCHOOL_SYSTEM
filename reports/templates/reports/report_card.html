@@ -34,6 +34,7 @@
   .invalid-notice { text-align: center; color: #c00; font-weight: bold; font-size: 10.5px; margin-top: 6px; }
   .footer-info { font-size: 10.5px; padding-top: 4px; }
   .footer-info .line { padding: 3px 0; border-bottom: 1px solid #000; }
+  .signature-img { max-height: 40px; display: block; margin-top: 2px; }
   @media print {
     body { font-size: 11px; }
     .report-card { border-width: 2px; }
@@ -72,10 +73,10 @@
       </div>
       <div class="info-line"><span class="label">CLASS TEACHER:</span> {{ classroom.class_teacher|default:"" }}</div>
       <div class="info-line"><span class="label">STREAM:</span> {{ classroom.stream|default:"" }}</div>
-      <div class="info-line"><span class="label">COMMENT:</span> ____________ <span class="label">SIGN:</span> _______</div>
-      <div class="info-line"><span class="label">GENERAL GRADE:</span></div>
-      <div class="info-line"><span class="label">GENERAL COMMENT:</span></div>
-      <div class="info-line"><span class="label">HEAD TEACHER'S COMMENT:</span></div>
+      <div class="info-line"><span class="label">COMMENT:</span> {{ class_teacher_comment }} <span class="label">SIGN:</span> ________</div>
+      <div class="info-line"><span class="label">GENERAL GRADE:</span> {{ general_grade }}</div>
+      <div class="info-line"><span class="label">GENERAL COMMENT:</span> {{ general_comment }}</div>
+      <div class="info-line"><span class="label">HEAD TEACHER'S COMMENT:</span> {{ head_teacher_comment }}</div>
 
       <!-- Grade summary -->
       <table class="grade-summary">
@@ -95,10 +96,24 @@
         {% endif %}
       </table>
 
+      {% if rc.position_display %}
+        <div class="info-line"><span class="label">POSITION IN CLASS:</span> {{ rc.position_display }}</div>
+      {% endif %}
+      {% if rc.attendance_summary %}
+        <div class="info-line"><span class="label">ATTENDANCE:</span> {{ rc.attendance_summary }}</div>
+      {% endif %}
+
       <div class="footer-info">
-        <div class="line"><strong>TERM ENDED:</strong> {{ term.end_date|date:"d/M/Y" }}</div>
-        <div class="line"><strong>NEXT TERM BEGINS:</strong> &nbsp;</div>
-        <div class="line"><strong>SIGN/STAMP:</strong></div>
+        <div class="line"><strong>TERM ENDED:</strong> {{ rc.term_ended_on|default:term.end_date|date:"d/M/Y" }}</div>
+        <div class="line"><strong>NEXT TERM BEGINS:</strong> {{ rc.next_term_begins_on|date:"d/M/Y"|default:"—" }}</div>
+        <div class="line"><strong>SIGN/STAMP:</strong>
+          {% if school.head_teacher_signature %}
+            <img src="{{ school.head_teacher_signature.url }}" alt="Head Teacher Signature" class="signature-img">
+          {% endif %}
+          {% if school.head_teacher_name %}
+            <span style="font-size: 10px;">{{ school.head_teacher_name }}</span>
+          {% endif %}
+        </div>
       </div>
     </div>
 

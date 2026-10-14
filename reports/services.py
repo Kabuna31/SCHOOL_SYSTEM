@@ -148,6 +148,9 @@ def _get_marks(student, term, assessment_type):
 
 def build_report(student, term):
     """Assemble the full report context for one student + one term."""
+    from .models import ReportCard
+    from .comment_engine import generate_comment
+
     class_level_name = student.class_level.name if student.class_level else ""
     alevel = is_a_level(class_level_name)
 
@@ -162,6 +165,8 @@ def build_report(student, term):
 
     rows = []
     total_points = 0
+    total_fs = Decimal("0")
+    sat = 0
 
     for subject in subjects:
         aoi = aoi_marks.get(subject.id)
@@ -184,7 +189,6 @@ def build_report(student, term):
         if alevel:
             if is_subsidiary(subject.name):
                 grade, loa = grade_subsidiary(fs)
-                points = ""
             else:
                 grade, loa, points = grade_a_level(fs)
                 if points:
@@ -205,6 +209,34 @@ def build_report(student, term):
             "tr": tr,
         })
 
+        if fs is not None:
+            total_fs += fs
+            sat += 1
+
+    average = _round2(total_fs / sat) if sat else None
+
+    # Report card metadata
+    rc = ReportCard.get_for(student, term)
+    if not rc.general_grade and average is not None:
+        rc.general_grade = grade_o_level(average)[0] if not alevel else grade_a_level(average)[0]
+    if not rc.general_comment:
+        rc.general_comment = generate_comment(average, alevel)
+    rc.save()
+
+    # fallbacks
+    school = student.school
+    class_teacher_comment = (
+        rc.class_teacher_comment
+        or getattr(enrollment.classroom.class_teacher, "short_name", "")
+        or school.default_class_teacher_comment
+        or ""
+    )
+    head_teacher_comment = (
+        rc.head_teacher_comment
+        or school.default_head_teacher_comment
+        or ""
+    )
+
     return {
         "student": student,
         "term": term,
@@ -213,10 +245,14 @@ def build_report(student, term):
         "rows": rows,
         "total_points": total_points,
         "class_level_name": class_level_name,
+        "average": average,
+        "sat": sat,
+        # report card specific
+        "rc": rc,
+        "class_teacher_comment": class_teacher_comment,
+        "general_comment": rc.general_comment,
+        "head_teacher_comment": head_teacher_comment,
+        "general_grade": rc.general_grade,
+        "position_display": rc.position_display,
+        "attendance_summary": rc.attendance_summary,
     }
-
-
-def _fmt_score(value):
-    if value is None:
-        return ""
-    return str(int(value)) if Decimal(value) == int(value) else str(value)

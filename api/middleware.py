@@ -17,10 +17,14 @@ class CustomExceptionMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        # Skip JSON error handling for admin and reports — they need HTML errors.
+        path = request.path_info or ""
+        if path.startswith("/admin/") or path.startswith("/reports/"):
+            return self.get_response(request)
+
         try:
             return self.get_response(request)
 
-        # Common Django errors
         except ValidationError as e:
             return JsonResponse(
                 {
@@ -56,14 +60,12 @@ class CustomExceptionMiddleware:
                 status=500,
             )
 
-        # DRF exceptions (optional, for future use if you integrate DRF globally)
         except APIException as e:
             return JsonResponse(
                 {"error": "API Error", "detail": str(e.detail)},
                 status=e.status_code,
             )
 
-        # Catch-all for other exceptions
         except Exception as e:
             logger.error("Unhandled exception: %s", traceback.format_exc())
             return JsonResponse(

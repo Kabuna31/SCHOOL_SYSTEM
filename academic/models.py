@@ -102,6 +102,9 @@ class Teacher(models.Model):
     date_of_birth = models.DateField(blank=True, null=True)
     designation = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to="Employee_images", blank=True, null=True)
+    signature = models.ImageField(
+        upload_to="Teacher_signatures", blank=True, null=True
+    )
     inactive = models.BooleanField(default=False)
 
     objects = SchoolScopedManager()

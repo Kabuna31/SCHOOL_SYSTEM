@@ -32,6 +32,22 @@ class School(models.Model):
     telephone = models.CharField(max_length=20, blank=True)
     school_email = models.EmailField(blank=True, null=True)
     school_logo = models.ImageField(blank=True, null=True, upload_to="school_info")
+    website = models.URLField(blank=True, null=True)
+    head_teacher_name = models.CharField(max_length=150, blank=True)
+    head_teacher_signature = models.ImageField(
+        upload_to="school_info/signatures", blank=True, null=True
+    )
+    class_teacher_signature = models.ImageField(
+        upload_to="school_info/signatures", blank=True, null=True
+    )
+    default_class_teacher_comment = models.CharField(
+        max_length=255, blank=True,
+        help_text="Default comment shown if a class teacher has none."
+    )
+    default_head_teacher_comment = models.CharField(
+        max_length=255, blank=True,
+        help_text="Default head teacher comment if none is set."
+    )
 
     def __str__(self):
         return self.name
