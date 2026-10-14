@@ -1,0 +1,64 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>Reports</h1>
+
+<h2>Single Report Card</h2>
+<form onsubmit="return goToCard(event);" style="margin-bottom: 24px;">
+  <label>Class:
+    <select id="classroom">
+      <option value="">-- Select --</option>
+      {% for c in classrooms %}
+        <option value="{{ c.id }}">{{ c }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  &nbsp;
+  <label>Term:
+    <select id="term">
+      {% for t in terms %}
+        <option value="{{ t.id }}">{{ t.name }} — {{ t.academic_year.name }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <br><br>
+  <div id="student-list">Select a class first.</div>
+  <br>
+  <button type="submit" class="default">View Report Card</button>
+  <button type="button" onclick="bulkPrint()">Print all in class</button>
+</form>
+
+<script>
+function goToCard(e) {
+  e.preventDefault();
+  const sid = document.getElementById("student").value;
+  const tid = document.getElementById("term").value;
+  if (!sid || !tid) { alert("Pick a student and term."); return false; }
+  window.location.href = "/reports/report-card/" + sid + "/" + tid + "/";
+}
+function bulkPrint() {
+  const cid = document.getElementById("classroom").value;
+  const tid = document.getElementById("term").value;
+  if (!cid || !tid) { alert("Pick a class and term."); return; }
+  window.open("/reports/bulk/" + cid + "/" + tid + "/", "_blank");
+}
+document.getElementById("classroom").addEventListener("change", function() {
+  const cid = this.value;
+  if (!cid) { document.getElementById("student-list").innerHTML = "Select a class first."; return; }
+  document.getElementById("student-list").innerHTML = "Loading…";
+  fetch("/admin/sis/student/?classroom=" + cid + "&format=json")
+    .then(r => r.json())
+    .then(d => {
+      let html = '<label>Student: <select id="student"><option value="">-- Select --</option>';
+      (d.students || []).forEach(s => { html += '<option value="' + s.id + '">' + s.name + '</option>'; });
+      html += '</select></label>';
+      document.getElementById("student-list").innerHTML = html;
+    })
+    .catch(() => {
+      document.getElementById("student-list").innerHTML =
+        '<label>Student ID: <input id="student" type="number" placeholder="Type student ID"></label>';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>Generate Report Cards</h1>
+<p>Select a student and term to view their report card.</p>
+
+<form method="get" action="" onsubmit="redirectToReport(event)">
+  <table>
+    <tr>
+      <th><label for="student">Student:</label></th>
+      <td>
+        <select id="student" name="student" style="min-width:300px;">
+          {% for s in students %}
+            <option value="{{ s.id }}">{{ s.admission_number }} — {{ s.full_name }}</option>
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <th><label for="term">Term:</label></th>
+      <td>
+        <select id="term" name="term">
+          {% for t in terms %}
+            <option value="{{ t.id }}">{{ t.name }} — {{ t.academic_year.name }}</option>
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <th><label for="type">Report Type:</label></th>
+      <td>
+        <select id="type" name="type">
+          <option value="EOT">End of Term</option>
+          <option value="AOI">Mid-Term (AOI)</option>
+        </select>
+      </td>
+    </tr>
+  </table>
+  <br>
+  <button type="submit" class="default">View Report Card</button>
+</form>
+
+<script>
+  function redirectToReport(e) {
+    e.preventDefault();
+    const s = document.getElementById("student").value;
+    const t = document.getElementById("term").value;
+    const type = document.getElementById("type").value;
+    window.location.href = "/reports/report-card/" + s + "/" + t + "/?type=" + type;
+  }
+</script>
+{% endblock %}

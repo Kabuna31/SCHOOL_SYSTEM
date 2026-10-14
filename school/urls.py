@@ -74,6 +74,7 @@ urlpatterns = [
     path("api/users/", include("api.users.urls")),
     path("api/timetable/", include("api.schedule.urls")),
     path("api/sis/", include("api.sis.urls")),
+    path("reports/", include("reports.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

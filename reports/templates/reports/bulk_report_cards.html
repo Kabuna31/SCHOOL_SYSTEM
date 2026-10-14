@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Bulk Report Cards — {{ classroom }}</title>
+<style>
+  @page { size: A4 portrait; margin: 8mm; }
+  body { margin: 0; padding: 0; }
+  .page-break { page-break-after: always; }
+</style>
+</head>
+<body>
+{% for ctx in reports %}
+  {% include "reports/_one_card.html" with school=ctx.school student=ctx.student term=ctx.term classroom=ctx.classroom is_a_level=ctx.is_a_level rows=ctx.rows total_points=ctx.total_points class_level_name=ctx.class_level_name %}
+  {% if not forloop.last %}<div class="page-break"></div>{% endif %}
+{% endfor %}
+</body>
+</html>
