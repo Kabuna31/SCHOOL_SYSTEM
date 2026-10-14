@@ -16,10 +16,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # ---------------------------------------------------------------------------
 # Core security settings
 # ---------------------------------------------------------------------------
-# No default: the app must fail loudly if SECRET_KEY is missing.
 SECRET_KEY = env("SECRET_KEY")
 
-# Safe default: set DEBUG=True explicitly in your local .env only.
 DEBUG = env.bool("DEBUG", default=False)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
@@ -27,7 +25,6 @@ render_hostname = env("RENDER_EXTERNAL_HOSTNAME", default="").strip()
 if render_hostname and render_hostname not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(render_hostname)
 
-# Needed if your frontend posts to Django (e.g. admin) from another domain.
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 TENANCY_PREPARATION = env.bool("TENANCY_PREPARATION", default=False)
 TENANCY_ENABLED = env.bool("TENANCY_ENABLED", default=False)
@@ -135,7 +132,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "tenants.middleware.TenantMembershipMiddleware",
-    'utils.middleware.CurrentRequestMiddleware',
+    "utils.middleware.CurrentRequestMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -158,7 +155,6 @@ TEMPLATES = [
             os.path.join(BASE_DIR, "static/dist"),
             os.path.join(BASE_DIR, "templates"),
         ],
-
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -176,7 +172,6 @@ WSGI_APPLICATION = "school.wsgi.application"
 # ---------------------------------------------------------------------------
 # Database
 # ---------------------------------------------------------------------------
-# SSL is required in production (Render) but not for a local Postgres.
 DATABASES = {
     "default": dj_database_url.parse(
         env("DATABASE_URL"),
@@ -217,12 +212,8 @@ if DIST_ASSETS_DIR.is_dir():
     STATICFILES_DIRS.append(DIST_ASSETS_DIR)
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-# NOTE: Render's disk is ephemeral, so files in MEDIA_ROOT are lost on every
-# redeploy. Move uploads to S3, Cloudinary or similar before real use.
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Requires Django 4.2+. (Replaces the deprecated STATICFILES_STORAGE setting.)
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -238,8 +229,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Django REST Framework + JWT
 # ---------------------------------------------------------------------------
 REST_FRAMEWORK = {
-    # Locked down by default. Public views (e.g. login) must opt in with
-    # permission_classes = [AllowAny].
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "tenants.authentication.SchoolJWTAuthentication",
@@ -272,8 +261,6 @@ SIMPLE_JWT = {
 # ---------------------------------------------------------------------------
 # CORS
 # ---------------------------------------------------------------------------
-# Open only in local development. In production, set CORS_ALLOWED_ORIGINS,
-# e.g. CORS_ALLOWED_ORIGINS=https://school.example.com,https://www.example.com
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 
@@ -301,8 +288,6 @@ INTERNAL_IPS = [
 # Production security (only when DEBUG is False)
 # ---------------------------------------------------------------------------
 if not DEBUG:
-    # Render terminates SSL at its proxy; without this header setting the
-    # redirect below loops forever.
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 31536000
@@ -387,24 +372,23 @@ JAZZMIN_SETTINGS = {
     "theme": "pulse",
     "default_theme_mode": "auto",
 
+    # Custom sidebar sections
     "custom_links": {
-    "reports": [{
-        "name": "Report Cards",
-        "url": "reports/",
-        "icon": "fas fa-file-alt",
-        "permissions": ["users.view_customuser"],
-    }, {
-        "name": "Marksheets (coming soon)",
-        "url": "reports/",
-        "icon": "fas fa-table",
-    }, {
-        "name": "Analysis (coming soon)",
-        "url": "reports/",
-        "icon": "fas fa-chart-bar",
-    }],
-},
+        "reports": [{
+            "name": "Report Cards",
+            "url": "/reports/",
+            "icon": "fas fa-file-alt",
+        }, {
+            "name": "Marksheets (coming soon)",
+            "url": "/reports/",
+            "icon": "fas fa-table",
+        }, {
+            "name": "Analysis (coming soon)",
+            "url": "/reports/",
+            "icon": "fas fa-chart-bar",
+        }],
+    },
 }
-
 
 JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": False,
