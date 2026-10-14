@@ -327,7 +327,7 @@ JAZZMIN_SETTINGS = {
     # Top Menu Links
     "topmenu_links": [
         {"name": "Home", "url": "/admin/", "icon": "fas fa-home"},
-        {"name": "Reports", "url": "/admin/reports/", "icon": "fas fa-file-alt"},
+        {"name": "Reports", "url": "/reports/", "icon": "fas fa-file-alt"},
         {"name": "View Live Site", "url": "/", "new_window": True, "icon": "fas fa-globe"},
     ],
 
@@ -390,16 +390,16 @@ JAZZMIN_SETTINGS = {
     "custom_links": {
     "reports": [{
         "name": "Report Cards",
-        "url": "/admin/reports/",
+        "url": "reports/",
         "icon": "fas fa-file-alt",
         "permissions": ["users.view_customuser"],
     }, {
         "name": "Marksheets (coming soon)",
-        "url": "/admin/reports/",
+        "url": "reports/",
         "icon": "fas fa-table",
     }, {
         "name": "Analysis (coming soon)",
-        "url": "/admin/reports/",
+        "url": "reports/",
         "icon": "fas fa-chart-bar",
     }],
 },
