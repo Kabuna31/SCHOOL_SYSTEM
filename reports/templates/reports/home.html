@@ -2,63 +2,57 @@
 {% load i18n %}
 
 {% block content %}
-<h1>Reports</h1>
+<div class="container" style="max-width: 1000px;">
 
-<h2>Single Report Card</h2>
-<form onsubmit="return goToCard(event);" style="margin-bottom: 24px;">
-  <label>Class:
-    <select id="classroom">
-      <option value="">-- Select --</option>
-      {% for c in classrooms %}
-        <option value="{{ c.id }}">{{ c }}</option>
-      {% endfor %}
-    </select>
-  </label>
-  &nbsp;
-  <label>Term:
-    <select id="term">
-      {% for t in terms %}
-        <option value="{{ t.id }}">{{ t.name }} — {{ t.academic_year.name }}</option>
-      {% endfor %}
-    </select>
-  </label>
-  <br><br>
-  <div id="student-list">Select a class first.</div>
-  <br>
-  <button type="submit" class="default">View Report Card</button>
-  <button type="button" onclick="bulkPrint()">Print all in class</button>
-</form>
+  <h1 style="margin-bottom: 8px;">Reports</h1>
+  <p style="color: #666; margin-bottom: 24px;">
+    Generate report cards, marksheets, and class analysis for any term.
+  </p>
 
-<script>
-function goToCard(e) {
-  e.preventDefault();
-  const sid = document.getElementById("student").value;
-  const tid = document.getElementById("term").value;
-  if (!sid || !tid) { alert("Pick a student and term."); return false; }
-  window.location.href = "/reports/report-card/" + sid + "/" + tid + "/";
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+
+    <a href="{% url 'reports:report_card_picker' %}" class="report-card-btn">
+      <div class="icon" style="color: #0D47A1;"><i class="fas fa-file-alt"></i></div>
+      <div class="title">Report Cards</div>
+      <div class="desc">O Level & A Level per-student academic reports</div>
+    </a>
+
+    <a href="{% url 'reports:marksheet_picker' %}" class="report-card-btn">
+      <div class="icon" style="color: #1B5E20;"><i class="fas fa-table"></i></div>
+      <div class="title">Marksheets</div>
+      <div class="desc">Class marksheets with AOI, EOT, FS, grade</div>
+    </a>
+
+    <a href="{% url 'reports:analysis_picker' %}" class="report-card-btn">
+      <div class="icon" style="color: #C62828;"><i class="fas fa-chart-bar"></i></div>
+      <div class="title">Class Analysis</div>
+      <div class="desc">Grade distribution and subject performance</div>
+    </a>
+
+    <a href="{% url 'reports:report_card_picker' %}?type=AOI" class="report-card-btn">
+      <div class="icon" style="color: #6A1B9A;"><i class="fas fa-clipboard-check"></i></div>
+      <div class="title">Mid-Term Reports</div>
+      <div class="desc">Mid-term progress reports (AOI only)</div>
+    </a>
+
+  </div>
+</div>
+
+<style>
+.report-card-btn {
+  display: block; padding: 24px; background: #fff;
+  border: 2px solid #e0e0e0; border-radius: 8px;
+  text-decoration: none; color: #333;
+  transition: all 0.2s ease;
 }
-function bulkPrint() {
-  const cid = document.getElementById("classroom").value;
-  const tid = document.getElementById("term").value;
-  if (!cid || !tid) { alert("Pick a class and term."); return; }
-  window.open("/reports/bulk/" + cid + "/" + tid + "/", "_blank");
+.report-card-btn:hover {
+  border-color: #0D47A1;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+  text-decoration: none;
 }
-document.getElementById("classroom").addEventListener("change", function() {
-  const cid = this.value;
-  if (!cid) { document.getElementById("student-list").innerHTML = "Select a class first."; return; }
-  document.getElementById("student-list").innerHTML = "Loading…";
-  fetch("/admin/sis/student/?classroom=" + cid + "&format=json")
-    .then(r => r.json())
-    .then(d => {
-      let html = '<label>Student: <select id="student"><option value="">-- Select --</option>';
-      (d.students || []).forEach(s => { html += '<option value="' + s.id + '">' + s.name + '</option>'; });
-      html += '</select></label>';
-      document.getElementById("student-list").innerHTML = html;
-    })
-    .catch(() => {
-      document.getElementById("student-list").innerHTML =
-        '<label>Student ID: <input id="student" type="number" placeholder="Type student ID"></label>';
-    });
-});
-</script>
+.report-card-btn .icon { font-size: 32px; margin-bottom: 8px; }
+.report-card-btn .title { font-weight: bold; font-size: 18px; margin-bottom: 4px; }
+.report-card-btn .desc { font-size: 13px; color: #666; }
+</style>
 {% endblock %}

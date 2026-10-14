@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Marksheet — {{ classroom }} — {{ term }}</title>
+<style>
+  @page { size: A4 landscape; margin: 8mm; }
+  body { font-family: Arial, sans-serif; font-size: 11px; margin: 0; padding: 8px; }
+  .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; }
+  .header h1 { margin: 0; font-size: 20px; }
+  .header p { margin: 2px 0; font-size: 11px; }
+  .header .title { font-weight: bold; text-decoration: underline; margin-top: 6px; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { border: 1px solid #000; padding: 3px 5px; font-size: 10.5px; }
+  th { background: #f0f0f0; font-weight: bold; text-align: center; }
+  td.name { text-align: left; }
+  td.num { text-align: center; }
+  .no-print { margin-bottom: 12px; }
+  @media print { .no-print { display: none; } }
+</style>
+</head>
+<body>
+
+<div class="no-print">
+  <button onclick="window.print()" style="padding: 8px 16px;">Print</button>
+  <a href="{% url 'reports:home' %}" style="margin-left: 12px;">← Back</a>
+</div>
+
+<div class="header">
+  <h1>{{ school.name|upper }}</h1>
+  <p>{{ school.address }} | Tel: {{ school.telephone }}</p>
+  <p>{{ school.school_email }}{% if school.website %} | {{ school.website }}{% endif %}</p>
+  <div class="title">MARKSHEET — {{ classroom }} — {{ term.name|upper }} {{ term.academic_year.name }}</div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 4%;">#</th>
+      <th style="width: 22%;">Student</th>
+      <th>Subject</th>
+      <th>AOI</th>
+      <th>EOT</th>
+      <th>FS</th>
+      <th>Grade</th>
+      <th>LOA</th>
+      <th>TR</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for ctx in rows %}
+      {% for row in ctx.rows %}
+        <tr>
+          {% if forloop.first %}
+            <td class="num" rowspan="{{ ctx.rows|length }}">{{ forloop.parentloop.counter }}</td>
+            <td class="name" rowspan="{{ ctx.rows|length }}">{{ ctx.student.full_name }}</td>
+          {% endif %}
+          <td class="name">{{ row.subject }}</td>
+          <td class="num">{{ row.aoi }}</td>
+          <td class="num">{{ row.eot }}</td>
+          <td class="num">{{ row.fs }}</td>
+          <td class="num">{{ row.grade }}</td>
+          <td class="num">{{ row.loa }}</td>
+          <td class="num">{{ row.tr }}</td>
+        </tr>
+      {% endfor %}
+    {% empty %}
+      <tr><td colspan="9" style="text-align: center;">No marks recorded.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+</body>
+</html>

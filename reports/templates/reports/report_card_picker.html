@@ -1,0 +1,68 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{% if is_midterm %}Mid-Term Reports{% else %}Report Cards{% endif %}</h1>
+<p style="color: #666;">Pick a class, term, and student to view their report card.</p>
+
+<form method="get" onsubmit="return goTo(event);">
+  <table style="background: #f9f9f9; padding: 16px; border-radius: 8px; margin-top: 16px;">
+    <tr>
+      <th style="padding: 8px; text-align: left;">Class:</th>
+      <td style="padding: 8px;">
+        <select id="classroom" style="min-width: 300px; padding: 6px;">
+          <option value="">-- Select --</option>
+          {% for c in classrooms %}
+            <option value="{{ c.id }}">{{ c }}</option>
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <th style="padding: 8px; text-align: left;">Term:</th>
+      <td style="padding: 8px;">
+        <select id="term" style="min-width: 300px; padding: 6px;">
+          {% for t in terms %}
+            <option value="{{ t.id }}">{{ t.name }} — {{ t.academic_year.name }}</option>
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <th style="padding: 8px; text-align: left;">Student ID:</th>
+      <td style="padding: 8px;">
+        <input id="student" type="number" placeholder="e.g. 42" style="padding: 6px; min-width: 150px;">
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" style="padding: 12px 8px;">
+        <button type="submit" class="button default" style="padding: 8px 20px;">View Report Card</button>
+        &nbsp;
+        <button type="button" onclick="bulk()" style="padding: 8px 20px;">Print all in class</button>
+      </td>
+    </tr>
+  </table>
+</form>
+
+<p style="margin-top: 24px;">
+  <a href="{% url 'reports:home' %}">← Back to Reports</a>
+</p>
+
+<script>
+function goTo(e) {
+  e.preventDefault();
+  const sid = document.getElementById("student").value;
+  const tid = document.getElementById("term").value;
+  if (!sid) { alert("Enter a student ID."); return false; }
+  if (!tid) { alert("Pick a term."); return false; }
+  window.location.href = "/reports/report-card/" + sid + "/" + tid + "/";
+}
+function bulk() {
+  const cid = document.getElementById("classroom").value;
+  const tid = document.getElementById("term").value;
+  if (!cid) { alert("Pick a class."); return; }
+  if (!tid) { alert("Pick a term."); return; }
+  window.open("/reports/bulk/" + cid + "/" + tid + "/", "_blank");
+}
+</script>
+{% endblock %}
