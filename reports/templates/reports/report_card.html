@@ -34,6 +34,8 @@
   .invalid-notice { text-align: center; color: #c00; font-weight: bold; font-size: 10.5px; margin-top: 6px; }
   .footer-info { font-size: 10.5px; padding-top: 4px; }
   .footer-info .line { padding: 3px 0; border-bottom: 1px solid #000; }
+  .student-photo { width: 100px; text-align: center; }
+  .student-photo img { max-width: 90px; max-height: 110px; border: 1px solid #000; }
   .signature-img { max-height: 40px; display: block; margin-top: 2px; }
   @media print {
     body { font-size: 11px; }
@@ -57,8 +59,17 @@
         <p>Email: {{ school.school_email }}{% if school.website %} | Website: {{ school.website }}{% endif %}</p>
         <p class="motto">Motto: {{ school.mission|default:"Discipline and Excellence" }}</p>
         <div class="report-title">
-          {% if is_a_level %}ADVANCED{% else %}ORDINARY{% endif %} LEVEL ACADEMIC REPORT CARD - {{ term.name|upper }} {{ term.academic_year.name }}
+          {% if is_midterm %}
+            {% if is_a_level %}ADVANCED{% else %}ORDINARY{% endif %} LEVEL MID-TERM PROGRESS REPORT - {{ term.name|upper }} {{ term.academic_year.name }}
+          {% else %}
+            {% if is_a_level %}ADVANCED{% else %}ORDINARY{% endif %} LEVEL ACADEMIC REPORT CARD - {{ term.name|upper }} {{ term.academic_year.name }}
+          {% endif %}
         </div>
+      </td>
+      <td class="student-photo">
+        {% if student.image %}
+          <img src="{{ student.image.url }}" alt="{{ student.full_name }}">
+        {% endif %}
       </td>
     </tr>
   </table>
@@ -73,7 +84,15 @@
       </div>
       <div class="info-line"><span class="label">CLASS TEACHER:</span> {{ classroom.class_teacher|default:"" }}</div>
       <div class="info-line"><span class="label">STREAM:</span> {{ classroom.stream|default:"" }}</div>
-      <div class="info-line"><span class="label">COMMENT:</span> {{ class_teacher_comment }} <span class="label">SIGN:</span> ________</div>
+      <div class="info-line">
+        <span class="label">COMMENT:</span> {{ class_teacher_comment }}
+        <span class="label">SIGN:</span>
+        {% if class_teacher.signature %}
+          <img src="{{ class_teacher.signature.url }}" class="signature-img" alt="teacher sig">
+        {% else %}
+          ________
+        {% endif %}
+      </div>
       <div class="info-line"><span class="label">GENERAL GRADE:</span> {{ general_grade }}</div>
       <div class="info-line"><span class="label">GENERAL COMMENT:</span> {{ general_comment }}</div>
       <div class="info-line"><span class="label">HEAD TEACHER'S COMMENT:</span> {{ head_teacher_comment }}</div>
@@ -123,29 +142,43 @@
         <thead>
           <tr>
             <th class="subject-name">SUBJECT</th>
-            <th>AOI(20%)</th>
-            <th>EOT(80%)</th>
-            <th>FS(100%)</th>
-            <th>GRADE</th>
-            <th>LOA</th>
-            <th>TR</th>
+            {% if is_midterm %}
+              <th>AOI(20%)</th>
+              <th>GRADE</th>
+              <th>LOA</th>
+              <th>TR</th>
+            {% else %}
+              <th>AOI(20%)</th>
+              <th>EOT(80%)</th>
+              <th>FS(100%)</th>
+              <th>GRADE</th>
+              <th>LOA</th>
+              <th>TR</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody>
           {% for row in rows %}
           <tr>
             <td class="subject-name">{{ row.subject }}</td>
-            <td>{{ row.aoi }}</td>
-            <td>{{ row.eot }}</td>
-            <td>{{ row.fs }}</td>
-            <td>{{ row.grade }}</td>
-            <td>{{ row.loa }}</td>
-            <td>{{ row.tr }}</td>
+            {% if is_midterm %}
+              <td>{{ row.aoi }}</td>
+              <td>{{ row.grade }}</td>
+              <td>{{ row.loa }}</td>
+              <td>{{ row.tr }}</td>
+            {% else %}
+              <td>{{ row.aoi }}</td>
+              <td>{{ row.eot }}</td>
+              <td>{{ row.fs }}</td>
+              <td>{{ row.grade }}</td>
+              <td>{{ row.loa }}</td>
+              <td>{{ row.tr }}</td>
+            {% endif %}
           </tr>
           {% empty %}
-          <tr><td colspan="7">No marks recorded.</td></tr>
+          <tr><td colspan="{% if is_midterm %}5{% else %}7{% endif %}">No marks recorded.</td></tr>
           {% endfor %}
-          {% if is_a_level %}
+          {% if is_a_level and not is_midterm %}
           <tr>
             <td colspan="6" style="text-align:right; font-weight:bold;">POINTS SCORED:</td>
             <td>{{ total_points }}</td>
