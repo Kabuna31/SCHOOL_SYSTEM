@@ -236,3 +236,48 @@ def class_marks_record(request, classroom_id, term_id):
     context = build_class_marks_record(classroom, term)
     context["school"] = school
     return render(request, "reports/class_marks_record.html", context)
+
+
+@staff_member_required
+def send_defaulters_sms(request):
+    """Send fee-reminder SMS to all defaulters. POST only."""
+    if request.method != "POST":
+        return redirect("reports:defaulters")
+
+    from automation.services import notify_parent
+    from django.contrib import messages
+
+    school = _current_school(request)
+    rows = build_defaulters(school)
+    sent = 0
+    failed = 0
+
+    for row in rows:
+        student = row["student"]
+        body = (
+            f"Dear Parent, our records show an outstanding balance of "
+            f"{row['total_owed']} for {student.full_name}. "
+            f"Please settle at your earliest convenience. - {school.name}"
+        )
+        results = notify_parent(
+            student,
+            subject="Fee Reminder",
+            message=body,
+            channels=("sms",),
+        )
+        ok, _ = results.get("sms", (False, ""))
+        if ok:
+            sent += 1
+        else:
+            failed += 1
+
+    if sent:
+        messages.success(request, f"Sent {sent} SMS reminders.")
+    if failed:
+        messages.warning(
+            request,
+            f"{failed} messages not sent (credentials missing or failure). "
+            f"Check the Notification Deliveries admin.",
+        )
+
+    return redirect("reports:defaulters")
