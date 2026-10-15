@@ -36,9 +36,18 @@
     </tr>
     <tr>
       <td colspan="2" style="padding: 12px 8px;">
-        <button type="submit" class="button default" style="padding: 8px 20px;">View Report Card</button>
+        <button type="submit" class="button default" style="padding: 8px 20px;">
+          View Report Card
+        </button>
         &nbsp;
-        <button type="button" onclick="bulk()" style="padding: 8px 20px;">Print all in class</button>
+        <button type="button" onclick="bulk()" style="padding: 8px 20px;">
+          Print all in class
+        </button>
+        &nbsp;
+        <button type="button" onclick="generateAll()"
+                style="padding: 8px 20px; background: #1B5E20; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
+          Generate All (positions + attendance)
+        </button>
       </td>
     </tr>
   </table>
@@ -53,16 +62,27 @@ function goTo(e) {
   e.preventDefault();
   const sid = document.getElementById("student").value;
   const tid = document.getElementById("term").value;
+  const mode = "{{ assessment_type }}";
   if (!sid) { alert("Enter a student ID."); return false; }
   if (!tid) { alert("Pick a term."); return false; }
-  window.location.href = "/reports/report-card/" + sid + "/" + tid + "/";
+  window.location.href = "/reports/report-card/" + sid + "/" + tid + "/?type=" + mode;
 }
+
 function bulk() {
   const cid = document.getElementById("classroom").value;
   const tid = document.getElementById("term").value;
   if (!cid) { alert("Pick a class."); return; }
   if (!tid) { alert("Pick a term."); return; }
   window.open("/reports/bulk/" + cid + "/" + tid + "/", "_blank");
+}
+
+function generateAll() {
+  const cid = document.getElementById("classroom").value;
+  const tid = document.getElementById("term").value;
+  if (!cid) { alert("Pick a class."); return; }
+  if (!tid) { alert("Pick a term."); return; }
+  if (!confirm("Compute positions and attendance for all students in this class?")) return;
+  window.location.href = "/reports/generate/" + cid + "/" + tid + "/";
 }
 </script>
 {% endblock %}

@@ -1,10 +1,15 @@
+from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from academic.models import ClassRoom, Student, StudentClassEnrollment
 from administration.models import School, Term
 
-from .services import build_report
+from .services import (
+    build_report,
+    compute_attendance_for_class,
+    compute_class_positions,
+)
 
 
 def _current_school(request):
@@ -14,15 +19,11 @@ def _current_school(request):
     return School.objects.filter(active=True).first()
 
 
-# ---------- Hub ----------
 @staff_member_required
 def reports_home(request):
-    return render(request, "reports/home.html", {
-        "title": "Reports",
-    })
+    return render(request, "reports/home.html", {"title": "Reports"})
 
 
-# ---------- Report Card ----------
 @staff_member_required
 def report_card_picker(request):
     school = _current_school(request)
@@ -44,27 +45,27 @@ def report_card(request, student_id, term_id):
     term = get_object_or_404(Term, pk=term_id)
     school = _current_school(request)
 
-    context = build_report(student, term)
+    mode = request.GET.get("type", "EOT").upper()
+    if mode not in ("EOT", "AOI"):
+        mode = "EOT"
+
+    context = build_report(student, term, mode=mode)
     if context is None:
         return render(request, "reports/no_enrollment.html", {
             "student": student, "term": term,
         })
 
     context["school"] = school
-    context["assessment_type"] = request.GET.get("type", "EOT").upper()
     return render(request, "reports/report_card.html", context)
 
 
-# ---------- Marksheet ----------
 @staff_member_required
 def marksheet_picker(request):
     school = _current_school(request)
     terms = Term.objects.filter(academic_year__school=school).order_by("-start_date")
     classrooms = ClassRoom.objects.filter(school=school).order_by("name__name", "stream__name")
     return render(request, "reports/marksheet_picker.html", {
-        "school": school,
-        "terms": terms,
-        "classrooms": classrooms,
+        "school": school, "terms": terms, "classrooms": classrooms,
     })
 
 
@@ -83,28 +84,22 @@ def marksheet(request, classroom_id, term_id):
 
     rows = []
     for e in enrollments:
-        ctx = build_report(e.student, term)
+        ctx = build_report(e.student, term, mode="EOT")
         if ctx:
             rows.append(ctx)
 
     return render(request, "reports/marksheet.html", {
-        "school": school,
-        "term": term,
-        "classroom": classroom,
-        "rows": rows,
+        "school": school, "term": term, "classroom": classroom, "rows": rows,
     })
 
 
-# ---------- Analysis ----------
 @staff_member_required
 def analysis_picker(request):
     school = _current_school(request)
     terms = Term.objects.filter(academic_year__school=school).order_by("-start_date")
     classrooms = ClassRoom.objects.filter(school=school).order_by("name__name", "stream__name")
     return render(request, "reports/analysis_picker.html", {
-        "school": school,
-        "terms": terms,
-        "classrooms": classrooms,
+        "school": school, "terms": terms, "classrooms": classrooms,
     })
 
 
@@ -124,13 +119,12 @@ def analysis(request, classroom_id, term_id):
     )
 
     subject_stats = defaultdict(lambda: {
-        "name": "", "scores": [], "grades": defaultdict(int),
-        "A": 0, "B": 0, "C": 0, "D": 0, "E": 0,
+        "name": "", "scores": [], "A": 0, "B": 0, "C": 0, "D": 0, "E": 0,
     })
     student_averages = []
 
     for e in enrollments:
-        ctx = build_report(e.student, term)
+        ctx = build_report(e.student, term, mode="EOT")
         if not ctx:
             continue
 
@@ -148,7 +142,6 @@ def analysis(request, classroom_id, term_id):
             stats["name"] = row["subject"]
             stats["scores"].append(fs)
             letter = row["grade"] or "?"
-            stats["grades"][letter] += 1
             if letter in ("A", "B", "C", "D", "E"):
                 stats[letter] += 1
 
@@ -174,45 +167,31 @@ def analysis(request, classroom_id, term_id):
     for i, row in enumerate(student_averages):
         row["rank"] = i + 1
 
-    # bar chart data
-    chart_data = [
-        {"name": s["name"], "mean": s["mean"]} for s in subjects
-    ]
-
     return render(request, "reports/analysis.html", {
         "school": school,
         "term": term,
         "classroom": classroom,
         "subjects": subjects,
-        "students": student_averages[:10],  # top 10
-        "chart_data": chart_data,
+        "students": student_averages[:10],
     })
 
 
-# ---------- Bulk ----------
 @staff_member_required
-def bulk_report_cards(request, classroom_id, term_id):
+def generate_for_class(request, classroom_id, term_id):
+    """Compute positions and attendance for a whole class."""
     school = _current_school(request)
     classroom = get_object_or_404(ClassRoom, pk=classroom_id, school=school)
     term = get_object_or_404(Term, pk=term_id)
 
-    enrollments = (
-        StudentClassEnrollment.objects
-        .filter(classroom=classroom, academic_year=term.academic_year, student__isnull=False)
-        .select_related("student")
-        .order_by("student__last_name", "student__first_name")
-    )
+    try:
+        total = compute_class_positions(classroom, term)
+        present_count = compute_attendance_for_class(classroom, term)
+        messages.success(
+            request,
+            f"Generated {total} report cards with positions. "
+            f"Processed {present_count} attendance records.",
+        )
+    except Exception as e:
+        messages.error(request, f"Error: {e}")
 
-    reports = []
-    for e in enrollments:
-        ctx = build_report(e.student, term)
-        if ctx:
-            ctx["school"] = school
-            reports.append(ctx)
-
-    return render(request, "reports/bulk_report_cards.html", {
-        "school": school,
-        "term": term,
-        "classroom": classroom,
-        "reports": reports,
-    })
+    return redirect(f"/reports/report-card-picker/?classroom={classroom.id}&term={term.id}")

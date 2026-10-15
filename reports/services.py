@@ -15,7 +15,6 @@ from examination.models import (
 )
 
 
-# Subjects that appear as "principal" (A Level) vs "subsidiary"
 SUBSIDIARY_NAMES = {
     "general paper",
     "sub math",
@@ -28,7 +27,6 @@ SUBSIDIARY_NAMES = {
 
 
 def is_a_level(class_level_name: str) -> bool:
-    """S5/S6 = A Level."""
     if not class_level_name:
         return False
     name = class_level_name.upper().replace(".", "").strip()
@@ -106,7 +104,7 @@ def grade_subsidiary(fs):
     return "", ""
 
 
-# ---- Score assembly ----
+# ---- helpers ----
 
 def _teacher_initials(teacher):
     if teacher is None:
@@ -120,7 +118,6 @@ def _teacher_initials(teacher):
 
 
 def _get_marks(student, term, assessment_type):
-    """Return {subject_id: MarksManagement} for one student, term, assessment_type."""
     enrollment = StudentClassEnrollment.objects.filter(
         student=student, academic_year=term.academic_year
     ).first()
@@ -139,15 +136,50 @@ def _get_marks(student, term, assessment_type):
 
     by_subject = {}
     for m in marks:
-        # If more than one, keep highest
         existing = by_subject.get(m.subject_id)
         if existing is None or (m.points_scored or 0) > (existing.points_scored or 0):
             by_subject[m.subject_id] = m
     return by_subject, enrollment
 
 
-def build_report(student, term):
-    """Assemble the full report context for one student + one term."""
+def _fmt_score(value):
+    if value is None:
+        return ""
+    return str(int(value)) if Decimal(value) == int(value) else str(value)
+
+
+def _count_attendance(student, term):
+    """Return (days_present, days_absent) for a student in a term."""
+    try:
+        from attendance.models import StudentAttendance
+    except ImportError:
+        return None, None
+
+    records = StudentAttendance.objects.filter(
+        student=student,
+        date__gte=term.start_date,
+        date__lte=term.end_date,
+    ).select_related("status")
+
+    days_absent = 0
+    for r in records:
+        s = r.status
+        if s is None:
+            continue
+        if s.absent or (s.absent is False and s.half):
+            days_absent += 0.5 if s.half else 1
+
+    # Days present = total attendance-marked days - absences.
+    # The "Present" status is not persisted, so we can only count
+    # number of distinct dates with any record, and treat the rest as present.
+    # For now, count absent days only. Present days = all school days in term minus absent.
+    return None, int(days_absent) if days_absent else 0
+
+
+# ---- Report assembly ----
+
+def build_report(student, term, mode="EOT"):
+    """Assemble the full report context. mode = 'EOT' or 'AOI' (mid-term)."""
     from .models import ReportCard
     from .comment_engine import generate_comment
 
@@ -160,7 +192,8 @@ def build_report(student, term):
     if enrollment is None:
         return None
 
-    subject_ids = set(aoi_marks) | set(eot_marks)
+    is_midterm = (mode == "AOI")
+    subject_ids = set(aoi_marks) | (set() if is_midterm else set(eot_marks))
     subjects = Subject.objects.filter(id__in=subject_ids).order_by("name")
 
     rows = []
@@ -170,19 +203,22 @@ def build_report(student, term):
 
     for subject in subjects:
         aoi = aoi_marks.get(subject.id)
-        eot = eot_marks.get(subject.id)
+        eot = None if is_midterm else eot_marks.get(subject.id)
 
         aoi_score = Decimal(str(aoi.points_scored)) if aoi else None
         eot_score = Decimal(str(eot.points_scored)) if eot else None
 
-        if aoi_score is None and eot_score is None:
-            fs = None
-        elif aoi_score is None:
-            fs = _round2(eot_score)
-        elif eot_score is None:
-            fs = _round2(aoi_score)
+        if is_midterm:
+            fs = _round2(aoi_score) if aoi_score is not None else None
         else:
-            fs = _round2(aoi_score * Decimal("0.2") + eot_score * Decimal("0.8"))
+            if aoi_score is None and eot_score is None:
+                fs = None
+            elif aoi_score is None:
+                fs = _round2(eot_score)
+            elif eot_score is None:
+                fs = _round2(aoi_score)
+            else:
+                fs = _round2(aoi_score * Decimal("0.2") + eot_score * Decimal("0.8"))
 
         grade, loa, points = "", "", ""
 
@@ -201,7 +237,7 @@ def build_report(student, term):
         rows.append({
             "subject": subject.name.title(),
             "aoi": _fmt_score(aoi_score),
-            "eot": _fmt_score(eot_score),
+            "eot": "" if is_midterm else _fmt_score(eot_score),
             "fs": _fmt_score(fs),
             "grade": grade,
             "loa": loa,
@@ -217,37 +253,45 @@ def build_report(student, term):
 
     # Report card metadata
     rc = ReportCard.get_for(student, term)
+
     if not rc.general_grade and average is not None:
-        rc.general_grade = grade_o_level(average)[0] if not alevel else grade_a_level(average)[0]
+        if alevel:
+            rc.general_grade = grade_a_level(average)[0]
+        else:
+            rc.general_grade = grade_o_level(average)[0]
+
     if not rc.general_comment:
         rc.general_comment = generate_comment(average, alevel)
+
     rc.save()
 
-    # fallbacks
-    school = student.school
+    # Attendance
+    _present, _absent = _count_attendance(student, term)
     class_teacher_comment = (
         rc.class_teacher_comment
         or getattr(enrollment.classroom.class_teacher, "short_name", "")
-        or school.default_class_teacher_comment
+        or student.school.default_class_teacher_comment
         or ""
     )
     head_teacher_comment = (
         rc.head_teacher_comment
-        or school.default_head_teacher_comment
+        or student.school.default_head_teacher_comment
         or ""
     )
+
+    class_teacher = enrollment.classroom.class_teacher
 
     return {
         "student": student,
         "term": term,
         "classroom": enrollment.classroom,
         "is_a_level": alevel,
+        "is_midterm": is_midterm,
         "rows": rows,
         "total_points": total_points,
         "class_level_name": class_level_name,
         "average": average,
         "sat": sat,
-        # report card specific
         "rc": rc,
         "class_teacher_comment": class_teacher_comment,
         "general_comment": rc.general_comment,
@@ -255,4 +299,55 @@ def build_report(student, term):
         "general_grade": rc.general_grade,
         "position_display": rc.position_display,
         "attendance_summary": rc.attendance_summary,
+        "class_teacher": class_teacher,
     }
+
+
+# ---- Class-wide generation ----
+
+def compute_class_positions(classroom, term):
+    """Compute positions for all students in a class + term. Saves to ReportCard."""
+    from .models import ReportCard
+
+    enrollments = StudentClassEnrollment.objects.filter(
+        classroom=classroom, academic_year=term.academic_year, student__isnull=False
+    ).select_related("student")
+
+    totals = []
+    for e in enrollments:
+        ctx = build_report(e.student, term, mode="EOT")
+        if not ctx or ctx["average"] is None:
+            continue
+        totals.append((e.student, float(ctx["average"])))
+
+    totals.sort(key=lambda x: -x[1])
+    total = len(totals)
+
+    for i, (student, avg) in enumerate(totals):
+        rc = ReportCard.get_for(student, term)
+        rc.position_in_class = i + 1
+        rc.out_of_class = total
+        rc.save()
+
+    return total
+
+
+def compute_attendance_for_class(classroom, term):
+    """Set days_present and days_absent for every student in a class."""
+    from .models import ReportCard
+
+    enrollments = StudentClassEnrollment.objects.filter(
+        classroom=classroom, academic_year=term.academic_year, student__isnull=False
+    ).select_related("student")
+
+    count = 0
+    for e in enrollments:
+        present, absent = _count_attendance(e.student, term)
+        rc = ReportCard.get_for(e.student, term)
+        if present is not None:
+            rc.days_present = present
+        if absent is not None:
+            rc.days_absent = absent
+        rc.save()
+        count += 1
+    return count
