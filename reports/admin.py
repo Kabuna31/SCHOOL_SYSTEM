@@ -22,41 +22,14 @@ class ReportCardAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "updated_at")
     autocomplete_fields = ("student",)
     fieldsets = (
-        ("Identity", {
-            "fields": ("school", "student", "term"),
-        }),
-        ("Comments", {
-            "fields": (
-                "class_teacher_comment",
-                "general_comment",
-                "head_teacher_comment",
-            ),
-        }),
-        ("Grades & Points", {
-            "fields": ("general_grade", "points_scored"),
-        }),
-        ("Position", {
-            "fields": ("position_in_class", "out_of_class"),
-        }),
-        ("Attendance", {
-            "fields": ("days_present", "days_absent"),
-        }),
-        ("Dates", {
-            "fields": ("term_ended_on", "next_term_begins_on"),
-        }),
-        ("Audit", {
-            "fields": ("created_at", "updated_at"),
-            "classes": ("collapse",),
-        }),
+        ("Identity", {"fields": ("school", "student", "term")}),
+        ("Comments", {"fields": ("class_teacher_comment", "general_comment", "head_teacher_comment")}),
+        ("Grades & Points", {"fields": ("general_grade", "points_scored")}),
+        ("Position", {"fields": ("position_in_class", "out_of_class")}),
+        ("Attendance", {"fields": ("days_present", "days_absent")}),
+        ("Dates", {"fields": ("term_ended_on", "next_term_begins_on")}),
+        ("Audit", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}),
     )
-
-    def get_model_perms(self, request):
-        """
-        Hide ReportCard from the sidebar.
-        Report cards are auto-created by build_report();
-        edit them at /admin/reports/reportcard/ directly if needed.
-        """
-        return {}
 
     def student_display(self, obj):
         return f"{obj.student.admission_number} — {obj.student.full_name}"

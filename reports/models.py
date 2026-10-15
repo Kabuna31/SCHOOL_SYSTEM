@@ -68,11 +68,16 @@ class ReportCard(models.Model):
     unfiltered_objects = models.Manager()
 
     class Meta:
-        unique_together = ("school", "student", "term")
-        ordering = ["-term__start_date", "student__last_name", "student__first_name"]
+    verbose_name = "Report Card"
+    verbose_name_plural = "Report Cards"
+    unique_together = ("school", "student", "term")
+    ordering = ["-term__start_date", "student__last_name", "student__first_name"]
 
     def __str__(self):
         return f"{self.student.full_name} - {self.term.name}"
+
+
+
 
     @classmethod
     def get_for(cls, student, term):
