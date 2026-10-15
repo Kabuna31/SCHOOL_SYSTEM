@@ -265,8 +265,14 @@ CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 
 EMAIL_BACKEND = env(
-    "EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
+    "EMAIL_BACKEND",
+    default=(
+        "django.core.mail.backends.console.EmailBackend"
+        if DEBUG
+        else "django.core.mail.backends.smtp.EmailBackend"
+    ),
 )
+
 EMAIL_HOST = env("EMAIL_HOST", default="")
 EMAIL_PORT = env.int("EMAIL_PORT", default=587)
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
