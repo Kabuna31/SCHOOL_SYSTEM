@@ -59,6 +59,7 @@ LEGACY_INSTALLED_APPS = [
     "finance.apps.FinanceConfig",
     "notes.apps.NotesConfig",
     "reports.apps.ReportsConfig",
+    "portal.apps.PortalConfig",
     "schedule.apps.ScheduleConfig",
     "sis.apps.SisConfig",
     "users.apps.UsersConfig",
@@ -92,6 +93,7 @@ TENANT_APPS = [
     "finance.apps.FinanceConfig",
     "notes.apps.NotesConfig",
     "reports.apps.ReportsConfig",
+    "portal.apps.PortalConfig",
     "schedule.apps.ScheduleConfig",
     "sis.apps.SisConfig",
 ]

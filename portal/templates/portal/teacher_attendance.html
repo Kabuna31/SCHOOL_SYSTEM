@@ -1,0 +1,32 @@
+{% extends "portal/base_portal.html" %}
+{% block content %}
+<h1>Mark Attendance</h1>
+<p class="muted">{{ allocation.class_room }} — {{ today }}</p>
+
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="date" value="{{ today }}">
+  <table class="tbl">
+    <thead>
+      <tr><th>#</th><th>Student</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      {% for e in enrollments %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ e.student.full_name }}</td>
+        <td>
+          <select name="status_{{ e.pk }}">
+            <option value="">—</option>
+            {% for s in statuses %}
+              <option value="{{ s.id }}">{{ s.name }}</option>
+            {% endfor %}
+          </select>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <button type="submit" class="btn">Save Attendance</button>
+</form>
+{% endblock %}

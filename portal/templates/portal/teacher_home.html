@@ -1,0 +1,26 @@
+{% extends "portal/base_portal.html" %}
+{% block content %}
+<h1>Welcome, {{ teacher.first_name }} {{ teacher.last_name }}</h1>
+<p class="muted">Your assigned subjects and classes:</p>
+
+<table class="tbl">
+  <thead>
+    <tr><th>Class</th><th>Subject</th><th>Term</th><th style="text-align:right;">Actions</th></tr>
+  </thead>
+  <tbody>
+    {% for a in allocations %}
+    <tr>
+      <td>{{ a.class_room }}</td>
+      <td>{{ a.subject.name }}</td>
+      <td>{{ a.term.name|default:"—" }}</td>
+      <td style="text-align:right;">
+        <a class="btn" href="{% url 'portal:teacher_marks_entry' a.id %}">Enter Marks</a>
+        <a class="btn secondary" href="{% url 'portal:teacher_attendance' a.id %}">Mark Attendance</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No subjects assigned yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

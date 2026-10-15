@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Portal — School Management</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; background: #f0f2f5; margin: 0; }
+    .nav { background: #0D47A1; color: #fff; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .nav a { color: #fff; text-decoration: none; margin-right: 16px; font-size: 14px; }
+    .nav .right a { margin-left: 16px; margin-right: 0; }
+    .wrap { max-width: 1100px; margin: 24px auto; padding: 24px; background: #fff; border-radius: 10px; }
+    h1 { margin: 0 0 6px; font-size: 22px; }
+    .muted { color: #666; font-size: 13px; }
+    .tbl { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .tbl th, .tbl td { padding: 8px; border-bottom: 1px solid #e0e0e0; font-size: 14px; text-align: left; }
+    .tbl th { background: #f7f7f7; }
+    .btn { display: inline-block; padding: 8px 14px; background: #0D47A1; color: #fff; border: none; border-radius: 6px; text-decoration: none; font-size: 13px; cursor: pointer; }
+    .btn.secondary { background: #1B5E20; }
+    .btn:hover { opacity: 0.9; }
+    select, input[type=number], input[type=text] { padding: 6px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; }
+    .messages { padding: 10px 14px; border-radius: 6px; background: #E8F5E9; color: #1B5E20; margin-bottom: 16px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <div>
+      <a href="/portal/teacher/">Teacher Home</a>
+    </div>
+    <div class="right">
+      <span style="font-size:13px;">{{ user.email }}</span>
+      <a href="{% url 'portal:logout' %}">Logout</a>
+    </div>
+  </div>
+  <div class="wrap">
+    {% if messages %}
+      {% for m in messages %}
+        <div class="messages">{{ m }}</div>
+      {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>
