@@ -371,23 +371,6 @@ JAZZMIN_SETTINGS = {
     # UI theme options
     "theme": "pulse",
     "default_theme_mode": "auto",
-
-    # Custom sidebar sections
-    "custom_links": {
-        "reports": [{
-            "name": "Report Cards",
-            "url": "/reports/",
-            "icon": "fas fa-file-alt",
-        }, {
-            "name": "Marksheets (coming soon)",
-            "url": "/reports/",
-            "icon": "fas fa-table",
-        }, {
-            "name": "Analysis (coming soon)",
-            "url": "/reports/",
-            "icon": "fas fa-chart-bar",
-        }],
-    },
 }
 
 JAZZMIN_UI_TWEAKS = {
