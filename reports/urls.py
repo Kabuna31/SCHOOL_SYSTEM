@@ -16,4 +16,7 @@ urlpatterns = [
     path("analysis/<int:classroom_id>/<int:term_id>/", views.analysis, name="analysis"),
 
     path("generate/<int:classroom_id>/<int:term_id>/", views.generate_for_class, name="generate_for_class"),
+    path("fee-statement/<int:student_id>/", views.fee_statement, name="fee_statement"),
+    path("defaulters/", views.defaulters, name="defaulters"),
+    path("class-marks/<int:classroom_id>/<int:term_id>/", views.class_marks_record, name="class_marks_record"),
 ]

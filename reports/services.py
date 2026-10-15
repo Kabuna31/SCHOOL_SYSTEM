@@ -351,3 +351,157 @@ def compute_attendance_for_class(classroom, term):
         rc.save()
         count += 1
     return count
+
+
+
+# ---- FEE STATEMENT ----
+
+def build_fee_statement(student):
+    """Assemble fee history for a student across all terms."""
+    from finance.models import DebtRecord, PaymentRecord, Receipt
+
+    debts = (
+        DebtRecord.objects
+        .filter(student=student, is_reversed=False)
+        .select_related("term", "term__academic_year")
+        .order_by("term__academic_year__start_date", "term__start_date")
+    )
+
+    rows = []
+    grand_total_due = Decimal("0.00")
+    grand_total_paid = Decimal("0.00")
+
+    for debt in debts:
+        payments = (
+            PaymentRecord.objects
+            .filter(debt_record=debt)
+            .select_related("receipt")
+            .order_by("paid_on")
+        )
+        total_paid = sum((p.amount for p in payments), Decimal("0.00"))
+        balance = debt.amount_added - total_paid
+
+        rows.append({
+            "term": debt.term,
+            "amount_added": debt.amount_added,
+            "total_paid": total_paid,
+            "balance": balance,
+            "payments": [
+                {
+                    "date": p.paid_on,
+                    "amount": p.amount,
+                    "method": p.method or "—",
+                    "reference": p.reference or "—",
+                    "receipt": p.receipt.receipt_number if p.receipt else "—",
+                }
+                for p in payments
+            ],
+        })
+
+        grand_total_due += debt.amount_added
+        grand_total_paid += total_paid
+
+    return {
+        "student": student,
+        "rows": rows,
+        "grand_total_due": grand_total_due,
+        "grand_total_paid": grand_total_paid,
+        "grand_balance": grand_total_due - grand_total_paid,
+    }
+
+
+def build_defaulters(school):
+    """List all students with an outstanding balance."""
+    from finance.models import DebtRecord
+
+    debts = (
+        DebtRecord.objects
+        .filter(school=school, is_reversed=False)
+        .select_related("student", "student__class_level", "term")
+        .order_by("student__last_name", "student__first_name")
+    )
+
+    by_student = {}
+    for debt in debts:
+        balance = debt.balance
+        if balance <= 0:
+            continue
+        key = debt.student_id
+        if key not in by_student:
+            by_student[key] = {
+                "student": debt.student,
+                "terms": [],
+                "total_owed": Decimal("0.00"),
+            }
+        by_student[key]["terms"].append({
+            "term": debt.term,
+            "amount_added": debt.amount_added,
+            "amount_paid": debt.amount_paid,
+            "balance": balance,
+        })
+        by_student[key]["total_owed"] += balance
+
+    return sorted(by_student.values(), key=lambda x: -x["total_owed"])
+
+
+# ---- CLASS MARKS RECORD ----
+
+def build_class_marks_record(classroom, term):
+    """Return a matrix: students x subjects with AOI/EOT/FS per subject."""
+    from academic.models import Subject as _S
+
+    enrollments = (
+        StudentClassEnrollment.objects
+        .filter(classroom=classroom, academic_year=term.academic_year, student__isnull=False)
+        .select_related("student")
+        .order_by("student__last_name", "student__first_name")
+    )
+
+    # Discover subjects that have any marks for this class/term
+    exams = ExaminationListHandler.objects.filter(
+        term=term, classrooms=classroom
+    )
+    subject_ids = (
+        MarksManagement.objects
+        .filter(student__in=[e.id for e in enrollments], exam_name__in=exams)
+        .values_list("subject_id", flat=True)
+        .distinct()
+    )
+    subjects = list(_S.objects.filter(id__in=subject_ids).order_by("name"))
+
+    # Pre-fetch all marks into a dict
+    marks_by_enrollment_subject = {}
+    for m in MarksManagement.objects.filter(
+        student__in=[e.id for e in enrollments], exam_name__in=exams
+    ).select_related("exam_name"):
+        key = (m.student_id, m.subject_id, m.exam_name.assessment_type)
+        marks_by_enrollment_subject[key] = float(m.points_scored or 0)
+
+    rows = []
+    for e in enrollments:
+        row = {"student": e.student, "cells": []}
+        for s in subjects:
+            aoi = marks_by_enrollment_subject.get((e.id, s.id, "AOI"))
+            eot = marks_by_enrollment_subject.get((e.id, s.id, "EOT"))
+            if aoi is None and eot is None:
+                fs = None
+            elif aoi is None:
+                fs = eot
+            elif eot is None:
+                fs = aoi
+            else:
+                fs = round(aoi * 0.2 + eot * 0.8, 1)
+            row["cells"].append({
+                "subject": s.name.title(),
+                "aoi": aoi if aoi is not None else "",
+                "eot": eot if eot is not None else "",
+                "fs": fs if fs is not None else "",
+            })
+        rows.append(row)
+
+    return {
+        "classroom": classroom,
+        "term": term,
+        "subjects": subjects,
+        "rows": rows,
+    }

@@ -195,3 +195,47 @@ def generate_for_class(request, classroom_id, term_id):
         messages.error(request, f"Error: {e}")
 
     return redirect(f"/reports/report-card-picker/?classroom={classroom.id}&term={term.id}")
+
+
+
+
+from .services import (
+    build_fee_statement,
+    build_defaulters,
+    build_class_marks_record,
+)
+
+
+@staff_member_required
+def fee_statement(request, student_id):
+    student = get_object_or_404(Student, pk=student_id)
+    school = _current_school(request)
+    if student.school_id != school.id:
+        return render(request, "reports/no_enrollment.html", {
+            "student": student, "term": None,
+        })
+
+    context = build_fee_statement(student)
+    context["school"] = school
+    return render(request, "reports/fee_statement.html", context)
+
+
+@staff_member_required
+def defaulters(request):
+    school = _current_school(request)
+    rows = build_defaulters(school)
+    return render(request, "reports/defaulters.html", {
+        "school": school,
+        "rows": rows,
+        "total_owed": sum((r["total_owed"] for r in rows), Decimal("0.00")),
+    })
+
+
+@staff_member_required
+def class_marks_record(request, classroom_id, term_id):
+    school = _current_school(request)
+    classroom = get_object_or_404(ClassRoom, pk=classroom_id, school=school)
+    term = get_object_or_404(Term, pk=term_id)
+    context = build_class_marks_record(classroom, term)
+    context["school"] = school
+    return render(request, "reports/class_marks_record.html", context)

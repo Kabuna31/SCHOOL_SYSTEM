@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Class Marks Record — {{ classroom }}</title>
+<style>
+  @page { size: A4 landscape; margin: 8mm; }
+  body { font-family: Arial, sans-serif; font-size: 10px; margin: 0; padding: 8px; }
+  .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 10px; }
+  .header h1 { margin: 0; font-size: 18px; }
+  .header p { margin: 1px 0; font-size: 10px; }
+  .title { font-weight: bold; text-decoration: underline; text-align: center; margin: 8px 0; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { border: 1px solid #000; padding: 3px 4px; font-size: 9px; text-align: center; }
+  th { background: #f0f0f0; }
+  td.student { text-align: left; font-weight: bold; font-size: 10px; }
+  .no-print { margin-bottom: 12px; }
+  @media print { .no-print { display: none; } }
+</style>
+</head>
+<body>
+
+<div class="no-print">
+  <button onclick="window.print()" style="padding: 8px 16px;">Print</button>
+  <a href="{% url 'reports:home' %}" style="margin-left: 12px;">← Back</a>
+</div>
+
+<div class="header">
+  <h1>{{ school.name|upper }}</h1>
+  <p>{{ school.address }} | Tel: {{ school.telephone }}</p>
+  <div class="title">CLASS MARKS RECORD — {{ classroom }} — {{ term.name|upper }} {{ term.academic_year.name }}</div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2" style="width: 4%;">#</th>
+      <th rowspan="2" style="width: 20%; text-align: left;">Student</th>
+      {% for s in subjects %}
+        <th colspan="3">{{ s.name|title }}</th>
+      {% endfor %}
+    </tr>
+    <tr>
+      {% for s in subjects %}
+        <th>AOI</th>
+        <th>EOT</th>
+        <th>FS</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td class="student">{{ row.student.full_name }}</td>
+        {% for c in row.cells %}
+          <td>{{ c.aoi }}</td>
+          <td>{{ c.eot }}</td>
+          <td><strong>{{ c.fs }}</strong></td>
+        {% endfor %}
+      </tr>
+    {% empty %}
+      <tr><td colspan="100">No students in this class.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+</body>
+</html>
