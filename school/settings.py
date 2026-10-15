@@ -386,6 +386,10 @@ JAZZMIN_SETTINGS = {
             "name": "Mid-Term Reports",
             "url": "/reports/report-card-picker/?type=AOI",
             "icon": "fas fa-clipboard-check",
+        }, {
+            "name": "Fee Defaulters",
+            "url": "/reports/defaulters/",
+            "icon": "fas fa-exclamation-triangle",
         }],
     },
 }
