@@ -23,13 +23,30 @@ class ReportCardAdmin(admin.ModelAdmin):
     autocomplete_fields = ("student",)
     fieldsets = (
         ("Identity", {"fields": ("school", "student", "term")}),
-        ("Comments", {"fields": ("class_teacher_comment", "general_comment", "head_teacher_comment")}),
+        (
+            "Comments",
+            {
+                "fields": (
+                    "class_teacher_comment",
+                    "general_comment",
+                    "head_teacher_comment",
+                )
+            },
+        ),
         ("Grades & Points", {"fields": ("general_grade", "points_scored")}),
         ("Position", {"fields": ("position_in_class", "out_of_class")}),
         ("Attendance", {"fields": ("days_present", "days_absent")}),
         ("Dates", {"fields": ("term_ended_on", "next_term_begins_on")}),
         ("Audit", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}),
     )
+
+    def get_model_perms(self, request):
+        """
+        Hide Report Cards from the sidebar.
+        Records are auto-created when a report card is viewed.
+        Access via /admin/reports/reportcard/ directly if needed.
+        """
+        return {}
 
     def student_display(self, obj):
         return f"{obj.student.admission_number} — {obj.student.full_name}"
