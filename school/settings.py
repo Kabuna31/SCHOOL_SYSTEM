@@ -371,6 +371,27 @@ JAZZMIN_SETTINGS = {
     # UI theme options
     "theme": "pulse",
     "default_theme_mode": "auto",
+
+    # Custom sidebar sections
+    "custom_links": {
+        "reports": [{
+            "name": "Report Cards",
+            "url": "/reports/report-card-picker/",
+            "icon": "fas fa-file-alt",
+        }, {
+            "name": "Marksheets",
+            "url": "/reports/marksheet-picker/",
+            "icon": "fas fa-table",
+        }, {
+            "name": "Analysis",
+            "url": "/reports/analysis-picker/",
+            "icon": "fas fa-chart-bar",
+        }, {
+            "name": "Mid-Term Reports",
+            "url": "/reports/report-card-picker/?type=AOI",
+            "icon": "fas fa-clipboard-check",
+        }],
+    },
 }
 
 JAZZMIN_UI_TWEAKS = {
