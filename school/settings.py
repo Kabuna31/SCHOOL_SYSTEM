@@ -375,10 +375,6 @@ JAZZMIN_SETTINGS = {
     # Custom sidebar sections
     "custom_links": {
         "reports": [{
-            "name": "Report Cards",
-            "url": "/reports/report-card-picker/",
-            "icon": "fas fa-file-alt",
-        }, {
             "name": "Marksheets",
             "url": "/reports/marksheet-picker/",
             "icon": "fas fa-table",
