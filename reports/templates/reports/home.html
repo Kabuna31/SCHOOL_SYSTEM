@@ -6,7 +6,7 @@
 
   <h1 style="margin-bottom: 8px;">Reports</h1>
   <p style="color: #666; margin-bottom: 24px;">
-    Generate report cards, marksheets, and class analysis for any term.
+    Generate report cards, marksheets, class analysis, and fee reports.
   </p>
 
   <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
@@ -14,7 +14,7 @@
     <a href="{% url 'reports:report_card_picker' %}" class="report-card-btn">
       <div class="icon" style="color: #0D47A1;"><i class="fas fa-file-alt"></i></div>
       <div class="title">Report Cards</div>
-      <div class="desc">O Level & A Level per-student academic reports</div>
+      <div class="desc">O Level &amp; A Level per-student academic reports</div>
     </a>
 
     <a href="{% url 'reports:marksheet_picker' %}" class="report-card-btn">
@@ -35,7 +35,25 @@
       <div class="desc">Mid-term progress reports (AOI only)</div>
     </a>
 
+    <a href="{% url 'reports:defaulters' %}" class="report-card-btn">
+      <div class="icon" style="color: #B71C1C;"><i class="fas fa-exclamation-triangle"></i></div>
+      <div class="title">Fee Defaulters</div>
+      <div class="desc">Students with outstanding balances</div>
+    </a>
+
   </div>
+
+  <h2 style="margin-top: 40px;">Fee Statement</h2>
+  <p style="color: #666;">Enter a student ID to view their fee history.</p>
+  <form method="get" onsubmit="return feeStatement(event);" style="margin-top: 12px;">
+    <label>Student ID:
+      <input id="fee_student_id" type="number" placeholder="e.g. 42" style="padding: 6px; margin-left: 6px;">
+    </label>
+    <button type="submit" class="button default" style="padding: 8px 16px; margin-left: 8px;">
+      View Fee Statement
+    </button>
+  </form>
+
 </div>
 
 <style>
@@ -55,4 +73,13 @@
 .report-card-btn .title { font-weight: bold; font-size: 18px; margin-bottom: 4px; }
 .report-card-btn .desc { font-size: 13px; color: #666; }
 </style>
+
+<script>
+function feeStatement(e) {
+  e.preventDefault();
+  const sid = document.getElementById("fee_student_id").value;
+  if (!sid) { alert("Enter a student ID."); return; }
+  window.location.href = "/reports/fee-statement/" + sid + "/";
+}
+</script>
 {% endblock %}
