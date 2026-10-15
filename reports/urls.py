@@ -21,6 +21,7 @@ urlpatterns = [
     path("fee-statement/<int:student_id>/", views.fee_statement, name="fee_statement"),
     path("defaulters/", views.defaulters, name="defaulters"),
     path("class-marks/<int:classroom_id>/<int:term_id>/", views.class_marks_record, name="class_marks_record"),
+    path("dashboard/", views.dashboard, name="dashboard"),
     path("defaulters/send-sms/", views.send_defaulters_sms, name="send_defaulters_sms"),
     # Password reset
     path(

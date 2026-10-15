@@ -281,3 +281,11 @@ def send_defaulters_sms(request):
         )
 
     return redirect("reports:defaulters")
+
+@staff_member_required
+def dashboard(request):
+    from .dashboard_services import build_dashboard_context
+    term_id = request.GET.get("term")
+    context = build_dashboard_context(request, term_id=term_id)
+    context["title"] = "Dashboard"
+    return render(request, "reports/dashboard.html", context)

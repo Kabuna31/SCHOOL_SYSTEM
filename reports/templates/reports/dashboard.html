@@ -1,0 +1,225 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container" style="max-width: 1200px;">
+
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1>Dashboard</h1>
+    <form method="get" style="margin: 0;">
+      <label>Term:</label>
+      <select name="term" onchange="this.form.submit()" style="padding: 6px;">
+        {% for t in terms %}
+          <option value="{{ t.id }}" {% if term and t.id == term.id %}selected{% endif %}>
+            {{ t.name }} — {{ t.academic_year.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </form>
+  </div>
+
+  <!-- KPI cards -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 24px;">
+
+    <div class="kpi-card" style="background: #E3F2FD;">
+      <div class="kpi-label">Students</div>
+      <div class="kpi-value">{{ total_students }}</div>
+    </div>
+
+    <div class="kpi-card" style="background: #E8F5E9;">
+      <div class="kpi-label">Teachers</div>
+      <div class="kpi-value">{{ total_teachers }}</div>
+    </div>
+
+    <div class="kpi-card" style="background: #FFF3E0;">
+      <div class="kpi-label">Classes</div>
+      <div class="kpi-value">{{ total_classes }}</div>
+    </div>
+
+    <div class="kpi-card" style="background: #F3E5F5;">
+      <div class="kpi-label">Defaulters ({{ term.name|default:"—" }})</div>
+      <div class="kpi-value">{{ defaulters_count }}</div>
+    </div>
+
+  </div>
+
+  <!-- Fees -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px;">
+
+    <div class="chart-card">
+      <h3>Fee Collection — {{ term.name|default:"—" }}</h3>
+      <div class="fee-summary">
+        <div><strong>Billed:</strong> {{ total_billed }}</div>
+        <div><strong>Paid:</strong> {{ total_paid }}</div>
+        <div><strong>Outstanding:</strong> {{ total_owed }}</div>
+      </div>
+      <canvas id="feeChart" height="180"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Students by Class Level</h3>
+      <canvas id="classChart" height="180"></canvas>
+    </div>
+
+  </div>
+
+  <!-- Gender + Attendance -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px;">
+
+    <div class="chart-card">
+      <h3>Gender Split</h3>
+      <canvas id="genderChart" height="180"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Attendance ({{ term.name|default:"—" }})</h3>
+      <p>Total marked: <strong>{{ attendance_total }}</strong></p>
+      <p>Absences: <strong>{{ attendance_absent }}</strong></p>
+      <canvas id="attendanceChart" height="180"></canvas>
+    </div>
+
+  </div>
+
+  <!-- Recent activity -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px;">
+
+    <div class="chart-card">
+      <h3>Recent Receipts</h3>
+      <ul style="list-style: none; padding: 0;">
+        {% for r in recent_receipts %}
+          <li style="padding: 6px 0; border-bottom: 1px solid #eee;">
+            #{{ r.receipt_number|default:"—" }} — {{ r.student.full_name|default:r.payer }} — {{ r.amount }}
+          </li>
+        {% empty %}
+          <li>No receipts yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="chart-card">
+      <h3>Recent Marks</h3>
+      <ul style="list-style: none; padding: 0;">
+        {% for m in recent_marks %}
+          <li style="padding: 6px 0; border-bottom: 1px solid #eee;">
+            {{ m.student.student.full_name|default:m.student }} — {{ m.subject.name }} — {{ m.points_scored }}
+          </li>
+        {% empty %}
+          <li>No marks yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+  const classData = {
+    labels: [{% for row in by_class_level %}"{{ row.class_level__name|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+    values: [{% for row in by_class_level %}{{ row.count }}{% if not forloop.last %},{% endif %}{% endfor %}],
+  };
+
+  const genderData = {
+    labels: [{% for row in by_gender %}"{{ row.gender|default:'Unknown'|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+    values: [{% for row in by_gender %}{{ row.count }}{% if not forloop.last %},{% endif %}{% endfor %}],
+  };
+
+  const feeData = {
+    labels: ["Billed", "Paid", "Outstanding"],
+    values: [{{ total_billed }}, {{ total_paid }}, {{ total_owed }}],
+  };
+
+  const attendanceData = {
+    labels: ["Marked", "Absent"],
+    values: [{{ attendance_total }}, {{ attendance_absent }}],
+  };
+
+  new Chart(document.getElementById("classChart"), {
+    type: "bar",
+    data: {
+      labels: classData.labels,
+      datasets: [{
+        label: "Students",
+        data: classData.values,
+        backgroundColor: "#0D47A1",
+      }],
+    },
+    options: { plugins: { legend: { display: false } } },
+  });
+
+  new Chart(document.getElementById("genderChart"), {
+    type: "doughnut",
+    data: {
+      labels: genderData.labels,
+      datasets: [{
+        data: genderData.values,
+        backgroundColor: ["#1B5E20", "#C62828", "#F9A825", "#6A1B9A", "#0288D1"],
+      }],
+    },
+  });
+
+  new Chart(document.getElementById("feeChart"), {
+    type: "bar",
+    data: {
+      labels: feeData.labels,
+      datasets: [{
+        label: "Amount",
+        data: feeData.values,
+        backgroundColor: ["#0D47A1", "#1B5E20", "#C62828"],
+      }],
+    },
+    options: { plugins: { legend: { display: false } } },
+  });
+
+  new Chart(document.getElementById("attendanceChart"), {
+    type: "bar",
+    data: {
+      labels: attendanceData.labels,
+      datasets: [{
+        label: "Count",
+        data: attendanceData.values,
+        backgroundColor: ["#1B5E20", "#C62828"],
+      }],
+    },
+    options: { plugins: { legend: { display: false } } },
+  });
+})();
+</script>
+
+<style>
+.kpi-card {
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+.kpi-label {
+  font-size: 13px;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.kpi-value {
+  font-size: 36px;
+  font-weight: bold;
+  margin-top: 6px;
+}
+.chart-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+}
+.chart-card h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 15px;
+  color: #333;
+}
+.fee-summary div {
+  padding: 4px 0;
+  font-size: 14px;
+}
+</style>
+{% endblock %}

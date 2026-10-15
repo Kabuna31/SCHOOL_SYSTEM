@@ -316,8 +316,9 @@ JAZZMIN_SETTINGS = {
     "search_model": ["users.customuser", "academic.classlevel"],
 
     # Top Menu Links
-    "topmenu_links": [
+     "topmenu_links": [
         {"name": "Home", "url": "/admin/", "icon": "fas fa-home"},
+        {"name": "Dashboard", "url": "/reports/dashboard/", "icon": "fas fa-chart-pie"},
         {"name": "Reports", "url": "/reports/", "icon": "fas fa-file-alt"},
         {"name": "View Live Site", "url": "/", "new_window": True, "icon": "fas fa-globe"},
     ],
