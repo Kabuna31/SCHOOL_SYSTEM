@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import get_object_or_404, redirect, render
@@ -9,6 +11,9 @@ from .services import (
     build_report,
     compute_attendance_for_class,
     compute_class_positions,
+    build_fee_statement,
+    build_defaulters,
+    build_class_marks_record,
 )
 
 
@@ -196,14 +201,6 @@ def generate_for_class(request, classroom_id, term_id):
 
     return redirect(f"/reports/report-card-picker/?classroom={classroom.id}&term={term.id}")
 
-
-
-
-from .services import (
-    build_fee_statement,
-    build_defaulters,
-    build_class_marks_record,
-)
 
 
 @staff_member_required
