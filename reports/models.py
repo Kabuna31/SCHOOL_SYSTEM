@@ -1,4 +1,4 @@
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from academic.models import Student
@@ -22,15 +22,15 @@ class ReportCard(models.Model):
     # Comments
     class_teacher_comment = models.CharField(
         max_length=255, blank=True,
-        help_text="Short comment from the class teacher."
+        help_text="Short comment from the class teacher.",
     )
     general_comment = models.TextField(
         blank=True,
-        help_text="General comment about the student's performance."
+        help_text="General comment about the student's performance.",
     )
     head_teacher_comment = models.CharField(
         max_length=255, blank=True,
-        help_text="Short comment from the head teacher."
+        help_text="Short comment from the head teacher.",
     )
 
     # Grades
@@ -68,16 +68,17 @@ class ReportCard(models.Model):
     unfiltered_objects = models.Manager()
 
     class Meta:
-    verbose_name = "Report Card"
-    verbose_name_plural = "Report Cards"
-    unique_together = ("school", "student", "term")
-    ordering = ["-term__start_date", "student__last_name", "student__first_name"]
+        verbose_name = "Report Card"
+        verbose_name_plural = "Report Cards"
+        unique_together = ("school", "student", "term")
+        ordering = [
+            "-term__start_date",
+            "student__last_name",
+            "student__first_name",
+        ]
 
     def __str__(self):
         return f"{self.student.full_name} - {self.term.name}"
-
-
-
 
     @classmethod
     def get_for(cls, student, term):
