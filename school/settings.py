@@ -272,7 +272,6 @@ EMAIL_BACKEND = env(
         else "django.core.mail.backends.smtp.EmailBackend"
     ),
 )
-
 EMAIL_HOST = env("EMAIL_HOST", default="")
 EMAIL_PORT = env.int("EMAIL_PORT", default=587)
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
@@ -316,7 +315,7 @@ JAZZMIN_SETTINGS = {
     "search_model": ["users.customuser", "academic.classlevel"],
 
     # Top Menu Links
-     "topmenu_links": [
+    "topmenu_links": [
         {"name": "Home", "url": "/admin/", "icon": "fas fa-home"},
         {"name": "Dashboard", "url": "/reports/dashboard/", "icon": "fas fa-chart-pie"},
         {"name": "Reports", "url": "/reports/", "icon": "fas fa-file-alt"},
@@ -382,6 +381,14 @@ JAZZMIN_SETTINGS = {
     # Custom sidebar sections
     "custom_links": {
         "reports": [{
+            "name": "Attendance",
+            "url": "/reports/attendance/",
+            "icon": "fas fa-user-check",
+        }, {
+            "name": "Fee Trends",
+            "url": "/reports/fee-trends/",
+            "icon": "fas fa-chart-line",
+        }, {
             "name": "Marksheets",
             "url": "/reports/marksheet-picker/",
             "icon": "fas fa-table",

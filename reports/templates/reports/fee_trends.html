@@ -1,0 +1,56 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<div class="container" style="max-width:1000px;">
+  <h1>Fee Trends</h1>
+  <form method="get">
+    <label>Term:</label>
+    <select name="term" onchange="this.form.submit()" style="padding:6px;">
+      {% for t in terms %}
+        <option value="{{ t.id }}" {% if term and t.id == term.id %}selected{% endif %}>
+          {{ t.name }} — {{ t.academic_year.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </form>
+
+  <h3 style="margin-top:20px;">Daily Collection (last 30 days)</h3>
+  <canvas id="dailyChart" height="100"></canvas>
+
+  <h3 style="margin-top:20px;">Monthly Collection</h3>
+  <canvas id="monthlyChart" height="100"></canvas>
+
+  <h3 style="margin-top:20px;">Per-Term Summary</h3>
+  <table style="width:100%;border-collapse:collapse;">
+    <tr><th style="text-align:left;padding:6px;border-bottom:1px solid #ddd;">Term</th>
+        <th style="text-align:right;padding:6px;border-bottom:1px solid #ddd;">Billed</th>
+        <th style="text-align:right;padding:6px;border-bottom:1px solid #ddd;">Paid</th>
+        <th style="text-align:right;padding:6px;border-bottom:1px solid #ddd;">Outstanding</th></tr>
+    {% for r in per_term %}
+      <tr><td style="padding:6px;">{{ r.term.name }}</td>
+          <td style="padding:6px;text-align:right;">{{ r.billed }}</td>
+          <td style="padding:6px;text-align:right;">{{ r.paid }}</td>
+          <td style="padding:6px;text-align:right;">{{ r.outstanding }}</td></tr>
+    {% empty %}
+      <tr><td colspan="4" style="padding:10px;">No data.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+new Chart(document.getElementById('dailyChart'), {
+  type: 'line',
+  data: {
+    labels: [{% for k, v in daily %}"{{ k }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+    datasets: [{ label: 'Collected', data: [{% for k, v in daily %}{{ v }}{% if not forloop.last %},{% endif %}{% endfor %}], borderColor: '#1B5E20', fill: false }],
+  },
+});
+new Chart(document.getElementById('monthlyChart'), {
+  type: 'bar',
+  data: {
+    labels: [{% for k, v in monthly %}"{{ k }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+    datasets: [{ label: 'Collected', data: [{% for k, v in monthly %}{{ v }}{% if not forloop.last %},{% endif %}{% endfor %}], backgroundColor: '#0D47A1' }],
+  },
+});
+</script>
+{% endblock %}

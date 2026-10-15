@@ -104,8 +104,6 @@ def grade_subsidiary(fs):
     return "", ""
 
 
-# ---- helpers ----
-
 def _teacher_initials(teacher):
     if teacher is None:
         return ""
@@ -149,7 +147,6 @@ def _fmt_score(value):
 
 
 def _count_attendance(student, term):
-    """Return (days_present, days_absent) for a student in a term."""
     try:
         from attendance.models import StudentAttendance
     except ImportError:
@@ -169,17 +166,10 @@ def _count_attendance(student, term):
         if s.absent or (s.absent is False and s.half):
             days_absent += 0.5 if s.half else 1
 
-    # Days present = total attendance-marked days - absences.
-    # The "Present" status is not persisted, so we can only count
-    # number of distinct dates with any record, and treat the rest as present.
-    # For now, count absent days only. Present days = all school days in term minus absent.
     return None, int(days_absent) if days_absent else 0
 
 
-# ---- Report assembly ----
-
 def build_report(student, term, mode="EOT"):
-    """Assemble the full report context. mode = 'EOT' or 'AOI' (mid-term)."""
     from .models import ReportCard
     from .comment_engine import generate_comment
 
@@ -251,7 +241,6 @@ def build_report(student, term, mode="EOT"):
 
     average = _round2(total_fs / sat) if sat else None
 
-    # Report card metadata
     rc = ReportCard.get_for(student, term)
 
     if not rc.general_grade and average is not None:
@@ -265,7 +254,6 @@ def build_report(student, term, mode="EOT"):
 
     rc.save()
 
-    # Attendance
     _present, _absent = _count_attendance(student, term)
     class_teacher_comment = (
         rc.class_teacher_comment
@@ -303,10 +291,7 @@ def build_report(student, term, mode="EOT"):
     }
 
 
-# ---- Class-wide generation ----
-
 def compute_class_positions(classroom, term):
-    """Compute positions for all students in a class + term. Saves to ReportCard."""
     from .models import ReportCard
 
     enrollments = StudentClassEnrollment.objects.filter(
@@ -333,7 +318,6 @@ def compute_class_positions(classroom, term):
 
 
 def compute_attendance_for_class(classroom, term):
-    """Set days_present and days_absent for every student in a class."""
     from .models import ReportCard
 
     enrollments = StudentClassEnrollment.objects.filter(
@@ -353,12 +337,10 @@ def compute_attendance_for_class(classroom, term):
     return count
 
 
-
-# ---- FEE STATEMENT ----
+# ---- FEE ----
 
 def build_fee_statement(student):
-    """Assemble fee history for a student across all terms."""
-    from finance.models import DebtRecord, PaymentRecord, Receipt
+    from finance.models import DebtRecord, PaymentRecord
 
     debts = (
         DebtRecord.objects
@@ -411,7 +393,6 @@ def build_fee_statement(student):
 
 
 def build_defaulters(school):
-    """List all students with an outstanding balance."""
     from finance.models import DebtRecord
 
     debts = (
@@ -444,10 +425,7 @@ def build_defaulters(school):
     return sorted(by_student.values(), key=lambda x: -x["total_owed"])
 
 
-# ---- CLASS MARKS RECORD ----
-
 def build_class_marks_record(classroom, term):
-    """Return a matrix: students x subjects with AOI/EOT/FS per subject."""
     from academic.models import Subject as _S
 
     enrollments = (
@@ -457,10 +435,7 @@ def build_class_marks_record(classroom, term):
         .order_by("student__last_name", "student__first_name")
     )
 
-    # Discover subjects that have any marks for this class/term
-    exams = ExaminationListHandler.objects.filter(
-        term=term, classrooms=classroom
-    )
+    exams = ExaminationListHandler.objects.filter(term=term, classrooms=classroom)
     subject_ids = (
         MarksManagement.objects
         .filter(student__in=[e.id for e in enrollments], exam_name__in=exams)
@@ -469,7 +444,6 @@ def build_class_marks_record(classroom, term):
     )
     subjects = list(_S.objects.filter(id__in=subject_ids).order_by("name"))
 
-    # Pre-fetch all marks into a dict
     marks_by_enrollment_subject = {}
     for m in MarksManagement.objects.filter(
         student__in=[e.id for e in enrollments], exam_name__in=exams

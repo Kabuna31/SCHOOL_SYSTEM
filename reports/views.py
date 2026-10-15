@@ -289,3 +289,37 @@ def dashboard(request):
     context = build_dashboard_context(request, term_id=term_id)
     context["title"] = "Dashboard"
     return render(request, "reports/dashboard.html", context)
+
+
+@staff_member_required
+def attendance_dashboard(request):
+    from .dashboard_services import build_attendance_dashboard
+    term_id = request.GET.get("term")
+    context = build_attendance_dashboard(request, term_id=term_id)
+    context["title"] = "Attendance Dashboard"
+    return render(request, "reports/attendance_dashboard.html", context)
+
+
+@staff_member_required
+def class_performance(request, classroom_id, term_id):
+    from .dashboard_services import build_class_performance
+    context = build_class_performance(request, classroom_id, term_id)
+    context["title"] = "Class Performance"
+    return render(request, "reports/class_performance.html", context)
+
+
+@staff_member_required
+def student_profile(request, student_id):
+    from .dashboard_services import build_student_profile
+    context = build_student_profile(request, student_id)
+    context["title"] = "Student Profile"
+    return render(request, "reports/student_profile.html", context)
+
+
+@staff_member_required
+def fee_trends(request):
+    from .dashboard_services import build_fee_trends
+    term_id = request.GET.get("term")
+    context = build_fee_trends(request, term_id=term_id)
+    context["title"] = "Fee Trends"
+    return render(request, "reports/fee_trends.html", context)

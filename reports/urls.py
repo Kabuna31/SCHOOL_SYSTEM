@@ -22,6 +22,10 @@ urlpatterns = [
     path("defaulters/", views.defaulters, name="defaulters"),
     path("class-marks/<int:classroom_id>/<int:term_id>/", views.class_marks_record, name="class_marks_record"),
     path("dashboard/", views.dashboard, name="dashboard"),
+    path("attendance/", views.attendance_dashboard, name="attendance_dashboard"),
+    path("class-performance/<int:classroom_id>/<int:term_id>/", views.class_performance, name="class_performance"),
+    path("student/<int:student_id>/", views.student_profile, name="student_profile"),
+    path("fee-trends/", views.fee_trends, name="fee_trends"),
     path("defaulters/send-sms/", views.send_defaulters_sms, name="send_defaulters_sms"),
     # Password reset
     path(

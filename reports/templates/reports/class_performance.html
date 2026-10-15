@@ -1,0 +1,34 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<div class="container" style="max-width: 1000px;">
+  <h1>Class Performance</h1>
+  <p style="color:#666">{{ classroom }} — {{ term.name }} {{ term.academic_year.name }}</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <h3>Subject Averages</h3>
+      {% for s in subjects %}
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;">
+          <span>{{ s.name }}</span><strong>{{ s.average }}%</strong>
+        </div>
+      {% empty %}
+        <p>No marks yet.</p>
+      {% endfor %}
+    </div>
+    <div class="card">
+      <h3>Top Students</h3>
+      {% for r in ranking %}
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;">
+          <span>{{ r.rank }}. {{ r.student.full_name }}</span><strong>{{ r.average }}%</strong>
+        </div>
+      {% empty %}
+        <p>No marks yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<style>
+.card { padding:20px;border:1px solid #e0e0e0;border-radius:10px;background:#fff; }
+.card h3 { margin-top:0; }
+</style>
+{% endblock %}
