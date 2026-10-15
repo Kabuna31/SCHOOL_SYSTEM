@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.utils.html import format_html
 
 from .models import ReportCard
 
@@ -50,6 +49,14 @@ class ReportCardAdmin(admin.ModelAdmin):
             "classes": ("collapse",),
         }),
     )
+
+    def get_model_perms(self, request):
+        """
+        Hide ReportCard from the sidebar.
+        Report cards are auto-created by build_report();
+        edit them at /admin/reports/reportcard/ directly if needed.
+        """
+        return {}
 
     def student_display(self, obj):
         return f"{obj.student.admission_number} — {obj.student.full_name}"
