@@ -29,4 +29,10 @@ urlpatterns = [
     # Bulk marks entry (v0.9.2)
     path("teacher/bulk-marks/", views_bulk.bulk_marks_select, name="bulk_marks_select"),
     path("teacher/bulk-marks/<int:allocation_id>/", views_bulk.bulk_marks_entry, name="bulk_marks_entry"),
+
+    # Bulk receipt printing (v0.9.5)
+    path("accountant/receipts/bulk-print/",
+         views_bulk.bulk_receipts_picker, name="bulk_receipts_picker"),
+    path("accountant/receipts/bulk-print/view/",
+         views_bulk.bulk_receipts_view, name="bulk_receipts_view"),
 ]

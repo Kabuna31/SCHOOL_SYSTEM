@@ -2,24 +2,35 @@
 {% block content %}
 <h1>All Receipts</h1>
 
-<form method="get" style="margin-bottom:16px;">
-  <label>Student:</label>
-  <select name="student">
-    <option value="">All students</option>
-    {% for s in students %}
-      <option value="{{ s.id }}" {% if selected_student == s.id|stringformat:"s" %}selected{% endif %}>
-        {{ s.full_name }}
-      </option>
-    {% endfor %}
-  </select>
+<form method="get" style="margin-bottom:16px; display:flex; flex-wrap:wrap; align-items:end; gap:12px;">
+  <div>
+    <label>Student:</label><br>
+    <select name="student">
+      <option value="">All students</option>
+      {% for s in students %}
+        <option value="{{ s.id }}" {% if selected_student == s.id|stringformat:"s" %}selected{% endif %}>
+          {{ s.full_name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
 
-  <label>From:</label>
-  <input type="date" name="from" value="{{ date_from }}">
+  <div>
+    <label>From:</label><br>
+    <input type="date" name="from" value="{{ date_from }}">
+  </div>
 
-  <label>To:</label>
-  <input type="date" name="to" value="{{ date_to }}">
+  <div>
+    <label>To:</label><br>
+    <input type="date" name="to" value="{{ date_to }}">
+  </div>
 
-  <button type="submit" class="btn">Filter</button>
+  <div>
+    <button type="submit" class="btn">Filter</button>
+    <a class="btn secondary" href="{% url 'portal:bulk_receipts_picker' %}" style="margin-left:6px;">
+      🖨️ Bulk Print
+    </a>
+  </div>
 </form>
 
 <table class="tbl">

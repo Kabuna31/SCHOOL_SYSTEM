@@ -442,3 +442,106 @@ def bulk_marks_entry(request, allocation_id):
         "rows": rows,
         "out_of": selected_exam.out_of if selected_exam else None,
     })
+
+
+
+# ---------- v0.9.5: Bulk receipt printing ----------
+
+from datetime import date, timedelta
+from django.utils.dateparse import parse_date
+
+
+def _accountant_or_staff(request):
+    u = request.user
+    return bool(u.is_staff or u.is_superuser or getattr(u, "is_accountant", False))
+
+
+@accountant_required
+def bulk_receipts_picker(request):
+    """Pick a date range and optional student filter."""
+    if not _accountant_or_staff(request):
+        messages.error(request, "Accountant access required.")
+        return redirect("portal:accountant_home")
+
+    school = current_school(request)
+    if school is None and not request.user.is_superuser:
+        messages.error(request, "No school linked to your account.")
+        return redirect("portal:accountant_home")
+
+    schools = None
+    if school is None:
+        from administration.models import School
+        schools = School.objects.all().order_by("name")
+        chosen_id = request.GET.get("school")
+        if chosen_id:
+            school = schools.filter(pk=chosen_id).first()
+
+    from academic.models import Student
+    students = Student.objects.none()
+    if school is not None:
+        students = (
+            Student.objects
+            .filter(school=school)
+            .order_by("last_name", "first_name")
+        )
+
+    today = date.today()
+    default_from = today - timedelta(days=30)
+
+    return render(request, "portal/bulk_receipts_picker.html", {
+        "school": school,
+        "schools": schools,
+        "students": students,
+        "default_from": default_from.isoformat(),
+        "default_to": today.isoformat(),
+    })
+
+
+@accountant_required
+def bulk_receipts_view(request):
+    """Render all matching receipts stacked for browser print."""
+    if not _accountant_or_staff(request):
+        messages.error(request, "Accountant access required.")
+        return redirect("portal:accountant_home")
+
+    school = current_school(request)
+    school_id = request.GET.get("school")
+    if school is None and request.user.is_superuser and school_id:
+        from administration.models import School
+        school = School.objects.filter(pk=school_id).first()
+    if school is None:
+        messages.error(request, "Pick a school first.")
+        return redirect("portal:bulk_receipts_picker")
+
+    from finance.models import Receipt
+
+    qs = (
+        Receipt.objects
+        .filter(school=school)
+        .select_related("student", "paid_for", "received_by")
+        .order_by("payment_date", "id")
+    )
+
+    date_from = parse_date(request.GET.get("from") or "")
+    date_to = parse_date(request.GET.get("to") or "")
+    student_id = request.GET.get("student")
+
+    if date_from:
+        qs = qs.filter(payment_date__gte=date_from)
+    if date_to:
+        qs = qs.filter(payment_date__lte=date_to)
+    if student_id:
+        qs = qs.filter(student_id=student_id)
+
+    receipts = list(qs[:500])
+
+    total = sum((r.amount or 0) for r in receipts)
+
+    return render(request, "portal/bulk_receipts_view.html", {
+        "school": school,
+        "receipts": receipts,
+        "date_from": date_from,
+        "date_to": date_to,
+        "total": total,
+        "generated_at": timezone.now(),
+    })

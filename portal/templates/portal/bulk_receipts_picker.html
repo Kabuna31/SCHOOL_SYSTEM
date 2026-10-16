@@ -1,0 +1,38 @@
+{% extends "portal/base_portal.html" %}
+{% block content %}
+<h1>Bulk Receipt Printing</h1>
+<p class="muted">Pick a date range, optionally filter by student. Ctrl+P → one PDF.</p>
+
+<form method="get" action="{% url 'portal:bulk_receipts_view' %}" style="margin-top:16px;">
+
+  {% if schools %}
+    <label>School:</label>
+    <select name="school" required>
+      <option value="">-- Select school --</option>
+      {% for s in schools %}
+        <option value="{{ s.id }}" {% if school and s.id == school.id %}selected{% endif %}>{{ s.name }}</option>
+      {% endfor %}
+    </select>
+    <br><br>
+  {% else %}
+    <input type="hidden" name="school" value="{{ school.id }}">
+  {% endif %}
+
+  <label>From:</label>
+  <input type="date" name="from" value="{{ default_from }}" required>
+
+  <label>To:</label>
+  <input type="date" name="to" value="{{ default_to }}" required>
+
+  <label>Student (optional):</label>
+  <select name="student">
+    <option value="">All students</option>
+    {% for s in students %}
+      <option value="{{ s.id }}">{{ s.admission_number }} — {{ s.full_name }}</option>
+    {% endfor %}
+  </select>
+
+  <br>
+  <button type="submit" class="btn" style="margin-top:16px;">Open Print View</button>
+</form>
+{% endblock %}

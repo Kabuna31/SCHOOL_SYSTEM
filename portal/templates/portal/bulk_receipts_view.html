@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Receipts — {{ school.name }}</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; background:#f5f5f5; margin:0; padding:20px; color:#222; }
+
+  .toolbar {
+    position: sticky; top: 0;
+    background:#fff; padding:12px 16px; border-radius:8px;
+    box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:20px;
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+  }
+  .toolbar h2 { margin:0; font-size:16px; }
+  .toolbar .btn {
+    background:#1565C0; color:#fff; border:0; padding:10px 18px;
+    border-radius:6px; cursor:pointer; font-size:14px;
+  }
+
+  .receipt {
+    background:#fff; padding:28px 32px; max-width:720px; margin:0 auto 24px auto;
+    border:1px solid #ddd; border-radius:6px;
+  }
+  .receipt h1 {
+    font-size:18px; margin:0 0 4px 0; color:#1565C0;
+  }
+  .receipt .meta { font-size:12px; color:#666; margin-bottom:16px; }
+
+  .info { display:grid; grid-template-columns:1fr 1fr; gap:6px 24px; margin-bottom:18px; font-size:14px; }
+  .info strong { color:#333; }
+
+  table { width:100%; border-collapse:collapse; font-size:13px; margin-bottom:16px; }
+  table th, table td { border:1px solid #ccc; padding:8px 10px; text-align:left; }
+  table th { background:#E3F2FD; font-weight:600; }
+  td.num { text-align:right; }
+
+  .amount-box {
+    background:#E8F5E9; padding:14px 18px; border-radius:6px;
+    font-size:16px; font-weight:bold; display:inline-block;
+  }
+
+  .signature { margin-top:36px; display:flex; justify-content:space-between; font-size:13px; }
+  .signature div { border-top:1px solid #333; padding-top:4px; width:220px; }
+
+  @media print {
+    body { background:#fff; padding:0; }
+    .toolbar { display:none; }
+    .receipt {
+      border:0; margin:0; padding:15mm; max-width:none;
+      page-break-after: always; border-radius:0;
+    }
+    .receipt:last-child { page-break-after: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h2>
+    {{ school.name }} — Receipts
+    {% if date_from or date_to %}
+      {% if date_from %} from {{ date_from }}{% endif %}
+      {% if date_to %} to {{ date_to }}{% endif %}
+    {% endif %}
+    — {{ receipts|length }} receipt{{ receipts|length|pluralize }}
+  </h2>
+  <button class="btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+</div>
+
+{% for r in receipts %}
+<div class="receipt">
+  <h1>{{ school.name }}</h1>
+  <div class="meta">
+    Official Receipt — {{ r.payment_date }}
+    {% if r.receipt_number %} — No. {{ r.receipt_number }}{% endif %}
+  </div>
+
+  <div class="info">
+    <div><strong>Student:</strong> {{ r.student.full_name|default:"—" }}</div>
+    <div><strong>Admission No:</strong> {{ r.student.admission_number|default:"—" }}</div>
+    <div><strong>Payer:</strong> {{ r.payer|default:"—" }}</div>
+    <div><strong>Received by:</strong> {{ r.received_by.first_name|default:"—" }}</div>
+    <div><strong>Payment method:</strong> {{ r.get_paid_through_display|default:"—" }}</div>
+    <div><strong>Status:</strong> {{ r.get_status_display|default:r.status }}</div>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Description</th><th style="width:25%;text-align:right;">Amount</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ r.paid_for.name|default:"Fee payment" }}</td>
+        <td class="num">{{ r.amount }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="amount-box">Total: {{ r.amount }}</div>
+
+  <div class="signature">
+    <div>Received by</div>
+    <div>Payer signature</div>
+    <div>Date: {{ r.payment_date }}</div>
+  </div>
+</div>
+{% empty %}
+<div class="receipt">
+  <p>No receipts found for this range.</p>
+</div>
+{% endfor %}
+
+</body>
+</html>
