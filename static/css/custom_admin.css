@@ -74,3 +74,26 @@ ul.object-tools > li::marker {
     font-size: 0 !important;
     color: transparent !important;
 }
+
+
+
+
+
+/* Force top menu icons visible — override any hiding rule */
+#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link::before {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    margin-right: 6px !important;
+    color: inherit !important;
+}
+
+#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link[href="/admin/"]::before {
+    content: "\f015" !important;
+}
+
+#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link[target="_blank"]::before {
+    content: "\f0ac" !important;
+}
