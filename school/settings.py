@@ -234,12 +234,6 @@ STORAGES = {
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
 
-# WhiteNoise: don't try to gzip already-compressed files (fonts, images)
-WHITENOISE_SKIP_COMPRESS_EXTENSIONS = [
-    "jpg", "jpeg", "png", "gif", "webp", "ico", "svg",
-    "woff", "woff2", "ttf", "otf", "eot",
-]
-
 # WhiteNoise: explicit MIME types for fonts
 WHITENOISE_MIMETYPES = {
     ".woff2": "font/woff2",
@@ -339,7 +333,7 @@ JAZZMIN_SETTINGS = {
     "site_title": "School Management Portal",
     "site_header": "School Administration",
     "site_brand": "School Management",
-    "site_logo": False,
+    "site_logo": "",
     "welcome_sign": "Welcome back, Administrator!",
     "copyright": "School Management System",
 
