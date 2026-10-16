@@ -395,9 +395,6 @@ JAZZMIN_SETTINGS = {
     "custom_js": None,
     "show_ui_builder": False,
 
-     "theme": "flatly",
-    "default_theme_mode": "auto",
-
     "custom_links": {
         "reports": [{
             "name": "Attendance",
@@ -428,6 +425,7 @@ JAZZMIN_SETTINGS = {
 }
 
 JAZZMIN_UI_TWEAKS = {
+    "theme": "flatly",
     "navbar_small_text": False,
     "footer_small_text": False,
     "body_small_text": False,
