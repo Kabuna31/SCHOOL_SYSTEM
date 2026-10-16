@@ -223,7 +223,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
