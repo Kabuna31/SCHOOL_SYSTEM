@@ -20,12 +20,17 @@ SECRET_KEY = env("SECRET_KEY")
 
 DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 render_hostname = env("RENDER_EXTERNAL_HOSTNAME", default="").strip()
 if render_hostname and render_hostname not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(render_hostname)
 
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+if render_hostname:
+    origin = f"https://{render_hostname}"
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
+
 TENANCY_PREPARATION = env.bool("TENANCY_PREPARATION", default=False)
 TENANCY_ENABLED = env.bool("TENANCY_ENABLED", default=False)
 TENANCY_CONFIGURED = TENANCY_PREPARATION or TENANCY_ENABLED
@@ -293,9 +298,16 @@ INTERNAL_IPS = [
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_SSL_REDIRECT = True
-    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_SECONDS = 60                # ← start short, raise later
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_REFERRER_POLICY = "same-origin"
+    X_FRAME_OPTIONS = "DENY"
 
 # ---------------------------------------------------------------------------
 # Jazzmin configuration
@@ -426,18 +438,22 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_flat_style": False,
 }
 
-
-
-
 # ---------------------------------------------------------------------------
 # Logging — surface errors to Render logs
 # ---------------------------------------------------------------------------
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{asctime}] {levelname} {name} {module}.{funcName}:{lineno} — {message}",
+            "style": "{",
+        },
+    },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
+            "formatter": "verbose",
         },
     },
     "root": {
@@ -447,7 +463,12 @@ LOGGING = {
     "loggers": {
         "django.request": {
             "handlers": ["console"],
-            "level": "DEBUG",
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["console"],
+            "level": "WARNING",
             "propagate": False,
         },
     },
