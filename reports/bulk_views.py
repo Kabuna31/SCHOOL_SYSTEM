@@ -2,23 +2,26 @@
 import logging
 
 from django.contrib import messages
-from academic.models import Student
-from .models import SMSLog
-from .sms_backends import get_backend
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
 from academic.models import (
     ClassRoom,
+    Student,
     StudentClassEnrollment,
 )
 from administration.models import Term, School
 from examination.models import MarksManagement
 from portal.decorators import current_school
 
+from .models import SMSLog
+from .sms_backends import get_backend
+
 log = logging.getLogger(__name__)
 
+
+# ---------- helpers ----------
 
 def _require_staff(request):
     return bool(request.user.is_staff or request.user.is_superuser)
@@ -42,6 +45,8 @@ def _debug(request, where):
     )
 
 
+# ---------- v0.9.3: Bulk report cards ----------
+
 @login_required
 def bulk_pdf_picker(request):
     _debug(request, "picker")
@@ -53,14 +58,12 @@ def bulk_pdf_picker(request):
     is_super = user.is_superuser
     school = _school(request)
 
-    # Non-superuser staff must have a school
     if school is None and not is_super:
         messages.error(request, "No school linked to your account.")
         return redirect("/")
 
     schools = None
     if school is None:
-        # Superuser path — they pick a school first
         schools = School.objects.all().order_by("name")
         chosen_id = request.GET.get("school")
         if chosen_id:
@@ -106,7 +109,6 @@ def bulk_report_cards(request, classroom_id, term_id):
         messages.error(request, "No school linked to your account.")
         return redirect("/")
 
-    # Superuser with no school: look up by ID without school scoping
     classroom_qs = ClassRoom.objects.select_related("name", "stream")
     term_qs = Term.objects.select_related("academic_year")
     if school is not None:
@@ -116,7 +118,6 @@ def bulk_report_cards(request, classroom_id, term_id):
     classroom = get_object_or_404(classroom_qs, pk=classroom_id)
     term = get_object_or_404(term_qs, pk=term_id)
 
-    # If superuser had no school, derive it from the classroom for downstream queries
     if school is None:
         school = classroom.school
 
@@ -170,7 +171,6 @@ def _collect_marks(school, term, enrollment):
             except Exception as e:
                 log.warning("[bulk_pdf] school filter failed: %s", e)
 
-        # Best-effort term filter
         try:
             qs = qs.filter(exam_name__term=term)
         except Exception as e:
@@ -178,11 +178,7 @@ def _collect_marks(school, term, enrollment):
 
         for m in qs:
             exam = getattr(m, "exam_name", None)
-            out_of = (
-                getattr(exam, "out_of", None)
-                or getattr(exam, "total", None)
-                or getattr(exam, "max_score", None)
-            )
+            out_of = getattr(exam, "out_of", None)
             rows.append({
                 "subject": getattr(getattr(m, "subject", None), "name", "—"),
                 "exam": getattr(exam, "name", "—"),
@@ -196,8 +192,6 @@ def _collect_marks(school, term, enrollment):
     except Exception as e:
         log.exception("[bulk_pdf] _collect_marks failed: %s", e)
     return rows, total
-
-
 
 
 # ---------- v0.9.4: Bulk SMS ----------
@@ -272,13 +266,77 @@ def bulk_sms_compose(request):
     if school is None and school_id:
         school = School.objects.filter(pk=school_id).first()
     if school is None and classroom_id:
-        classroom = ClassRoom.objects.filter(pk=classroom_id).first()
-        if classroom:
-            school = classroom.school
+        classroom_lookup = ClassRoom.objects.filter(pk=classroom_id).first()
+        if classroom_lookup:
+            school = classroom_lookup.school
 
     if school is None:
         messages.error(request, "Pick a school first.")
         return redirect("reports:bulk_sms_picker")
+
+    students = Student.objects.filter(school=school).select_related("parent_guardian")
+    classroom = None
+
+    if target == "class" and classroom_id:
+        classroom = ClassRoom.objects.filter(pk=classroom_id, school=school).first()
+        if classroom:
+            enroll_ids = StudentClassEnrollment.objects.filter(
+                classroom=classroom
+            ).values_list("student_id", flat=True)
+            students = students.filter(pk__in=enroll_ids)
+
+    if request.method == "POST":
+        template = (request.POST.get("message") or "").strip()
+        if not template:
+            messages.error(request, "Message body is required.")
+            return redirect(request.get_full_path())
+
+        backend = get_backend()
+        sent_ok, sent_fail = 0, 0
+
+        for s in students:
+            parent = getattr(s, "parent_guardian", None)
+            phone = (
+                getattr(parent, "phone_number", None)
+                or getattr(s, "parent_contact", None)
+                or ""
+            ).strip()
+            if not phone:
+                continue
+
+            body = _format_message(
+                template, parent=parent, student=s, balance="", school=school
+            )
+
+            ok, resp = backend.send(phone, body)
+            SMSLog.objects.create(
+                school=school,
+                sent_by=user,
+                recipient_name=getattr(parent, "full_name", "") or s.full_name,
+                phone_number=phone,
+                message=body,
+                status="sent" if ok else "failed",
+                provider=backend.name,
+                provider_response=resp[:2000],
+            )
+            if ok:
+                sent_ok += 1
+            else:
+                sent_fail += 1
+
+        messages.success(request, f"Sent {sent_ok}, failed {sent_fail}.")
+        return redirect(
+            f"{request.path}?school={school.id}&target={target}&classroom={classroom_id or ''}"
+        )
+
+    # GET — render compose page
+    return render(request, "reports/bulk_sms_compose.html", {
+        "school": school,
+        "classroom": classroom,
+        "target": target,
+        "students": students[:300],
+        "count": students.count(),
+    })
 
 
 @login_required
