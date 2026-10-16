@@ -10,9 +10,9 @@ from academic.models import (
     StudentClassEnrollment,
     Student,
 )
-from academic.models import Term, AcademicYear
-from examination.models import MarksManagement, ExaminationListHandler
-from reports.models import ReportCard  # if you have one; else compute on the fly
+from administration.models import Term, AcademicYear
+
+
 
 
 def _require_staff(request):
