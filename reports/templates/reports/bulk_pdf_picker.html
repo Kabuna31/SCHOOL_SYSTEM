@@ -1,0 +1,38 @@
+{% extends "portal/base_portal.html" %}
+{% block content %}
+<h1>Bulk Report Cards</h1>
+<p class="muted">Pick a class and term. One print job → all report cards.</p>
+
+<form method="get" onsubmit="return goToCards(event);" style="margin-top:16px;">
+  <label>Class:</label>
+  <select id="classroom" required>
+    <option value="">-- Select class --</option>
+    {% for c in classrooms %}
+      <option value="{{ c.id }}">
+        {{ c.class_level.name }} {{ c.name.name }}{% if c.stream %} {{ c.stream.name }}{% endif %}
+      </option>
+    {% endfor %}
+  </select>
+
+  <label>Term:</label>
+  <select id="term" required>
+    <option value="">-- Select term --</option>
+    {% for t in terms %}
+      <option value="{{ t.id }}">{{ t.name }} — {{ t.academic_year.name }}</option>
+    {% endfor %}
+  </select>
+
+  <button type="submit" class="btn" style="margin-top:16px;">Open Print View</button>
+</form>
+
+<script>
+function goToCards(e) {
+  e.preventDefault();
+  var c = document.getElementById('classroom').value;
+  var t = document.getElementById('term').value;
+  if (!c || !t) { alert('Pick both class and term.'); return false; }
+  window.location = "/reports/bulk-pdf/" + c + "/" + t + "/";
+  return false;
+}
+</script>
+{% endblock %}

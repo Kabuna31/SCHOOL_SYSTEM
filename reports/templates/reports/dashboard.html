@@ -4,18 +4,26 @@
 {% block content %}
 <div class="container" style="max-width: 1200px;">
 
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h1>Dashboard</h1>
-    <form method="get" style="margin: 0;">
-      <label>Term:</label>
-      <select name="term" onchange="this.form.submit()" style="padding: 6px;">
-        {% for t in terms %}
-          <option value="{{ t.id }}" {% if term and t.id == term.id %}selected{% endif %}>
-            {{ t.name }} — {{ t.academic_year.name }}
-          </option>
-        {% endfor %}
-      </select>
-    </form>
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <h1 style="margin: 0;">Dashboard</h1>
+
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <form method="get" style="margin: 0;">
+        <label>Term:</label>
+        <select name="term" onchange="this.form.submit()" style="padding: 6px;">
+          {% for t in terms %}
+            <option value="{{ t.id }}" {% if term and t.id == term.id %}selected{% endif %}>
+              {{ t.name }} — {{ t.academic_year.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </form>
+
+      <a class="btn" href="{% url 'reports:bulk_pdf_picker' %}{% if term %}?term={{ term.id }}{% endif %}"
+         style="background:#1565C0;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:14px;white-space:nowrap;">
+        🖨️ Bulk Report Cards
+      </a>
+    </div>
   </div>
 
   <!-- KPI cards -->

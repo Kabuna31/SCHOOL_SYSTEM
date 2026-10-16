@@ -1,4 +1,5 @@
 from django.urls import path
+from . import bulk_views
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 from . import views
@@ -60,4 +61,11 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
+
+# ... existing urlpatterns ...
+
+    # Bulk report cards (v0.9.3)
+    path("bulk-pdf/", bulk_views.bulk_pdf_picker, name="bulk_pdf_picker"),
+    path("bulk-pdf/<int:classroom_id>/<int:term_id>/",
+         bulk_views.bulk_report_cards, name="bulk_report_cards"),
 ]
