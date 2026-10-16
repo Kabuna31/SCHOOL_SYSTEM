@@ -53,6 +53,7 @@ body .object-tools ul li::marker {
     content: none !important;
 }
 
+
 /* Kill the disc bullet on the Import/Export <li> itself */
 li:has(> a[href*="export"]),
 li:has(> a[href*="import"]),
@@ -74,42 +75,25 @@ ul.object-tools > li::marker {
     color: transparent !important;
 }
 
-/* --------------------------------------------------------------------------
-   Top menu icon visibility
-   Jazzmin renders <i class="fas fa-..."> from topmenu_links "icon" keys.
-   The pulse theme's navbar styling was leaving them the same color as the
-   background until hover. Force an explicit color so they're always visible.
-   -------------------------------------------------------------------------- */
 
-#jazzy-navbar .navbar-nav .nav-link,
-#jazzy-navbar .navbar-nav .nav-link i,
-#jazzy-navbar .navbar-nav .nav-link .nav-icon {
-    color: #ffffff !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-}
 
-#jazzy-navbar .navbar-nav .nav-link i,
-#jazzy-navbar .navbar-nav .nav-link .nav-icon {
+
+
+/* Force top menu icons visible — override any hiding rule */
+#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link::before {
     display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
     margin-right: 6px !important;
+    color: inherit !important;
 }
 
-#jazzy-navbar .navbar-nav .nav-link:hover,
-#jazzy-navbar .navbar-nav .nav-link:hover i,
-#jazzy-navbar .navbar-nav .nav-link:hover .nav-icon {
-    color: #ffc107 !important;
+#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link[href="/admin/"]::before {
+    content: "\f015" !important;
 }
 
-/* Brand and user menu text stay legible on the pulse navbar */
-#jazzy-navbar .navbar-brand,
-#jazzy-navbar .navbar-brand *,
-#jazzy-navbar .ms-auto .nav-link,
-#jazzy-navbar .ms-auto .nav-link i {
-    color: #ffffff !important;
-}
-
-#jazzy-navbar .ms-auto .nav-link:hover,
-#jazzy-navbar .ms-auto .nav-link:hover i {
-    color: #ffc107 !important;
+#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link[target="_blank"]::before {
+    content: "\f0ac" !important;
 }
