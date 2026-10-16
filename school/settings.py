@@ -1,3 +1,4 @@
+import mimetypes
 import os
 from datetime import timedelta, date
 from pathlib import Path
@@ -6,6 +7,13 @@ import dj_database_url
 import environ
 from django.core.exceptions import ImproperlyConfigured
 from django.core.validators import MinValueValidator
+
+# Font MIME types (must run before STATIC_* usage)
+mimetypes.add_type("font/woff2", ".woff2", True)
+mimetypes.add_type("font/woff", ".woff", True)
+mimetypes.add_type("font/ttf", ".ttf", True)
+mimetypes.add_type("font/otf", ".otf", True)
+mimetypes.add_type("application/vnd.ms-fontobject", ".eot", True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -226,6 +234,21 @@ STORAGES = {
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
 
+# WhiteNoise: don't try to gzip already-compressed files (fonts, images)
+WHITENOISE_SKIP_COMPRESS_EXTENSIONS = [
+    "jpg", "jpeg", "png", "gif", "webp", "ico", "svg",
+    "woff", "woff2", "ttf", "otf", "eot",
+]
+
+# WhiteNoise: explicit MIME types for fonts
+WHITENOISE_MIMETYPES = {
+    ".woff2": "font/woff2",
+    ".woff": "font/woff",
+    ".ttf": "font/ttf",
+    ".otf": "font/otf",
+    ".eot": "application/vnd.ms-fontobject",
+}
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ---------------------------------------------------------------------------
@@ -298,7 +321,7 @@ INTERNAL_IPS = [
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_SSL_REDIRECT = True
-    SECURE_HSTS_SECONDS = 60                # ← start short, raise later
+    SECURE_HSTS_SECONDS = 60
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SESSION_COOKIE_SECURE = True
@@ -313,18 +336,15 @@ if not DEBUG:
 # Jazzmin configuration
 # ---------------------------------------------------------------------------
 JAZZMIN_SETTINGS = {
-    # Title & Branding
     "site_title": "School Management Portal",
     "site_header": "School Administration",
     "site_brand": "School Management",
-    "site_logo": None,
+    "site_logo": False,
     "welcome_sign": "Welcome back, Administrator!",
     "copyright": "School Management System",
 
-    # Search model configuration
     "search_model": ["users.customuser", "academic.classlevel"],
 
-    # Top Menu Links
     "topmenu_links": [
         {"name": "Home", "url": "/admin/", "icon": "fas fa-home"},
         {"name": "Dashboard", "url": "/reports/dashboard/", "icon": "fas fa-chart-pie"},
@@ -332,7 +352,6 @@ JAZZMIN_SETTINGS = {
         {"name": "View Live Site", "url": "/", "new_window": True, "icon": "fas fa-globe"},
     ],
 
-    # User Menu
     "usermenu_links": [
         {
             "name": "Support",
@@ -343,7 +362,6 @@ JAZZMIN_SETTINGS = {
         {"name": "Profile & Account", "url": "/admin/users/customuser/", "icon": "fas fa-user-shield"},
     ],
 
-    # Sidebar icon mapping
     "icons": {
         "auth": "fas fa-users-cog",
         "users.customuser": "fas fa-user-shield",
@@ -376,7 +394,6 @@ JAZZMIN_SETTINGS = {
         "sis.student": "fas fa-user-graduate",
     },
 
-    # UI tweaks & layout
     "show_sidebar": True,
     "navigation_expanded": True,
     "related_modal_active": True,
@@ -384,11 +401,9 @@ JAZZMIN_SETTINGS = {
     "custom_js": None,
     "show_ui_builder": False,
 
-    # UI theme options
     "theme": "default",
     "default_theme_mode": "auto",
 
-    # Custom sidebar sections
     "custom_links": {
         "reports": [{
             "name": "Attendance",
