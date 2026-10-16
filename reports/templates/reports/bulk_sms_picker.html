@@ -8,13 +8,18 @@
 
   {% if schools %}
     <label>School:</label>
-    <select onchange="window.location='{% url 'reports:bulk_sms_picker' %}?school='+this.value;">
+    <select name="school" onchange="this.form.submit()">
       <option value="">-- Select school --</option>
       {% for s in schools %}
         <option value="{{ s.id }}" {% if school and s.id == school.id %}selected{% endif %}>{{ s.name }}</option>
       {% endfor %}
     </select>
     <br><br>
+  {% else %}
+    {# non-superuser: still pass school through as hidden so compose knows #}
+    {% if school %}
+      <input type="hidden" name="school" value="{{ school.id }}">
+    {% endif %}
   {% endif %}
 
   <label>Target:</label>
@@ -34,8 +39,12 @@
   </div>
 
   <br>
-  <button type="submit" class="btn" style="margin-top:16px;">Continue</button>
+  <button type="submit" class="btn" style="margin-top:16px;" {% if not school %}disabled{% endif %}>Continue</button>
   <a class="btn secondary" href="{% url 'reports:bulk_sms_log' %}" style="margin-left:8px;">View Send Log</a>
+
+  {% if not school %}
+    <p class="muted" style="color:#B71C1C; margin-top:8px;">Pick a school first.</p>
+  {% endif %}
 </form>
 </div>
 {% endblock %}

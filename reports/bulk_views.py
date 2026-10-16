@@ -266,7 +266,11 @@ def bulk_sms_compose(request):
 
     target = request.GET.get("target") or request.POST.get("target") or "school"
     classroom_id = request.GET.get("classroom") or request.POST.get("classroom")
+    school_id = request.GET.get("school") or request.POST.get("school")
 
+    # Superuser: resolve school from ?school=, then ?classroom=, in that order
+    if school is None and school_id:
+        school = School.objects.filter(pk=school_id).first()
     if school is None and classroom_id:
         classroom = ClassRoom.objects.filter(pk=classroom_id).first()
         if classroom:
@@ -275,68 +279,6 @@ def bulk_sms_compose(request):
     if school is None:
         messages.error(request, "Pick a school first.")
         return redirect("reports:bulk_sms_picker")
-
-    students = Student.objects.filter(school=school).select_related("parent_guardian")
-    classroom = None
-
-    if target == "class" and classroom_id:
-        classroom = ClassRoom.objects.filter(pk=classroom_id, school=school).first()
-        if classroom:
-            from academic.models import StudentClassEnrollment
-            enroll_ids = StudentClassEnrollment.objects.filter(
-                classroom=classroom
-            ).values_list("student_id", flat=True)
-            students = students.filter(pk__in=enroll_ids)
-
-    if request.method == "POST":
-        template = (request.POST.get("message") or "").strip()
-        if not template:
-            messages.error(request, "Message body is required.")
-            return redirect(request.get_full_path())
-
-        backend = get_backend()
-        sent_ok, sent_fail = 0, 0
-
-        for s in students:
-            parent = getattr(s, "parent_guardian", None)
-            phone = (
-                getattr(parent, "phone_number", None)
-                or getattr(s, "parent_contact", None)
-                or ""
-            ).strip()
-            if not phone:
-                continue
-
-            body = _format_message(
-                template, parent=parent, student=s, balance="", school=school
-            )
-
-            ok, resp = backend.send(phone, body)
-            SMSLog.objects.create(
-                school=school,
-                sent_by=user,
-                recipient_name=getattr(parent, "full_name", "") or s.full_name,
-                phone_number=phone,
-                message=body,
-                status="sent" if ok else "failed",
-                provider=backend.name,
-                provider_response=resp[:2000],
-            )
-            if ok:
-                sent_ok += 1
-            else:
-                sent_fail += 1
-
-        messages.success(request, f"Sent {sent_ok}, failed {sent_fail}.")
-        return redirect(f"{request.path}?target={target}&classroom={classroom_id or ''}")
-
-    return render(request, "reports/bulk_sms_compose.html", {
-        "school": school,
-        "classroom": classroom,
-        "target": target,
-        "students": students[:300],
-        "count": students.count(),
-    })
 
 
 @login_required
