@@ -273,3 +273,172 @@ def bulk_students_errors_csv(request):
         writer.writerow(line)
 
     return response
+
+
+
+# ---------- v0.9.2: Bulk marks entry ----------
+
+from .decorators import teacher_required, current_teacher
+
+
+@teacher_required
+def bulk_marks_select(request):
+    """List teacher's allocations with a 'Enter bulk marks' button."""
+    teacher = current_teacher(request)
+    school = current_school(request)
+
+    if teacher is None:
+        messages.error(request, "No teacher profile linked to your account.")
+        return redirect("portal:teacher_home")
+
+    allocations = (
+        AllocatedSubject.objects
+        .filter(teacher_name=teacher, school=school)
+        .select_related("subject", "class_room", "class_room__name",
+                        "class_room__stream", "term", "academic_year")
+        .order_by("class_room__name__name", "class_room__stream__name", "subject__name")
+    )
+
+    return render(request, "portal/bulk_marks_select.html", {
+        "teacher": teacher,
+        "allocations": allocations,
+    })
+
+
+@teacher_required
+def bulk_marks_entry(request, allocation_id):
+    """Enter marks for every student in a class in one table."""
+    allocation = get_object_or_404(AllocatedSubject, pk=allocation_id)
+    teacher = current_teacher(request)
+
+    if allocation.teacher_name_id != teacher.id and not request.user.is_superuser:
+        messages.error(request, "You are not assigned to this subject.")
+        return redirect("portal:bulk_marks_select")
+
+    # Determine the term
+    term = allocation.term or (
+        Term.objects.filter(academic_year=allocation.academic_year)
+        .order_by("-start_date")
+        .first()
+    )
+    if term is None:
+        messages.error(request, "No term found for this allocation.")
+        return redirect("portal:bulk_marks_select")
+
+    # Exams for this class + term
+    exams = (
+        ExaminationListHandler.objects
+        .filter(school=allocation.school, term=term, classrooms=allocation.class_room)
+        .order_by("name")
+    )
+
+    # Students enrolled
+    enrollments = (
+        StudentClassEnrollment.objects
+        .filter(
+            classroom=allocation.class_room,
+            academic_year=allocation.academic_year,
+            student__isnull=False,
+        )
+        .select_related("student")
+        .order_by("student__last_name", "student__first_name")
+    )
+
+    # Exam selection
+    exam_id = request.POST.get("exam_id") or request.GET.get("exam_id")
+    selected_exam = exams.filter(pk=exam_id).first() if exam_id else exams.first()
+
+    saved = 0
+    errors_list = []
+    warnings_list = []
+
+    if request.method == "POST" and selected_exam:
+        for enrollment in enrollments:
+            field_name = f"score_{enrollment.pk}"
+            raw = request.POST.get(field_name, "").strip()
+
+            # Empty = leave unchanged
+            if raw == "":
+                continue
+
+            try:
+                score = float(raw)
+            except ValueError:
+                errors_list.append(f"{enrollment.student.full_name}: '{raw}' is not a number.")
+                continue
+
+            if score < 0 or score > selected_exam.out_of:
+                errors_list.append(
+                    f"{enrollment.student.full_name}: {score} is outside 0–{selected_exam.out_of}."
+                )
+                continue
+
+            # Lock check
+            existing = MarksManagement.objects.filter(
+                school=allocation.school,
+                exam_name=selected_exam,
+                subject=allocation.subject,
+                student=enrollment,
+            ).first()
+
+            if existing and existing._submission_is_locked():
+                warnings_list.append(
+                    f"{enrollment.student.full_name}: submission is locked — skipped."
+                )
+                continue
+
+            try:
+                if existing:
+                    existing.points_scored = score
+                    existing.created_by = teacher
+                    existing.save()
+                else:
+                    MarksManagement.objects.create(
+                        school=allocation.school,
+                        exam_name=selected_exam,
+                        subject=allocation.subject,
+                        student=enrollment,
+                        points_scored=score,
+                        created_by=teacher,
+                    )
+                saved += 1
+            except Exception as e:
+                errors_list.append(f"{enrollment.student.full_name}: {e}")
+
+        if saved:
+            messages.success(request, f"Saved {saved} marks.")
+        if warnings_list:
+            messages.warning(request, " ".join(warnings_list[:5]))
+        if errors_list:
+            messages.error(request, " ".join(errors_list[:5]))
+
+        return redirect(
+            f"/portal/teacher/bulk-marks/{allocation.id}/?exam_id={selected_exam.id}"
+        )
+
+    # Build table rows with existing scores
+    existing_map = {}
+    if selected_exam:
+        for m in MarksManagement.objects.filter(
+            exam_name=selected_exam,
+            subject=allocation.subject,
+            student__in=enrollments,
+        ):
+            existing_map[m.student_id] = m.points_scored
+
+    rows = []
+    for e in enrollments:
+        rows.append({
+            "enrollment": e,
+            "student": e.student,
+            "score": existing_map.get(e.pk, ""),
+        })
+
+    return render(request, "portal/bulk_marks_entry.html", {
+        "allocation": allocation,
+        "term": term,
+        "exams": exams,
+        "selected_exam": selected_exam,
+        "rows": rows,
+        "out_of": selected_exam.out_of if selected_exam else None,
+    })

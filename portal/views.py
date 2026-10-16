@@ -7,6 +7,15 @@ from django.utils import timezone
 
 from academic.models import (
     AllocatedSubject,
+    StudentClassEnrollment,
+)
+from examination.models import (
+    ExaminationListHandler,
+    MarksManagement,
+)
+
+from academic.models import (
+    AllocatedSubject,
     ClassRoom,
     StudentClassEnrollment,
     Subject,

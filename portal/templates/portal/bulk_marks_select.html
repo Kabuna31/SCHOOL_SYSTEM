@@ -1,0 +1,25 @@
+{% extends "portal/base_portal.html" %}
+{% block content %}
+<h1>Bulk Marks Entry</h1>
+<p class="muted">Pick a class + subject to enter marks for the whole class at once.</p>
+
+<table class="tbl" style="margin-top:16px;">
+  <thead>
+    <tr><th>Class</th><th>Subject</th><th>Term</th><th style="text-align:right;">Action</th></tr>
+  </thead>
+  <tbody>
+    {% for a in allocations %}
+    <tr>
+      <td>{{ a.class_room }}</td>
+      <td>{{ a.subject.name }}</td>
+      <td>{{ a.term.name|default:a.academic_year.name }}</td>
+      <td style="text-align:right;">
+        <a class="btn" href="{% url 'portal:bulk_marks_entry' a.id %}">Enter marks</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No subjects assigned to you yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

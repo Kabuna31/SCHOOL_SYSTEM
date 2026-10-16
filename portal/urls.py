@@ -25,4 +25,8 @@ urlpatterns = [
     path("admin/bulk-students/confirm/", views_bulk.bulk_students_confirm, name="bulk_students_confirm"),
     path("admin/bulk-students/sample/", views_bulk.bulk_students_sample, name="bulk_students_sample"),
     path("admin/bulk-students/errors.csv", views_bulk.bulk_students_errors_csv, name="bulk_students_errors_csv"),
+
+    # Bulk marks entry (v0.9.2)
+    path("teacher/bulk-marks/", views_bulk.bulk_marks_select, name="bulk_marks_select"),
+    path("teacher/bulk-marks/<int:allocation_id>/", views_bulk.bulk_marks_entry, name="bulk_marks_entry"),
 ]

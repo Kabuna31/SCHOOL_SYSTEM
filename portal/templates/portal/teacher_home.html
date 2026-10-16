@@ -15,6 +15,7 @@
       <td>{{ a.term.name|default:"—" }}</td>
       <td style="text-align:right;">
         <a class="btn" href="{% url 'portal:teacher_marks_entry' a.id %}">Enter Marks</a>
+        <a class="btn" href="{% url 'portal:bulk_marks_entry' a.id %}">Bulk marks</a>
         <a class="btn secondary" href="{% url 'portal:teacher_attendance' a.id %}">Mark Attendance</a>
       </td>
     </tr>
@@ -24,3 +25,5 @@
   </tbody>
 </table>
 {% endblock %}
+
+
