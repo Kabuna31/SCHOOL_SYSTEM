@@ -217,12 +217,8 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_ROOT = BASE_DIR / "media"
 
 STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -377,7 +373,7 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": False,
 
     # UI theme options
-    "theme": "pulse",
+    "theme": "default",
     "default_theme_mode": "auto",
 
     # Custom sidebar sections
