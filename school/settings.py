@@ -395,7 +395,7 @@ JAZZMIN_SETTINGS = {
     "custom_js": None,
     "show_ui_builder": False,
 
-    "theme": "default",
+     "theme": "flatly",
     "default_theme_mode": "auto",
 
     "custom_links": {
