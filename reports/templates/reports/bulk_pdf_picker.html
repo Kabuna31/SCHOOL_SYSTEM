@@ -4,8 +4,20 @@
 <p class="muted">Pick a class and term. One print job → all report cards.</p>
 
 <form method="get" onsubmit="return goToCards(event);" style="margin-top:16px;">
+
+  {% if schools %}
+    <label>School:</label>
+    <select id="school" onchange="window.location='/reports/bulk-pdf/?school='+this.value;">
+      <option value="">-- Select school --</option>
+      {% for s in schools %}
+        <option value="{{ s.id }}" {% if school and s.id == school.id %}selected{% endif %}>{{ s.name }}</option>
+      {% endfor %}
+    </select>
+    <br><br>
+  {% endif %}
+
   <label>Class:</label>
-  <select id="classroom" required>
+  <select id="classroom" required {% if not classrooms %}disabled{% endif %}>
     <option value="">-- Select class --</option>
     {% for c in classrooms %}
       <option value="{{ c.id }}">{{ c }}</option>
@@ -13,7 +25,7 @@
   </select>
 
   <label>Term:</label>
-  <select id="term" required>
+  <select id="term" required {% if not terms %}disabled{% endif %}>
     <option value="">-- Select term --</option>
     {% for t in terms %}
       <option value="{{ t.id }}">{{ t.name }} — {{ t.academic_year.name }}</option>

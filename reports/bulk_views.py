@@ -10,7 +10,7 @@ from academic.models import (
     ClassRoom,
     StudentClassEnrollment,
 )
-from administration.models import Term
+from administration.models import Term, School
 from examination.models import MarksManagement
 from portal.decorators import current_school
 
@@ -22,6 +22,7 @@ def _require_staff(request):
 
 
 def _school(request):
+    """Return the user's school, or None for superusers (cross-tenant)."""
     return current_school(request)
 
 
@@ -45,27 +46,43 @@ def bulk_pdf_picker(request):
         messages.error(request, "Staff access required.")
         return redirect("/")
 
+    user = request.user
+    is_super = user.is_superuser
     school = _school(request)
-    if school is None:
+
+    # Non-superuser staff must have a school
+    if school is None and not is_super:
         messages.error(request, "No school linked to your account.")
         return redirect("/")
 
-    classrooms = (
-        ClassRoom.objects
-        .filter(school=school)
-        .select_related("name", "stream")
-        .order_by("name__name", "stream__name")
-    )
+    schools = None
+    if school is None:
+        # Superuser path — they pick a school first
+        schools = School.objects.all().order_by("name")
+        chosen_id = request.GET.get("school")
+        if chosen_id:
+            school = schools.filter(pk=chosen_id).first()
 
-    terms = (
-        Term.objects
-        .filter(academic_year__school=school)
-        .select_related("academic_year")
-        .order_by("-academic_year__start_date", "-start_date")
-    )
+    classrooms = ClassRoom.objects.none()
+    terms = Term.objects.none()
+
+    if school is not None:
+        classrooms = (
+            ClassRoom.objects
+            .filter(school=school)
+            .select_related("name", "stream")
+            .order_by("name__name", "stream__name")
+        )
+        terms = (
+            Term.objects
+            .filter(academic_year__school=school)
+            .select_related("academic_year")
+            .order_by("-academic_year__start_date", "-start_date")
+        )
 
     return render(request, "reports/bulk_pdf_picker.html", {
         "school": school,
+        "schools": schools,
         "classrooms": classrooms,
         "terms": terms,
     })
@@ -78,24 +95,31 @@ def bulk_report_cards(request, classroom_id, term_id):
         messages.error(request, "Staff access required.")
         return redirect("/")
 
+    user = request.user
+    is_super = user.is_superuser
     school = _school(request)
-    if school is None:
+
+    if school is None and not is_super:
         messages.error(request, "No school linked to your account.")
         return redirect("/")
 
-    classroom = get_object_or_404(
-        ClassRoom.objects.select_related("name", "stream"),
-        pk=classroom_id, school=school,
-    )
-    term = get_object_or_404(
-        Term.objects.select_related("academic_year"),
-        pk=term_id, academic_year__school=school,
-    )
+    # Superuser with no school: look up by ID without school scoping
+    classroom_qs = ClassRoom.objects.select_related("name", "stream")
+    term_qs = Term.objects.select_related("academic_year")
+    if school is not None:
+        classroom_qs = classroom_qs.filter(school=school)
+        term_qs = term_qs.filter(academic_year__school=school)
+
+    classroom = get_object_or_404(classroom_qs, pk=classroom_id)
+    term = get_object_or_404(term_qs, pk=term_id)
+
+    # If superuser had no school, derive it from the classroom for downstream queries
+    if school is None:
+        school = classroom.school
 
     enrollments = (
         StudentClassEnrollment.objects
         .filter(
-            school=school,
             classroom=classroom,
             academic_year=term.academic_year,
             student__isnull=False,
@@ -133,11 +157,17 @@ def _collect_marks(school, term, enrollment):
     try:
         qs = (
             MarksManagement.objects
-            .filter(school=school, student=enrollment)
+            .filter(student=enrollment)
             .select_related("subject", "exam_name")
             .order_by("subject__name")
         )
-        # Best-effort term filter — skip if the field path doesn't exist
+        if school is not None:
+            try:
+                qs = qs.filter(school=school)
+            except Exception as e:
+                log.warning("[bulk_pdf] school filter failed: %s", e)
+
+        # Best-effort term filter
         try:
             qs = qs.filter(exam_name__term=term)
         except Exception as e:
