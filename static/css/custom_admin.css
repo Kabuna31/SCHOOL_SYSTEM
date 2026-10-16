@@ -52,3 +52,25 @@ body ul.object-tools li::marker,
 body .object-tools ul li::marker {
     content: none !important;
 }
+
+
+/* Kill the disc bullet on the Import/Export <li> itself */
+li:has(> a[href*="export"]),
+li:has(> a[href*="import"]),
+.object-tools li,
+ul.object-tools > li,
+body li[style] {
+    list-style: none !important;
+    list-style-type: none !important;
+    list-style-image: none !important;
+}
+
+li:has(> a[href*="export"])::marker,
+li:has(> a[href*="import"])::marker,
+.object-tools li::marker,
+ul.object-tools > li::marker {
+    content: none !important;
+    display: none !important;
+    font-size: 0 !important;
+    color: transparent !important;
+}
