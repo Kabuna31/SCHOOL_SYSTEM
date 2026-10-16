@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.core.exceptions import (
     ValidationError,
     ObjectDoesNotExist,
@@ -12,24 +12,32 @@ import traceback
 logger = logging.getLogger(__name__)
 
 
+# Only requests under this prefix get JSON error responses.
+# Everything else (admin, portal, reports, and any random browser URL)
+# falls through to Django's default HTML error handling — which uses
+# templates/404.html, templates/500.html, etc.
+API_PATH_PREFIX = "/api/"
+
+
 class CustomExceptionMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        # Bypass JSON error handling for admin, portal, reports — they need HTML.
         path = request.path_info or ""
-        if (
-            path.startswith("/admin/")
-            or path.startswith("/portal/")
-            or path.startswith("/reports/")
-            or path.startswith("/health/")
-        ):
+
+        # Non-API paths: let Django handle them (HTML error pages).
+        if not path.startswith(API_PATH_PREFIX):
             return self.get_response(request)
 
         try:
             return self.get_response(request)
 
+        except Http404 as e:
+            return JsonResponse(
+                {"error": "Page Not Found", "detail": str(e) or f"Not found: {path}"},
+                status=404,
+            )
         except ValidationError as e:
             return JsonResponse(
                 {
