@@ -5,6 +5,7 @@
 <p class="muted">
   Target: <strong>{{ target }}</strong>
   {% if classroom %} — {{ classroom }}{% endif %}
+  {% if school %} — {{ school.name }}{% endif %}
   — {{ count }} student{{ count|pluralize }} matched
 </p>
 
@@ -12,6 +13,7 @@
   {% csrf_token %}
   <input type="hidden" name="target" value="{{ target }}">
   <input type="hidden" name="classroom" value="{{ classroom.id|default:'' }}">
+  <input type="hidden" name="school" value="{{ school.id|default:'' }}">
 
   <label>Message template:</label>
   <textarea name="message" rows="5" required
