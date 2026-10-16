@@ -114,3 +114,20 @@
 #jazzy-navbar .navbar-nav.ms-auto > li > a.nav-link i {
     color: var(--bs-body-color) !important;
 }
+
+
+/* Import / Export buttons: remove list bullets */
+ul.object-tools,
+ul.object-tools li {
+    list-style: none !important;
+    margin: 0;
+    padding: 0;
+}
+ul.object-tools li::marker {
+    content: none;
+}
+ul.object-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
