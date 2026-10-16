@@ -1,0 +1,26 @@
+{% extends "portal/base_portal.html" %}
+{% block content %}
+<h1>Import Complete</h1>
+<p style="font-size:16px;">
+  ✅ <strong>{{ created }}</strong> students imported successfully.
+</p>
+
+{% if failed %}
+<p style="color:#B71C1C;">
+  ❌ {{ failed|length }} rows failed during import:
+</p>
+<table class="tbl">
+  <thead><tr><th>Row</th><th>Error</th></tr></thead>
+  <tbody>
+    {% for f in failed %}
+    <tr><td>{{ f.row }}</td><td>{{ f.error }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<div style="margin-top:24px;">
+  <a class="btn" href="{% url 'portal:bulk_students_upload' %}">Import More</a>
+  <a class="btn secondary" href="/admin/academic/student/">View Students</a>
+</div>
+{% endblock %}

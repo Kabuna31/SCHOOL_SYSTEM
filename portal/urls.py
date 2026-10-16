@@ -1,4 +1,5 @@
 from django.urls import path
+from . import bulk_views as views_bulk
 from . import views
 
 app_name = "portal"
@@ -18,4 +19,10 @@ urlpatterns = [
     path("accountant/receipts/", views.accountant_receipts, name="accountant_receipts"),
 
     path("parent/child/<int:student_id>/", views.parent_child_detail, name="parent_child_detail"),
+
+    # Bulk student import (v0.9.1)
+    path("admin/bulk-students/", views_bulk.bulk_students_upload, name="bulk_students_upload"),
+    path("admin/bulk-students/confirm/", views_bulk.bulk_students_confirm, name="bulk_students_confirm"),
+    path("admin/bulk-students/sample/", views_bulk.bulk_students_sample, name="bulk_students_sample"),
+    path("admin/bulk-students/errors.csv", views_bulk.bulk_students_errors_csv, name="bulk_students_errors_csv"),
 ]

@@ -1,0 +1,32 @@
+{% extends "portal/base_portal.html" %}
+{% block content %}
+<h1>Bulk Import Students</h1>
+<p class="muted">Upload a CSV file with student records.</p>
+
+<div style="margin:16px 0;">
+  <a class="btn secondary" href="{% url 'portal:bulk_students_sample' %}">Download Sample CSV</a>
+</div>
+
+<form method="post" enctype="multipart/form-data" style="margin-top:20px;">
+  {% csrf_token %}
+  <label>CSV File:</label>
+  <input type="file" name="csv_file" accept=".csv" required>
+
+  <button type="submit" class="btn" style="margin-top:16px;">Upload &amp; Preview</button>
+</form>
+
+<h3 style="margin-top:32px;">Required Columns</h3>
+<ul>
+  {% for c in required_columns %}<li><code>{{ c }}</code></li>{% endfor %}
+</ul>
+
+<h3>Optional Columns</h3>
+<ul>
+  {% for c in optional_columns %}<li><code>{{ c }}</code></li>{% endfor %}
+</ul>
+
+<p style="margin-top:16px; font-size:13px; color:#666;">
+  <strong>Tip:</strong> Download the sample CSV above, open it in Excel or Google Sheets,
+  replace the two sample rows with your student list, and save as CSV (UTF-8).
+</p>
+{% endblock %}

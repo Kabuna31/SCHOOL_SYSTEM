@@ -1,0 +1,55 @@
+{% extends "portal/base_portal.html" %}
+{% block content %}
+<h1>Preview</h1>
+<p class="muted">{{ valid_count }} valid rows, {{ error_count }} rows with errors.</p>
+
+{% if valid_count %}
+<div style="margin-top:16px;">
+  <a class="btn" href="{% url 'portal:bulk_students_confirm' %}">Confirm &amp; Import {{ total_valid }} students</a>
+  <a class="btn secondary" href="{% url 'portal:bulk_students_upload' %}">Cancel</a>
+</div>
+{% endif %}
+
+{% if error_count %}
+<div style="margin-top:24px;">
+  <h3>Rows with Errors ({{ total_error }})</h3>
+  <p class="muted">These rows will NOT be imported. Fix the CSV and re-upload.</p>
+  <a class="btn secondary" href="{% url 'portal:bulk_students_errors_csv' %}">Download Error Report</a>
+
+  <table class="tbl" style="margin-top:12px;">
+    <thead><tr><th>Line</th><th>Name</th><th>Errors</th></tr></thead>
+    <tbody>
+      {% for r in error_rows %}
+      <tr>
+        <td>{{ r._line }}</td>
+        <td>{{ r.first_name }} {{ r.last_name }}</td>
+        <td style="color:#B71C1C;">{{ r._errors|join:"; " }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if valid_count %}
+<div style="margin-top:24px;">
+  <h3>Valid Rows (showing first 50 of {{ total_valid }})</h3>
+  <table class="tbl">
+    <thead>
+      <tr><th>#</th><th>Name</th><th>Class</th><th>Admission</th><th>Parent Contact</th></tr>
+    </thead>
+    <tbody>
+      {% for r in valid_rows %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ r.first_name }} {{ r.last_name }}</td>
+        <td>{{ r.class_level|default:"—" }}</td>
+        <td>{{ r.admission_number|default:"—" }}</td>
+        <td>{{ r.parent_contact }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}
