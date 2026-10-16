@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.db import models
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -230,10 +231,163 @@ def teacher_attendance(request, allocation_id):
 
 # ---------- Accountant / Parent stubs (v0.8.2, v0.8.3) ----------
 
+# ---------- Accountant ----------
+
+def _current_accountant(request):
+    user = request.user
+    if hasattr(user, "accountant"):
+        return user.accountant
+    return None
+
+
 @accountant_required
 def accountant_home(request):
-    return render(request, "portal/accountant_home.html")
+    from finance.models import Receipt, Payment
+    from academic.models import Student
+    from decimal import Decimal
 
+    accountant = _current_accountant(request)
+    school = current_school(request)
+
+    if school is None:
+        return render(request, "portal/no_accountant.html")
+
+    today = timezone.now().date()
+    month_start = today.replace(day=1)
+
+    # KPIs
+    receipts_today = Receipt.objects.filter(
+        school=school, payment_date=today
+    )
+    receipts_month = Receipt.objects.filter(
+        school=school, payment_date__gte=month_start
+    )
+    total_today = receipts_today.aggregate(s=models.Sum("amount"))["s"] or Decimal("0.00")
+    total_month = receipts_month.aggregate(s=models.Sum("amount"))["s"] or Decimal("0.00")
+
+    # Recent receipts
+    recent = (
+        Receipt.objects
+        .filter(school=school)
+        .select_related("student", "paid_for", "received_by")
+        .order_by("-payment_date", "-id")[:20]
+    )
+
+    # Student lookup for payment entry
+    students = Student.objects.filter(school=school).order_by("last_name", "first_name")[:500]
+
+    return render(request, "portal/accountant_home.html", {
+        "accountant": accountant,
+        "school": school,
+        "today": today,
+        "receipts_today_count": receipts_today.count(),
+        "total_today": total_today,
+        "total_month": total_month,
+        "recent": recent,
+        "students": students,
+    })
+
+
+@accountant_required
+def accountant_payment_add(request):
+    from finance.models import (
+        Receipt, ReceiptAllocation, PaymentThrough, PaymentStatus,
+    )
+    from academic.models import Student
+    from decimal import Decimal
+
+    school = current_school(request)
+    if school is None:
+        messages.error(request, "No school linked to your account.")
+        return redirect("portal:accountant_home")
+
+    allocations = ReceiptAllocation.objects.filter(school=school).order_by("name")
+    students = Student.objects.filter(school=school).order_by("last_name", "first_name")
+    accountant = _current_accountant(request)
+
+    if request.method == "POST":
+        student_id = request.POST.get("student")
+        amount = request.POST.get("amount", "").strip()
+        allocation_id = request.POST.get("paid_for")
+        paid_through = request.POST.get("paid_through") or PaymentThrough.CASH
+        payer = request.POST.get("payer", "").strip() or "Unknown"
+
+        student = students.filter(pk=student_id).first()
+        allocation = allocations.filter(pk=allocation_id).first()
+
+        try:
+            amount_dec = Decimal(amount)
+            if amount_dec <= 0:
+                raise ValueError("Amount must be positive.")
+        except Exception:
+            messages.error(request, "Invalid amount.")
+            return redirect("portal:accountant_payment_add")
+
+        if student is None:
+            messages.error(request, "Please pick a student.")
+            return redirect("portal:accountant_payment_add")
+
+        receipt = Receipt.objects.create(
+            school=school,
+            payer=payer,
+            paid_for=allocation,
+            student=student,
+            amount=amount_dec,
+            paid_through=paid_through,
+            status=PaymentStatus.COMPLETED,
+            received_by=accountant,
+        )
+        messages.success(
+            request,
+            f"Receipt #{receipt.receipt_number} recorded for {student.full_name}."
+        )
+        return redirect("portal:accountant_home")
+
+    return render(request, "portal/accountant_payment_add.html", {
+        "school": school,
+        "students": students,
+        "allocations": allocations,
+        "paid_through_choices": PaymentThrough.choices,
+    })
+
+
+@accountant_required
+def accountant_receipts(request):
+    from finance.models import Receipt
+
+    school = current_school(request)
+    if school is None:
+        return render(request, "portal/no_accountant.html")
+
+    qs = (
+        Receipt.objects
+        .filter(school=school)
+        .select_related("student", "paid_for", "received_by")
+        .order_by("-payment_date", "-id")
+    )
+
+    student_id = request.GET.get("student")
+    date_from = request.GET.get("from")
+    date_to = request.GET.get("to")
+
+    if student_id:
+        qs = qs.filter(student_id=student_id)
+    if date_from:
+        qs = qs.filter(payment_date__gte=date_from)
+    if date_to:
+        qs = qs.filter(payment_date__lte=date_to)
+
+    from academic.models import Student
+    students = Student.objects.filter(school=school).order_by("last_name", "first_name")
+
+    return render(request, "portal/accountant_receipts.html", {
+        "school": school,
+        "receipts": qs[:200],
+        "students": students,
+        "selected_student": student_id,
+        "date_from": date_from or "",
+        "date_to": date_to or "",
+    })
 
 @parent_required
 def parent_home(request):

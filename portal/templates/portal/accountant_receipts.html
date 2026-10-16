@@ -1,0 +1,45 @@
+{% extends "portal/base_portal.html" %}
+{% block content %}
+<h1>All Receipts</h1>
+
+<form method="get" style="margin-bottom:16px;">
+  <label>Student:</label>
+  <select name="student">
+    <option value="">All students</option>
+    {% for s in students %}
+      <option value="{{ s.id }}" {% if selected_student == s.id|stringformat:"s" %}selected{% endif %}>
+        {{ s.full_name }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <label>From:</label>
+  <input type="date" name="from" value="{{ date_from }}">
+
+  <label>To:</label>
+  <input type="date" name="to" value="{{ date_to }}">
+
+  <button type="submit" class="btn">Filter</button>
+</form>
+
+<table class="tbl">
+  <thead>
+    <tr><th>#</th><th>Date</th><th>Student</th><th>For</th><th>Amount</th><th>Through</th><th>Received By</th></tr>
+  </thead>
+  <tbody>
+    {% for r in receipts %}
+    <tr>
+      <td>{{ r.receipt_number }}</td>
+      <td>{{ r.payment_date }}</td>
+      <td>{{ r.student.full_name|default:"—" }}</td>
+      <td>{{ r.paid_for.name|default:"—" }}</td>
+      <td>{{ r.amount }}</td>
+      <td>{{ r.get_paid_through_display }}</td>
+      <td>{{ r.received_by.first_name|default:"—" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7">No receipts found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

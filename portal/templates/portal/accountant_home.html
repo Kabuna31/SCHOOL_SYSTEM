@@ -1,5 +1,52 @@
 {% extends "portal/base_portal.html" %}
 {% block content %}
-<h1>Accountant Portal</h1>
-<p class="muted">Coming in v0.8.2 — payment entry and fee reports.</p>
+<h1>Accountant Dashboard</h1>
+<p class="muted">Welcome, {{ accountant.first_name }} {{ accountant.last_name }}</p>
+
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-top:16px;">
+  <div class="kpi" style="background:#E3F2FD;">
+    <div class="lbl">Receipts Today</div>
+    <div class="val">{{ receipts_today_count }}</div>
+  </div>
+  <div class="kpi" style="background:#E8F5E9;">
+    <div class="lbl">Collected Today</div>
+    <div class="val">{{ total_today }}</div>
+  </div>
+  <div class="kpi" style="background:#FFF3E0;">
+    <div class="lbl">Collected This Month</div>
+    <div class="val">{{ total_month }}</div>
+  </div>
+</div>
+
+<div style="margin-top:24px;">
+  <a class="btn" href="{% url 'portal:accountant_payment_add' %}">Record Payment</a>
+  <a class="btn secondary" href="{% url 'portal:accountant_receipts' %}">View All Receipts</a>
+</div>
+
+<h3 style="margin-top:32px;">Recent Receipts</h3>
+<table class="tbl">
+  <thead>
+    <tr><th>#</th><th>Date</th><th>Student</th><th>For</th><th>Amount</th><th>By</th></tr>
+  </thead>
+  <tbody>
+    {% for r in recent %}
+    <tr>
+      <td>{{ r.receipt_number }}</td>
+      <td>{{ r.payment_date }}</td>
+      <td>{{ r.student.full_name|default:"—" }}</td>
+      <td>{{ r.paid_for.name|default:"—" }}</td>
+      <td>{{ r.amount }}</td>
+      <td>{{ r.received_by.first_name|default:"—" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">No receipts yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<style>
+.kpi { padding:20px;border-radius:10px;text-align:center; }
+.kpi .lbl { font-size:13px;color:#555;text-transform:uppercase; }
+.kpi .val { font-size:28px;font-weight:bold; }
+</style>
 {% endblock %}

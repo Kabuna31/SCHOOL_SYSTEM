@@ -13,4 +13,7 @@ urlpatterns = [
 
     path("accountant/", views.accountant_home, name="accountant_home"),
     path("parent/", views.parent_home, name="parent_home"),
+
+    path("accountant/payment/add/", views.accountant_payment_add, name="accountant_payment_add"),
+    path("accountant/receipts/", views.accountant_receipts, name="accountant_receipts"),
 ]
