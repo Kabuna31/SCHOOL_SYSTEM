@@ -116,18 +116,61 @@
 }
 
 
-/* Import / Export buttons: remove list bullets */
+/* ==========================================================================
+   Import / Export buttons — remove list bullets
+   ========================================================================== */
+
+/* The buttons live in a <div class="object-tools"> containing <ul class="object-tools">.
+   Bullets come from the <li> markers. Kill them everywhere they might appear. */
+
+.object-tools,
+.object-tools *,
+div.object-tools ul,
+div.object-tools ul li,
 ul.object-tools,
 ul.object-tools li {
     list-style: none !important;
-    margin: 0;
-    padding: 0;
+    list-style-type: none !important;
+    list-style-image: none !important;
 }
+
+.object-tools li::before,
+.object-tools li::after,
+ul.object-tools li::before,
+ul.object-tools li::after {
+    content: none !important;
+    display: none !important;
+}
+
+.object-tools li::marker,
 ul.object-tools li::marker {
-    content: none;
+    content: "" !important;
+    color: transparent !important;
+    font-size: 0 !important;
 }
+
+/* Layout: horizontal button row */
+.object-tools,
 ul.object-tools {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Hide any stray icon that could still render as a bullet */
+.object-tools li > a > i.fa,
+.object-tools li > a > i.fas,
+.object-tools li > a > i.far,
+.object-tools li > a > i.fa-solid {
+    /* keep visible — real FA icons should show */
+}
+
+/* Fallback: nuke bullets from *any* button list inside the admin content area */
+#content .object-tools ul,
+#content-main .object-tools ul,
+.content .object-tools ul {
+    list-style: none !important;
+    padding-left: 0 !important;
 }
