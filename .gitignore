@@ -114,3 +114,6 @@ db.sqlite3db.sqlite3
 
 # collectstatic output
 staticfiles/
+
+# Local database backups
+backups/
