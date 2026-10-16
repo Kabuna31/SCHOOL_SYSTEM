@@ -1,176 +1,54 @@
-/* ==========================================================================
-   Jazzmin Custom Navbar & Menu Styling
-   ========================================================================== */
+/* --------------------------------------------------------------------------
+   ABSOLUTE BULLET KILL — applies to every list in the admin content area
+   -------------------------------------------------------------------------- */
 
-/* Ensure top navbar lists display horizontally as flex containers */
-#jazzy-navbar .navbar-nav {
-    display: flex !important;
-    align-items: center !important;
-    flex-direction: row !important;
-    list-style: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Force visibility and spacing on navbar items */
-#jazzy-navbar .navbar-nav .nav-item {
-    display: inline-block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    list-style: none !important;
-    margin-right: 10px !important;
-}
-
-/* Style top menu links as visible buttons */
-#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link {
-    display: inline-flex !important;
-    align-items: center !important;
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    color: #ffffff !important;
-    padding: 6px 12px !important;
-    border-radius: 4px !important;
-    text-decoration: none !important;
-}
-
-#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.2) !important;
-    color: #ffffff !important;
-}
-
-/* Style top menu icons */
-#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link i {
-    margin-right: 6px !important;
-    display: inline-block !important;
-    visibility: visible !important;
-    color: #ffffff !important;
-}
-
-/* Style top-right user profile dropdown and icons */
-#jazzy-navbar .navbar-nav.ms-auto .user-menu > a {
-    display: inline-flex !important;
-    align-items: center !important;
-    color: #ffffff !important;
-    padding: 6px 12px !important;
-    text-decoration: none !important;
-}
-
-#jazzy-navbar .navbar-nav.ms-auto .user-menu > a i,
-#jazzy-navbar .navbar-nav.ms-auto .user-menu > a img {
-    display: inline-block !important;
-    visibility: visible !important;
-    margin-right: 8px !important;
-}
-
-#jazzy-navbar .navbar-nav.ms-auto .dropdown-menu {
-    background-color: #2c3e50 !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-#jazzy-navbar .navbar-nav.ms-auto .dropdown-menu .dropdown-item {
-    color: #ffffff !important;
-    display: flex !important;
-    align-items: center !important;
-    padding: 8px 16px !important;
-}
-
-#jazzy-navbar .navbar-nav.ms-auto .dropdown-menu .dropdown-item i {
-    display: inline-block !important;
-    visibility: visible !important;
-    margin-right: 10px !important;
-    color: #ffffff !important;
-}
-
-/* Hamburger button: not a pill */
-#jazzy-navbar .navbar-nav:not(.ms-auto) li a[data-lte-toggle] {
-    background: none;
-    padding: 0.5rem;
-}
-
-/* Top menu icons (Jazzmin does not render the "icon" setting for top links) */
-#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link[href="/admin/"]::before,
-#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link[target="_blank"]::before {
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-    margin-right: 6px;
-}
-#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link[href="/admin/"]::before { content: "\f015"; }
-#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link[target="_blank"]::before { content: "\f0ac"; }
-
-/* Theme-aware colours for top links (3.0.5 navbar is light in light mode) */
-#jazzy-navbar .navbar-nav:not(.ms-auto) li a.nav-link {
-    color: inherit !important;
-    background-color: rgba(128, 128, 128, 0.15) !important;
-}
-#jazzy-navbar .navbar-nav:not(.ms-auto) li a.nav-link:hover {
-    background-color: rgba(128, 128, 128, 0.3) !important;
-}
-#jazzy-navbar .navbar-nav:not(.ms-auto) li a.nav-link i,
-#jazzy-navbar .navbar-nav:not(.ms-auto) li a.nav-link::before {
-    color: inherit !important;
-}
-
-/* Right-hand navbar icons (user menu etc.): follow the theme text colour */
-#jazzy-navbar .navbar-nav.ms-auto > li > a.nav-link,
-#jazzy-navbar .navbar-nav.ms-auto > li > a.nav-link i {
-    color: var(--bs-body-color) !important;
-}
-
-
-/* ==========================================================================
-   Import / Export buttons — remove list bullets
-   ========================================================================== */
-
-/* The buttons live in a <div class="object-tools"> containing <ul class="object-tools">.
-   Bullets come from the <li> markers. Kill them everywhere they might appear. */
-
-.object-tools,
-.object-tools *,
-div.object-tools ul,
-div.object-tools ul li,
-ul.object-tools,
-ul.object-tools li {
+/* Kill bullets at the property level */
+#content-wrapper ul,
+#content-wrapper ol,
+#content-main ul,
+#content-main ol,
+.content-wrapper ul,
+.content-wrapper ol,
+.main-content ul,
+.main-content ol {
     list-style: none !important;
     list-style-type: none !important;
     list-style-image: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
 }
 
-.object-tools li::before,
-.object-tools li::after,
-ul.object-tools li::before,
-ul.object-tools li::after {
+/* Kill the ::marker pseudo-element (Chromium, Firefox, Safari) */
+#content-wrapper ul li::marker,
+#content-wrapper ol li::marker,
+#content-main ul li::marker,
+#content-main ol li::marker,
+.content-wrapper ul li::marker,
+.content-wrapper ol li::marker,
+.main-content ul li::marker,
+.main-content ol li::marker {
     content: none !important;
     display: none !important;
-}
-
-.object-tools li::marker,
-ul.object-tools li::marker {
-    content: "" !important;
-    color: transparent !important;
     font-size: 0 !important;
+    color: transparent !important;
 }
 
-/* Layout: horizontal button row */
-.object-tools,
-ul.object-tools {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 8px !important;
-    margin: 0 !important;
-    padding: 0 !important;
+/* Kill any ::before that might be an injected bullet */
+#content-wrapper ul li::before,
+#content-main ul li::before,
+.content-wrapper ul li::before {
+    content: none !important;
 }
 
-/* Hide any stray icon that could still render as a bullet */
-.object-tools li > a > i.fa,
-.object-tools li > a > i.fas,
-.object-tools li > a > i.far,
-.object-tools li > a > i.fa-solid {
-    /* keep visible — real FA icons should show */
-}
-
-/* Fallback: nuke bullets from *any* button list inside the admin content area */
-#content .object-tools ul,
-#content-main .object-tools ul,
-.content .object-tools ul {
+/* In case Jazzmin uses a different wrapper id */
+body ul.object-tools,
+body ul.object-tools li,
+body .object-tools ul,
+body .object-tools ul li {
     list-style: none !important;
-    padding-left: 0 !important;
+    list-style-type: none !important;
+}
+body ul.object-tools li::marker,
+body .object-tools ul li::marker {
+    content: none !important;
 }
