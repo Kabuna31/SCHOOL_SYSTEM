@@ -17,9 +17,14 @@ class CustomExceptionMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Skip JSON error handling for admin and reports — they need HTML errors.
+        # Bypass JSON error handling for admin, portal, reports — they need HTML.
         path = request.path_info or ""
-        if path.startswith("/admin/") or path.startswith("/reports/"):
+        if (
+            path.startswith("/admin/")
+            or path.startswith("/portal/")
+            or path.startswith("/reports/")
+            or path.startswith("/health/")
+        ):
             return self.get_response(request)
 
         try:
@@ -35,37 +40,31 @@ class CustomExceptionMiddleware:
                 },
                 status=400,
             )
-
         except ObjectDoesNotExist as e:
             return JsonResponse(
                 {"error": "Not Found", "detail": str(e)},
                 status=404,
             )
-
         except PermissionDenied as e:
             return JsonResponse(
                 {"error": "Permission Denied", "detail": str(e)},
                 status=403,
             )
-
         except IntegrityError as e:
             return JsonResponse(
                 {"error": "Integrity Error", "detail": str(e)},
                 status=400,
             )
-
         except DatabaseError as e:
             return JsonResponse(
                 {"error": "Database Error", "detail": str(e)},
                 status=500,
             )
-
         except APIException as e:
             return JsonResponse(
                 {"error": "API Error", "detail": str(e.detail)},
                 status=e.status_code,
             )
-
         except Exception as e:
             logger.error("Unhandled exception: %s", traceback.format_exc())
             return JsonResponse(
