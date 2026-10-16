@@ -389,6 +389,140 @@ def accountant_receipts(request):
         "date_to": date_to or "",
     })
 
+# ---------- Parent ----------
+
+def _current_parent(request):
+    user = request.user
+    if hasattr(user, "academic_parent"):
+        return user.academic_parent
+    return None
+
+
 @parent_required
 def parent_home(request):
-    return render(request, "portal/parent_home.html")
+    from academic.models import Student
+    from finance.models import DebtRecord
+    from attendance.models import StudentAttendance
+    from examination.models import MarksManagement
+    from decimal import Decimal
+
+    parent = _current_parent(request)
+    if parent is None:
+        return render(request, "portal/no_parent.html")
+
+    children = (
+        Student.objects
+        .filter(parent_guardian=parent)
+        .select_related("class_level", "class_of_year")
+        .order_by("last_name", "first_name")
+    )
+
+    child_data = []
+    for child in children:
+        debts = DebtRecord.objects.filter(student=child, is_reversed=False)
+        billed = sum((d.amount_added for d in debts), Decimal("0.00"))
+        paid = sum((d.amount_paid for d in debts), Decimal("0.00"))
+        balance = billed - paid
+
+        recent_marks = (
+            MarksManagement.objects
+            .filter(student__student=child)
+            .select_related("subject", "exam_name")
+            .order_by("-date_time")[:10]
+        )
+
+        attendance = (
+            StudentAttendance.objects
+            .filter(student=child)
+            .select_related("status")
+            .order_by("-date")[:30]
+        )
+        absent_count = sum(
+            1 for a in attendance if a.status and a.status.absent
+        )
+
+        child_data.append({
+            "student": child,
+            "billed": billed,
+            "paid": paid,
+            "balance": balance,
+            "recent_marks": recent_marks,
+            "absent_count": absent_count,
+            "attendance_marked": len(attendance),
+        })
+
+    return render(request, "portal/parent_home.html", {
+        "parent": parent,
+        "children": child_data,
+    })
+
+
+@parent_required
+def parent_child_detail(request, student_id):
+    from academic.models import Student, StudentClassEnrollment
+    from finance.models import DebtRecord, Receipt
+    from attendance.models import StudentAttendance
+    from examination.models import MarksManagement
+    from decimal import Decimal
+
+    parent = _current_parent(request)
+    if parent is None:
+        return render(request, "portal/no_parent.html")
+
+    student = Student.objects.filter(pk=student_id, parent_guardian=parent).first()
+    if student is None:
+        messages.error(request, "That student isn't linked to your account.")
+        return redirect("portal:parent_home")
+
+    enrollment = (
+        StudentClassEnrollment.objects
+        .filter(student=student)
+        .select_related("classroom", "classroom__name", "classroom__stream", "academic_year")
+        .order_by("-academic_year__start_date")
+        .first()
+    )
+
+    debts = (
+        DebtRecord.objects
+        .filter(student=student, is_reversed=False)
+        .select_related("term", "term__academic_year")
+        .order_by("-term__start_date")
+    )
+    billed = sum((d.amount_added for d in debts), Decimal("0.00"))
+    paid = sum((d.amount_paid for d in debts), Decimal("0.00"))
+    balance = billed - paid
+
+    receipts = (
+        Receipt.objects
+        .filter(student=student)
+        .order_by("-payment_date")[:20]
+    )
+
+    marks = (
+        MarksManagement.objects
+        .filter(student__student=student)
+        .select_related("subject", "exam_name")
+        .order_by("-date_time")[:30]
+    )
+
+    attendance = (
+        StudentAttendance.objects
+        .filter(student=student)
+        .select_related("status")
+        .order_by("-date")[:60]
+    )
+    absent_count = sum(1 for a in attendance if a.status and a.status.absent)
+
+    return render(request, "portal/parent_child_detail.html", {
+        "parent": parent,
+        "student": student,
+        "enrollment": enrollment,
+        "debts": debts,
+        "billed": billed,
+        "paid": paid,
+        "balance": balance,
+        "receipts": receipts,
+        "marks": marks,
+        "attendance": attendance,
+        "absent_count": absent_count,
+    })

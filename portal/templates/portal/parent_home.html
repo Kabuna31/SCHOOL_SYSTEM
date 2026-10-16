@@ -1,5 +1,61 @@
 {% extends "portal/base_portal.html" %}
 {% block content %}
 <h1>Parent Portal</h1>
-<p class="muted">Coming in v0.8.3 — view your child's fees, marks, attendance.</p>
+<p class="muted">Welcome, {{ parent.first_name }} {{ parent.last_name }}</p>
+
+{% if children %}
+  {% for c in children %}
+  <div style="border:1px solid #e0e0e0; border-radius:10px; padding:16px; margin-top:16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <h3 style="margin:0;">{{ c.student.full_name }}</h3>
+        <p class="muted" style="margin:4px 0;">
+          {{ c.student.admission_number }} — {{ c.student.class_level|default:"—" }}
+        </p>
+      </div>
+      <a class="btn" href="{% url 'portal:parent_child_detail' c.student.id %}">View Details</a>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:12px;">
+      <div class="kpi" style="background:#E3F2FD;">
+        <div class="lbl">Billed</div><div class="val">{{ c.billed }}</div>
+      </div>
+      <div class="kpi" style="background:#E8F5E9;">
+        <div class="lbl">Paid</div><div class="val">{{ c.paid }}</div>
+      </div>
+      <div class="kpi" style="background:#FFEBEE;">
+        <div class="lbl">Balance</div><div class="val">{{ c.balance }}</div>
+      </div>
+    </div>
+
+    <p style="margin-top:10px; font-size:13px;">
+      Attendance: {{ c.attendance_marked }} marked — <strong>{{ c.absent_count }} absent</strong>
+    </p>
+
+    {% if c.recent_marks %}
+    <h4 style="margin-top:12px;">Recent Marks</h4>
+    <table class="tbl">
+      <thead><tr><th>Subject</th><th>Exam</th><th>Score</th></tr></thead>
+      <tbody>
+        {% for m in c.recent_marks %}
+        <tr>
+          <td>{{ m.subject.name }}</td>
+          <td>{{ m.exam_name.name }}</td>
+          <td>{{ m.points_scored }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+  {% endfor %}
+{% else %}
+  <p>No children linked to your account.</p>
+{% endif %}
+
+<style>
+.kpi { padding:14px;border-radius:8px;text-align:center; }
+.kpi .lbl { font-size:12px;color:#555;text-transform:uppercase; }
+.kpi .val { font-size:22px;font-weight:bold; }
+</style>
 {% endblock %}

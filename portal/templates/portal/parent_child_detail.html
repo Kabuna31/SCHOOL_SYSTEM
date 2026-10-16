@@ -1,0 +1,89 @@
+{% extends "portal/base_portal.html" %}
+{% block content %}
+<h1>{{ student.full_name }}</h1>
+<p class="muted">
+  {{ student.admission_number }} —
+  {% if enrollment %}{{ enrollment.classroom }}{% else %}No class{% endif %}
+</p>
+
+<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:16px;">
+  <div class="kpi" style="background:#E3F2FD;">
+    <div class="lbl">Billed</div><div class="val">{{ billed }}</div>
+  </div>
+  <div class="kpi" style="background:#E8F5E9;">
+    <div class="lbl">Paid</div><div class="val">{{ paid }}</div>
+  </div>
+  <div class="kpi" style="background:#FFEBEE;">
+    <div class="lbl">Balance</div><div class="val">{{ balance }}</div>
+  </div>
+</div>
+
+<h3 style="margin-top:28px;">Fee History</h3>
+<table class="tbl">
+  <thead><tr><th>Term</th><th>Billed</th><th>Paid</th><th>Balance</th></tr></thead>
+  <tbody>
+    {% for d in debts %}
+    <tr>
+      <td>{{ d.term.name }} — {{ d.term.academic_year.name }}</td>
+      <td>{{ d.amount_added }}</td>
+      <td>{{ d.amount_paid }}</td>
+      <td>{{ d.balance }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No fee records yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h3 style="margin-top:28px;">Recent Receipts</h3>
+<table class="tbl">
+  <thead><tr><th>#</th><th>Date</th><th>Amount</th><th>For</th></tr></thead>
+  <tbody>
+    {% for r in receipts %}
+    <tr>
+      <td>{{ r.receipt_number }}</td>
+      <td>{{ r.payment_date }}</td>
+      <td>{{ r.amount }}</td>
+      <td>{{ r.paid_for.name|default:"—" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No receipts yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h3 style="margin-top:28px;">Marks</h3>
+<table class="tbl">
+  <thead><tr><th>Subject</th><th>Exam</th><th>Score</th></tr></thead>
+  <tbody>
+    {% for m in marks %}
+    <tr>
+      <td>{{ m.subject.name }}</td>
+      <td>{{ m.exam_name.name }}</td>
+      <td>{{ m.points_scored }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">No marks yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h3 style="margin-top:28px;">Attendance</h3>
+<p>Total marked: {{ attendance|length }} — <strong>{{ absent_count }} absent</strong></p>
+<table class="tbl">
+  <thead><tr><th>Date</th><th>Status</th></tr></thead>
+  <tbody>
+    {% for a in attendance %}
+    <tr><td>{{ a.date }}</td><td>{{ a.status.name }}</td></tr>
+    {% empty %}
+    <tr><td colspan="2">No attendance yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<style>
+.kpi { padding:20px;border-radius:10px;text-align:center; }
+.kpi .lbl { font-size:13px;color:#555;text-transform:uppercase; }
+.kpi .val { font-size:28px;font-weight:bold; }
+</style>
+{% endblock %}

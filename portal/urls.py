@@ -16,4 +16,6 @@ urlpatterns = [
 
     path("accountant/payment/add/", views.accountant_payment_add, name="accountant_payment_add"),
     path("accountant/receipts/", views.accountant_receipts, name="accountant_receipts"),
+
+    path("parent/child/<int:student_id>/", views.parent_child_detail, name="parent_child_detail"),
 ]
