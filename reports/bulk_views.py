@@ -6,13 +6,11 @@ from django.utils import timezone
 
 from academic.models import (
     ClassRoom,
-    ClassLevel,
     StudentClassEnrollment,
-    Student,
 )
-from administration.models import Term, AcademicYear
-
-
+from administration.models import Term
+from examination.models import MarksManagement
+from portal.decorators import current_school
 
 
 def _require_staff(request):
@@ -20,12 +18,8 @@ def _require_staff(request):
 
 
 def _school(request):
-    """Reuse your existing current_school helper."""
-    try:
-        from portal.decorators import current_school
-        return current_school(request)
-    except Exception:
-        return getattr(request.user, "school", None)
+    """Reuse the portal's existing current_school helper."""
+    return current_school(request)
 
 
 @login_required
@@ -43,15 +37,15 @@ def bulk_pdf_picker(request):
     classrooms = (
         ClassRoom.objects
         .filter(school=school)
-        .select_related("name", "stream", "class_level")
-        .order_by("class_level__name", "name__name", "stream__name")
+        .select_related("name", "stream")                 # name IS the ClassLevel
+        .order_by("name__name", "stream__name")           # level name, stream name
     )
 
     terms = (
         Term.objects
         .filter(academic_year__school=school)
         .select_related("academic_year")
-        .order_by("-academic_year__start_date", "-start_date")
+        .order_by("-academic_year__start_date", "-start_date")   # VERIFY field names
     )
 
     return render(request, "reports/bulk_pdf_picker.html", {
@@ -74,7 +68,7 @@ def bulk_report_cards(request, classroom_id, term_id):
         return redirect("/")
 
     classroom = get_object_or_404(
-        ClassRoom.objects.select_related("name", "stream", "class_level"),
+        ClassRoom.objects.select_related("name", "stream"),
         pk=classroom_id, school=school,
     )
     term = get_object_or_404(
@@ -85,6 +79,7 @@ def bulk_report_cards(request, classroom_id, term_id):
     enrollments = (
         StudentClassEnrollment.objects
         .filter(
+            school=school,
             classroom=classroom,
             academic_year=term.academic_year,
             student__isnull=False,
@@ -93,17 +88,17 @@ def bulk_report_cards(request, classroom_id, term_id):
         .order_by("student__last_name", "student__first_name")
     )
 
-    # Collect marks per student for this term
     students_data = []
     for enr in enrollments:
         student = enr.student
 
+        # VERIFY: adjust field names once we know the MarksManagement schema
         marks = (
             MarksManagement.objects
             .filter(
-                student=enr,
-                exam_name__term=term,
                 school=school,
+                student=enr,               # VERIFY: points to StudentClassEnrollment or Student?
+                exam_name__term=term,      # VERIFY: does ExamName have .term FK?
             )
             .select_related("subject", "exam_name")
             .order_by("subject__name")
@@ -116,7 +111,7 @@ def bulk_report_cards(request, classroom_id, term_id):
                 "subject": m.subject.name,
                 "exam": m.exam_name.name,
                 "score": m.points_scored,
-                "out_of": m.exam_name.out_of,
+                "out_of": m.exam_name.out_of,   # VERIFY: is it .out_of or .total?
             })
             total += float(m.points_scored or 0)
 

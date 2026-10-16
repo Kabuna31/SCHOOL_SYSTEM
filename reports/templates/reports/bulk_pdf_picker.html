@@ -8,9 +8,7 @@
   <select id="classroom" required>
     <option value="">-- Select class --</option>
     {% for c in classrooms %}
-      <option value="{{ c.id }}">
-        {{ c.class_level.name }} {{ c.name.name }}{% if c.stream %} {{ c.stream.name }}{% endif %}
-      </option>
+      <option value="{{ c.id }}">{{ c }}</option>
     {% endfor %}
   </select>
 
