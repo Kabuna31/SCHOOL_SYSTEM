@@ -3,12 +3,18 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
+from django.shortcuts import render
 
 
 # --- GLOBAL ADMIN BRANDING FOR ALL USERS ---
 admin.site.site_header = "School Management System Administration"
 admin.site.site_title = "School Admin Portal"
 admin.site.index_title = "Welcome to the School Management Dashboard"
+
+
+def _wants_json(request):
+    """True only for /api/* paths — everything else gets HTML."""
+    return request.path.startswith("/api/")
 
 
 def api_welcome(request):
@@ -21,43 +27,51 @@ def api_welcome(request):
 
 
 def custom_404_handler(request, exception):
-    return JsonResponse(
-        {
-            "error": "Page Not Found",
-            "detail": f"The requested URL {request.path} was not found on this server.",
-        },
-        status=404,
-    )
+    if _wants_json(request):
+        return JsonResponse(
+            {
+                "error": "Page Not Found",
+                "detail": f"The requested URL {request.path} was not found on this server.",
+            },
+            status=404,
+        )
+    return render(request, "404.html", status=404)
 
 
 def custom_500_handler(request):
-    return JsonResponse(
-        {
-            "error": "Server Error",
-            "detail": "An unexpected error occurred on the server. Please try again later.",
-        },
-        status=500,
-    )
+    if _wants_json(request):
+        return JsonResponse(
+            {
+                "error": "Server Error",
+                "detail": "An unexpected error occurred on the server. Please try again later.",
+            },
+            status=500,
+        )
+    return render(request, "500.html", status=500)
 
 
 def custom_403_handler(request, exception):
-    return JsonResponse(
-        {
-            "error": "Permission Denied",
-            "detail": "You do not have permission to perform this action.",
-        },
-        status=403,
-    )
+    if _wants_json(request):
+        return JsonResponse(
+            {
+                "error": "Permission Denied",
+                "detail": "You do not have permission to perform this action.",
+            },
+            status=403,
+        )
+    return render(request, "403.html", status=403)
 
 
 def custom_400_handler(request, exception):
-    return JsonResponse(
-        {
-            "error": "Bad Request",
-            "detail": "The request could not be understood or was missing required parameters.",
-        },
-        status=400,
-    )
+    if _wants_json(request):
+        return JsonResponse(
+            {
+                "error": "Bad Request",
+                "detail": "The request could not be understood or was missing required parameters.",
+            },
+            status=400,
+        )
+    return render(request, "400.html", status=400)
 
 
 urlpatterns = [
