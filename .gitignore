@@ -111,3 +111,6 @@ ENV/
 .mypy_cache/
 
 db.sqlite3db.sqlite3
+
+# collectstatic output
+staticfiles/
