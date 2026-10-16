@@ -68,4 +68,8 @@ urlpatterns = [
     path("bulk-pdf/", bulk_views.bulk_pdf_picker, name="bulk_pdf_picker"),
     path("bulk-pdf/<int:classroom_id>/<int:term_id>/",
          bulk_views.bulk_report_cards, name="bulk_report_cards"),
+
+    path("sms/", bulk_views.bulk_sms_picker, name="bulk_sms_picker"),
+    path("sms/compose/", bulk_views.bulk_sms_compose, name="bulk_sms_compose"),
+    path("sms/log/", bulk_views.bulk_sms_log, name="bulk_sms_log"),
 ]

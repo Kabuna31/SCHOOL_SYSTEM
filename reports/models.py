@@ -1,4 +1,5 @@
 from django.core.validators import MinValueValidator
+from django.conf import settings
 from django.db import models
 
 from academic.models import Student
@@ -104,3 +105,39 @@ class ReportCard(models.Model):
         if self.out_of_class:
             return f"{self.position_in_class} / {self.out_of_class}"
         return str(self.position_in_class)
+
+class SMSLog(models.Model):
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("sent", "Sent"),
+        ("failed", "Failed"),
+    ]
+
+    school = models.ForeignKey(
+        "administration.School",
+        on_delete=models.CASCADE,
+        related_name="sms_logs",
+    )
+    sent_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name="sms_logs",
+    )
+    recipient_name = models.CharField(max_length=200, blank=True)
+    phone_number = models.CharField(max_length=30)
+    message = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    provider = models.CharField(max_length=50, blank=True)
+    provider_response = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=["school", "-created_at"]),
+            models.Index(fields=["status"]),
+        ]
+
+    def __str__(self):
+        return f"{self.phone_number} — {self.status}"

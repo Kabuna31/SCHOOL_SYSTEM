@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<div class="container" style="max-width:900px;">
+<h1>Bulk SMS</h1>
+<p class="muted">Choose a target audience, then compose the message.</p>
+
+<form method="get" action="{% url 'reports:bulk_sms_compose' %}">
+
+  {% if schools %}
+    <label>School:</label>
+    <select onchange="window.location='{% url 'reports:bulk_sms_picker' %}?school='+this.value;">
+      <option value="">-- Select school --</option>
+      {% for s in schools %}
+        <option value="{{ s.id }}" {% if school and s.id == school.id %}selected{% endif %}>{{ s.name }}</option>
+      {% endfor %}
+    </select>
+    <br><br>
+  {% endif %}
+
+  <label>Target:</label>
+  <select name="target" id="target" onchange="document.getElementById('classrow').style.display=this.value==='class'?'block':'none';">
+    <option value="school">Whole school</option>
+    <option value="class">One class</option>
+  </select>
+
+  <div id="classrow" style="display:none; margin-top:8px;">
+    <label>Class:</label>
+    <select name="classroom">
+      <option value="">-- Select class --</option>
+      {% for c in classrooms %}
+        <option value="{{ c.id }}">{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <br>
+  <button type="submit" class="btn" style="margin-top:16px;">Continue</button>
+  <a class="btn secondary" href="{% url 'reports:bulk_sms_log' %}" style="margin-left:8px;">View Send Log</a>
+</form>
+</div>
+{% endblock %}

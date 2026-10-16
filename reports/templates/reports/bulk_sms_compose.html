@@ -1,0 +1,45 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<div class="container" style="max-width:900px;">
+<h1>Compose SMS</h1>
+<p class="muted">
+  Target: <strong>{{ target }}</strong>
+  {% if classroom %} — {{ classroom }}{% endif %}
+  — {{ count }} student{{ count|pluralize }} matched
+</p>
+
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="target" value="{{ target }}">
+  <input type="hidden" name="classroom" value="{{ classroom.id|default:'' }}">
+
+  <label>Message template:</label>
+  <textarea name="message" rows="5" required
+    style="width:100%;padding:10px;font-family:inherit;"
+    placeholder="Dear {parent}, this is a reminder from {school} that {student}'s fees balance is {balance}."></textarea>
+
+  <p class="muted" style="font-size:13px;">
+    Placeholders: <code>{parent}</code> <code>{student}</code> <code>{balance}</code> <code>{school}</code>
+  </p>
+
+  <button type="submit" class="btn"
+    onclick="return confirm('Send to {{ count }} recipients?');">Send Now</button>
+</form>
+
+<h3 style="margin-top:32px;">Recipients (first 20 shown)</h3>
+<table class="tbl">
+  <thead><tr><th>Student</th><th>Parent</th><th>Phone</th></tr></thead>
+  <tbody>
+    {% for s in students|slice:":20" %}
+    <tr>
+      <td>{{ s.full_name }}</td>
+      <td>{{ s.parent_guardian.full_name|default:"—" }}</td>
+      <td>{{ s.parent_guardian.phone_number|default:s.parent_contact|default:"—" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">No recipients matched.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

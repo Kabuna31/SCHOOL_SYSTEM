@@ -7,7 +7,7 @@
   <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
     <h1 style="margin: 0;">Dashboard</h1>
 
-    <div style="display: flex; align-items: center; gap: 12px;">
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
       <form method="get" style="margin: 0;">
         <label>Term:</label>
         <select name="term" onchange="this.form.submit()" style="padding: 6px;">
@@ -22,6 +22,11 @@
       <a class="btn" href="{% url 'reports:bulk_pdf_picker' %}{% if term %}?term={{ term.id }}{% endif %}"
          style="background:#1565C0;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:14px;white-space:nowrap;">
         🖨️ Bulk Report Cards
+      </a>
+
+      <a class="btn" href="{% url 'reports:bulk_sms_picker' %}"
+         style="background:#1B5E20;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:14px;white-space:nowrap;">
+        📱 Bulk SMS
       </a>
     </div>
   </div>
