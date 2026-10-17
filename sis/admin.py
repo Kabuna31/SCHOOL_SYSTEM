@@ -69,7 +69,7 @@ class StudentResource(resources.ModelResource):
         return Student.unfiltered_objects.all()
 
 
-@admin.register(Student)
+#@admin.register(Student)
 class StudentAdmin(ImportExportModelAdmin):
     resource_class = StudentResource
     change_list_template = "admin/import_export/change_list_import_export.html"
@@ -109,7 +109,7 @@ class ParentResource(resources.ModelResource):
         export_order = fields
 
 
-@admin.register(Parent)
+# @admin.register(Parent)
 class ParentAdmin(ImportExportModelAdmin):
     resource_class = ParentResource
     change_list_template = "admin/import_export/change_list_import_export.html"
