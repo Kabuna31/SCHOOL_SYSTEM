@@ -348,7 +348,6 @@ JAZZMIN_SETTINGS = {
         {"name": "Dashboard", "url": "/reports/dashboard/", "icon": "fas fa-chart-pie"},
         {"name": "Reports", "url": "/reports/", "icon": "fas fa-file-alt"},
         {"name": "View Live Site", "url": "/", "new_window": True, "icon": "fas fa-globe"},
-        {"name": "Profile & Account", "url": "/admin/users/customuser/", "icon": "fas fa-user-shield"},
     ],
 
     # User Menu
@@ -359,6 +358,7 @@ JAZZMIN_SETTINGS = {
             "new_window": True,
             "icon": "fas fa-question-circle",
         },
+        {"name": "Profile & Account", "url": "/admin/users/customuser/", "icon": "fas fa-user-shield"},
     ],
 
     # Sidebar icon mapping
