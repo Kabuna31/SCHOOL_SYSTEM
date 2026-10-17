@@ -75,49 +75,25 @@ ul.object-tools > li::marker {
 }
 
 /* --------------------------------------------------------------------------
-   Top menu icon visibility
-   Jazzmin renders <i class="fas fa-..."> from topmenu_links "icon" keys.
-   Force an explicit visible color (non-hover AND hover) so they don't inherit
-   a color matching the pulse navbar background.
+   Top menu icon visibility — icons are real <i> elements now, so we just
+   need to make sure their color contrasts with the pulse navbar background.
    -------------------------------------------------------------------------- */
-
-html body #jazzy-navbar .navbar-nav .nav-link,
-html body #jazzy-navbar .navbar-nav .nav-link i,
-html body #jazzy-navbar .navbar-nav .nav-link .nav-icon,
-html body #jazzy-navbar .navbar-nav .nav-link i.fas,
-html body #jazzy-navbar .navbar-nav .nav-link i.far,
-html body #jazzy-navbar .navbar-nav .nav-link i.fab,
-html body #jazzy-navbar .navbar-nav .nav-link i.fa {
+html body #jazzy-navbar .nav-link,
+html body #jazzy-navbar .nav-link i,
+html body #jazzy-navbar .nav-link .fas,
+html body #jazzy-navbar .nav-link .far,
+html body #jazzy-navbar .nav-link .fab,
+html body #jazzy-navbar .nav-link svg {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
+    fill: #ffffff !important;
     opacity: 1 !important;
-    visibility: visible !important;
 }
 
-html body #jazzy-navbar .navbar-nav .nav-link i,
-html body #jazzy-navbar .navbar-nav .nav-link .nav-icon {
-    display: inline-block !important;
-    margin-right: 6px !important;
-}
-
-html body #jazzy-navbar .navbar-nav .nav-link:hover,
-html body #jazzy-navbar .navbar-nav .nav-link:hover i,
-html body #jazzy-navbar .navbar-nav .nav-link:hover .nav-icon {
+html body #jazzy-navbar .nav-link:hover,
+html body #jazzy-navbar .nav-link:hover i,
+html body #jazzy-navbar .nav-link:hover svg {
     color: #ffc107 !important;
     -webkit-text-fill-color: #ffc107 !important;
-}
-
-/* Brand and right-side user menu stay legible on the pulse navbar */
-html body #jazzy-navbar .navbar-brand,
-html body #jazzy-navbar .navbar-brand *,
-html body #jazzy-navbar .ms-auto .nav-link,
-html body #jazzy-navbar .ms-auto .nav-link i {
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-}
-
-html body #jazzy-navbar .ms-auto .nav-link:hover,
-html body #jazzy-navbar .ms-auto .nav-link:hover i {
-    color: #ffc107 !important;
-    -webkit-text-fill-color: #ffc107 !important;
+    fill: #ffc107 !important;
 }
