@@ -38,27 +38,36 @@ enable_import_export(GradeScaleRule)
 enable_import_export(Result)
 
 
-# ---------- ExaminationListHandler ----------
 class ExaminationListHandlerResource(resources.ModelResource):
     term = fields.Field(
         column_name="term",
         attribute="term",
         widget=ForeignKeyWidget(Term, field="name"),
     )
+    school = fields.Field(
+        column_name="school",
+        attribute="school",
+        widget=ForeignKeyWidget(
+            ExaminationListHandler._meta.get_field("school").related_model,
+            field="name",
+        ),
+    )
 
     class Meta:
         model = ExaminationListHandler
         import_id_fields = ("name", "term")
         fields = (
-            "id",
             "name",
             "term",
             "assessment_type",
-            "out_of",
             "start_date",
             "ends_date",
+            "out_of",
             "school",
         )
+        export_formats = ("csv", "xlsx")
+        import_formats = ("csv", "xlsx")
+
 
 
 @admin.register(ExaminationListHandler)
@@ -79,11 +88,16 @@ class ExaminationListHandlerAdmin(ImportExportModelAdmin):
 
 
 # ---------- MarksManagement (import/export + custom "Enter marks" view) ----------
+# In examination/admin.py, replace the MarksManagementResource class
+
 class MarksManagementResource(resources.ModelResource):
     student = fields.Field(
         column_name="student",
         attribute="student",
-        widget=ForeignKeyWidget(StudentClassEnrollment, field="id"),
+        widget=ForeignKeyWidget(
+            StudentClassEnrollment,
+            field="student__admission_number",
+        ),
     )
     subject = fields.Field(
         column_name="subject",
@@ -95,25 +109,24 @@ class MarksManagementResource(resources.ModelResource):
         attribute="exam_name",
         widget=ForeignKeyWidget(ExaminationListHandler, field="name"),
     )
-    created_by = fields.Field(
-        column_name="created_by",
+    teacher = fields.Field(
+        column_name="teacher",
         attribute="created_by",
-        widget=ForeignKeyWidget(Teacher, field="id"),
+        widget=ForeignKeyWidget(Teacher, field="email"),
     )
 
     class Meta:
         model = MarksManagement
         import_id_fields = ("student", "subject", "exam_name")
         fields = (
-            "id",
             "exam_name",
             "student",
             "subject",
             "points_scored",
-            "created_by",
-            "school",
+            "teacher",
         )
-
+        export_formats = ("csv", "xlsx")
+        import_formats = ("csv", "xlsx")
 
 @admin.register(MarksManagement)
 class MarksManagementAdmin(ImportExportModelAdmin):

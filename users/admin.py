@@ -26,17 +26,13 @@ class GroupAdmin(DjangoGroupAdmin):
 
 # ---------- CustomUser import/export ----------
 class CustomUserResource(resources.ModelResource):
-    """
-    Resource for bulk import/export of users.
-    NOTE: Passwords are exported hashed. When importing, leave `password` blank
-    to create an unusable password, or the user can reset it later.
-    """
+    """Safe user import/export — never exports passwords or permissions."""
+
     school = fields.Field(
         column_name="school",
         attribute="school",
         widget=ForeignKeyWidget(
-            CustomUser._meta.get_field("school").related_model,
-            field="name",
+            CustomUser._meta.get_field("school").related_model, field="name"
         ),
     )
 
@@ -44,27 +40,24 @@ class CustomUserResource(resources.ModelResource):
         model = CustomUser
         import_id_fields = ("email",)
         fields = (
-            "id",
             "email",
             "first_name",
             "middle_name",
             "last_name",
             "school",
-            "is_staff",
             "is_active",
-            "is_superuser",
             "is_accountant",
             "is_teacher",
             "is_parent",
         )
-        export_order = fields
+        export_formats = ("csv", "xlsx")
+        import_formats = ("csv", "xlsx")
 
     def before_import_row(self, row, **kwargs):
-        # Don't import hashed passwords via CSV — mark them unusable.
+        # Never import hashed passwords
         row["password"] = ""
 
     def after_init_instance(self, instance, new, row, **kwargs):
-        # New users get an unusable password; admin can reset via the UI.
         if new and not instance.password:
             instance.set_unusable_password()
 
@@ -164,8 +157,7 @@ class AccountantResource(resources.ModelResource):
         column_name="school",
         attribute="school",
         widget=ForeignKeyWidget(
-            Accountant._meta.get_field("school").related_model,
-            field="name",
+            Accountant._meta.get_field("school").related_model, field="name"
         ),
     )
     user = fields.Field(
@@ -176,9 +168,8 @@ class AccountantResource(resources.ModelResource):
 
     class Meta:
         model = Accountant
-        import_id_fields = ("empId",)
+        import_id_fields = ("email",)
         fields = (
-            "id",
             "first_name",
             "middle_name",
             "last_name",
@@ -186,12 +177,13 @@ class AccountantResource(resources.ModelResource):
             "school",
             "empId",
             "salary",
-            "inactive",
             "gender",
             "tin_number",
             "user",
+            "inactive",
         )
-
+        export_formats = ("csv", "xlsx")
+        import_formats = ("csv", "xlsx")
 
 @admin.register(Accountant)
 class AccountantAdmin(ImportExportModelAdmin):

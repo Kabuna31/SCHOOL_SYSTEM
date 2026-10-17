@@ -1,42 +1,19 @@
-from django.contrib import admin
-from .models import *
-from .resources import (
-    StudentResource,
-    SubjectResource,
-    TeacherResource,
-    ParentResource,
-    ClassLevelResource,
-    ClassYearResource,
-    StreamResource,
-    ClassRoomResource,
-    StudentClassEnrollmentResource,
-    AllocatedSubjectResource,
+from import_export import resources, fields
+from import_export.widgets import ForeignKeyWidget
+
+from .models import (
+    Student,
+    Subject,
+    Teacher,
+    Parent,
+    ClassLevel,
+    ClassYear,
+    Stream,
+    ClassRoom,
+    StudentClassEnrollment,
+    AllocatedSubject,
 )
-from school.admin_utils import enable_import_export
 
-
-# Models with custom resource
-enable_import_export(Student, resource_class=StudentResource)
-enable_import_export(Subject, resource_class=SubjectResource)
-enable_import_export(Teacher, resource_class=TeacherResource)
-enable_import_export(Parent, resource_class=ParentResource)
-enable_import_export(ClassLevel, resource_class=ClassLevelResource)
-enable_import_export(ClassYear, resource_class=ClassYearResource)
-enable_import_export(Stream, resource_class=StreamResource)
-enable_import_export(ClassRoom, resource_class=ClassRoomResource)
-enable_import_export(StudentClassEnrollment, resource_class=StudentClassEnrollmentResource)
-enable_import_export(AllocatedSubject, resource_class=AllocatedSubjectResource)
-
-
-# Models with default import/export (simple, no FK mess)
-enable_import_export(Department)
-enable_import_export(GradeLevel)
-enable_import_export(Topic)
-enable_import_export(SubTopic)
-enable_import_export(Dormitory)
-enable_import_export(DormitoryAllocation)
-enable_import_export(MessageToParent)
-enable_import_export(MessageToTeacher)
 
 class StudentResource(resources.ModelResource):
     class_level = fields.Field(
