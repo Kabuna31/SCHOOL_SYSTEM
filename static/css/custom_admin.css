@@ -386,70 +386,27 @@ body.login .errorlist li {
 
 
 /* ==========================================================================
-   FORCE logo to be small on admin login — maximum specificity
+   Login page — constrain logo size only, let Jazzmin handle dark/light switch
    ========================================================================== */
 
-/* Target every possible logo element inside the login page */
-body.login img,
-body.login-page img,
-body.login .card img,
-body.login .card-body img,
-body.login .login-box img,
-body.login .login-logo img,
-body.login .brand-image,
-body.login .brand-link img,
-body.login .brand-link .brand-image,
-.login-page .card img,
-.login-page .login-box img,
-.login-page .brand-image,
-#login-form img,
-.login-card-body img {
+/* Logo sizing on login form (do NOT set display — Jazzmin uses display
+   to switch between logo-dark and logo-light based on theme) */
+body.login img.logo-dark,
+body.login img.logo-light {
     max-width: 64px !important;
     max-height: 64px !important;
     width: 64px !important;
     height: 64px !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
     object-fit: contain !important;
-    display: inline-block !important;
-    margin: 0 auto 16px auto !important;
-    padding: 0 !important;
+    margin: 0 auto 12px auto !important;
 }
 
-/* The container that might be constraining or expanding the logo */
-body.login .login-logo,
-body.login .brand-link,
-body.login .brand-image-link,
-.login-page .login-logo,
-.login-page .brand-link {
-    max-width: 100% !important;
-    width: auto !important;
-    text-align: center !important;
-    display: block !important;
-    padding: 0 !important;
-    margin-bottom: 20px !important;
-}
-
-
-
-/* ==========================================================================
-   Hide the login-page logo (keep header logo only)
-   ========================================================================== */
-
-/* Hide logo above the login form */
-body.login .login-logo,
-body.login .login-logo img,
-body.login .login-card-body > img,
-body.login .login-card-body > .brand-image,
-body.login .card-body > img:first-child,
-body.login .card-body > .brand-image {
-    display: none !important;
-}
-
-/* The login form's branding block becomes just text */
-body.login .login-logo {
-    display: none !important;
-    border: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
+/* Header logo on regular admin pages (not login) */
+body:not(.login) img.brand-image,
+body:not(.login) .brand-link img {
+    max-width: 32px !important;
+    max-height: 32px !important;
+    width: 32px !important;
+    height: 32px !important;
+    object-fit: contain !important;
 }
