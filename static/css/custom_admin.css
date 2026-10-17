@@ -381,3 +381,51 @@ body.login .errorlist li {
         padding: 32px 24px !important;
     }
 }
+
+
+
+
+/* ==========================================================================
+   FORCE logo to be small on admin login — maximum specificity
+   ========================================================================== */
+
+/* Target every possible logo element inside the login page */
+body.login img,
+body.login-page img,
+body.login .card img,
+body.login .card-body img,
+body.login .login-box img,
+body.login .login-logo img,
+body.login .brand-image,
+body.login .brand-link img,
+body.login .brand-link .brand-image,
+.login-page .card img,
+.login-page .login-box img,
+.login-page .brand-image,
+#login-form img,
+.login-card-body img {
+    max-width: 64px !important;
+    max-height: 64px !important;
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    object-fit: contain !important;
+    display: inline-block !important;
+    margin: 0 auto 16px auto !important;
+    padding: 0 !important;
+}
+
+/* The container that might be constraining or expanding the logo */
+body.login .login-logo,
+body.login .brand-link,
+body.login .brand-image-link,
+.login-page .login-logo,
+.login-page .brand-link {
+    max-width: 100% !important;
+    width: auto !important;
+    text-align: center !important;
+    display: block !important;
+    padding: 0 !important;
+    margin-bottom: 20px !important;
+}
