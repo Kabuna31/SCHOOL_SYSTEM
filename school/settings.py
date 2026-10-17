@@ -347,18 +347,12 @@ JAZZMIN_SETTINGS = {
         {"name": "Home", "url": "/admin/", "icon": "fas fa-home"},
         {"name": "Dashboard", "url": "/reports/dashboard/", "icon": "fas fa-chart-pie"},
         {"name": "Reports", "url": "/reports/", "icon": "fas fa-file-alt"},
-        {"name": "View Live Site", "url": "/", "new_window": True, "icon": "fas fa-globe"},
     ],
 
     # User Menu
     "usermenu_links": [
         {
-            "name": "Support",
-            "url": "https://github.com/Kabuna31/SCHOOL_SYSTEM",
-            "new_window": True,
-            "icon": "fas fa-question-circle",
-        },
-        {"name": "Profile & Account", "url": "/admin/users/customuser/", "icon": "fas fa-user-shield"},
+           "name": "Profile & Account", "url": "/admin/users/customuser/", "icon": "fas fa-user-shield"},
     ],
 
     # Sidebar icon mapping
