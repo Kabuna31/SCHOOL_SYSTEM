@@ -99,3 +99,27 @@ handler404 = custom_404_handler
 handler500 = custom_500_handler
 handler403 = custom_403_handler
 handler400 = custom_400_handler
+
+
+
+
+def _debug_csrf(request):
+    from django.http import JsonResponse
+    from django.conf import settings
+    import os
+    return JsonResponse({
+        "CSRF_TRUSTED_ORIGINS": settings.CSRF_TRUSTED_ORIGINS,
+        "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
+        "RENDER_EXTERNAL_HOSTNAME": os.environ.get("RENDER_EXTERNAL_HOSTNAME", "NOT SET"),
+        "CSRF_COOKIE_SECURE": settings.CSRF_COOKIE_SECURE,
+        "SESSION_COOKIE_SECURE": settings.SESSION_COOKIE_SECURE,
+        "CSRF_COOKIE_SAMESITE": settings.CSRF_COOKIE_SAMESITE,
+        "SESSION_COOKIE_SAMESITE": settings.SESSION_COOKIE_SAMESITE,
+        "SESSION_COOKIE_DOMAIN": getattr(settings, "SESSION_COOKIE_DOMAIN", None),
+        "CSRF_COOKIE_DOMAIN": getattr(settings, "CSRF_COOKIE_DOMAIN", None),
+        "SESSION_COOKIE_NAME": settings.SESSION_COOKIE_NAME,
+        "CSRF_COOKIE_NAME": settings.CSRF_COOKIE_NAME,
+        "DEBUG": settings.DEBUG,
+    })
+
+urlpatterns += [path("__debug_csrf/", _debug_csrf)]
