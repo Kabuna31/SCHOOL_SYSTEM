@@ -429,3 +429,27 @@ body.login .brand-image-link,
     padding: 0 !important;
     margin-bottom: 20px !important;
 }
+
+
+
+/* ==========================================================================
+   Hide the login-page logo (keep header logo only)
+   ========================================================================== */
+
+/* Hide logo above the login form */
+body.login .login-logo,
+body.login .login-logo img,
+body.login .login-card-body > img,
+body.login .login-card-body > .brand-image,
+body.login .card-body > img:first-child,
+body.login .card-body > .brand-image {
+    display: none !important;
+}
+
+/* The login form's branding block becomes just text */
+body.login .login-logo {
+    display: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
