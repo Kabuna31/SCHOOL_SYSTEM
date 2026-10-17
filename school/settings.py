@@ -340,10 +340,10 @@ JAZZMIN_SETTINGS = {
     "search_model": ["users.customuser", "academic.classlevel"],
 
     "topmenu_links": [
-        {"name": "Home", "url": "/admin/", "icon": "fas fa-home"},
-        {"name": "Dashboard", "url": "/reports/dashboard/", "icon": "fas fa-chart-pie"},
-        {"name": "Reports", "url": "/reports/", "icon": "fas fa-file-alt"},
-        {"name": "View Live Site", "url": "/", "new_window": True, "icon": "fas fa-globe"},
+        {"name": '<i class="fas fa-home me-1"></i> Home', "url": "/admin/"},
+        {"name": '<i class="fas fa-chart-pie me-1"></i> Dashboard', "url": "/reports/dashboard/"},
+        {"name": '<i class="fas fa-file-alt me-1"></i> Reports', "url": "/reports/"},
+        {"name": '<i class="fas fa-globe me-1"></i> View Live Site', "url": "/", "new_window": True},
     ],
 
     "usermenu_links": [
