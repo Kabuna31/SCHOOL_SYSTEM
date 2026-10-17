@@ -327,9 +327,11 @@ if not DEBUG:
     X_FRAME_OPTIONS = "DENY"
 
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 # Jazzmin configuration
 # ---------------------------------------------------------------------------
 JAZZMIN_SETTINGS = {
+    # Title & Branding
     "site_title": "School Management Portal",
     "site_header": "School Administration",
     "site_brand": "School Management",
@@ -337,8 +339,10 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Welcome back, Administrator!",
     "copyright": "School Management System",
 
+    # Search model configuration
     "search_model": ["users.customuser", "academic.classlevel"],
 
+    # Top Menu Links
     "topmenu_links": [
         {"name": "Home", "url": "/admin/", "icon": "fas fa-home"},
         {"name": "Dashboard", "url": "/reports/dashboard/", "icon": "fas fa-chart-pie"},
@@ -346,6 +350,7 @@ JAZZMIN_SETTINGS = {
         {"name": "View Live Site", "url": "/", "new_window": True, "icon": "fas fa-globe"},
     ],
 
+    # User Menu
     "usermenu_links": [
         {
             "name": "Support",
@@ -356,6 +361,7 @@ JAZZMIN_SETTINGS = {
         {"name": "Profile & Account", "url": "/admin/users/customuser/", "icon": "fas fa-user-shield"},
     ],
 
+    # Sidebar icon mapping
     "icons": {
         "auth": "fas fa-users-cog",
         "users.customuser": "fas fa-user-shield",
@@ -388,6 +394,7 @@ JAZZMIN_SETTINGS = {
         "sis.student": "fas fa-user-graduate",
     },
 
+    # UI tweaks & layout
     "show_sidebar": True,
     "navigation_expanded": True,
     "related_modal_active": True,
@@ -395,6 +402,11 @@ JAZZMIN_SETTINGS = {
     "custom_js": None,
     "show_ui_builder": False,
 
+    # UI theme options
+    "theme": "default",
+    "default_theme_mode": "auto",
+
+    # Custom sidebar sections
     "custom_links": {
         "reports": [{
             "name": "Attendance",
@@ -425,14 +437,13 @@ JAZZMIN_SETTINGS = {
 }
 
 JAZZMIN_UI_TWEAKS = {
-    "theme": "pulse",
     "navbar_small_text": False,
     "footer_small_text": False,
     "body_small_text": False,
     "brand_small_text": False,
-    "brand_colour": False,
+    "brand_colour": "navbar-navy",
     "accent": "accent-primary",
-    "navbar": "navbar-dark",
+    "navbar": "navbar-dark navbar-navy",
     "no_navbar_border": False,
     "navbar_fixed": True,
     "layout_fixed": True,
@@ -444,6 +455,7 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
 }
+
 
 # ---------------------------------------------------------------------------
 # Logging — surface errors to Render logs
