@@ -174,3 +174,53 @@ ul.object-tools {
     list-style: none !important;
     padding-left: 0 !important;
 }
+
+
+
+
+/* ==========================================================================
+   FINAL bullet kill — applies to every list item in the admin page
+   ========================================================================== */
+
+/* Global: kill list-style on all lists */
+ul, ol {
+    list-style: none !important;
+    list-style-type: none !important;
+    list-style-image: none !important;
+}
+
+/* Global: kill ::marker on all list items (Chromium, Firefox, Safari) */
+li::marker {
+    content: none !important;
+    display: none !important;
+    color: transparent !important;
+    font-size: 0 !important;
+    visibility: hidden !important;
+}
+
+/* Global: kill pseudo-element bullets (some frameworks inject these) */
+li::before,
+li::after {
+    content: none !important;
+}
+
+/* Restore padding for actual nav lists so layout isn't crushed */
+#jazzy-sidebar ul,
+#jazzy-sidebar ol,
+.main-sidebar ul,
+.main-sidebar ol,
+.navbar-nav,
+.navbar-nav ul {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+/* Keep the object-tools row as horizontal buttons */
+.object-tools,
+ul.object-tools {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
