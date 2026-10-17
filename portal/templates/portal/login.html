@@ -1,42 +1,256 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Login — School Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign In — School Management System</title>
   <style>
-    body { font-family: -apple-system, sans-serif; background: #f0f2f5; margin: 0; }
-    .wrap { max-width: 400px; margin: 80px auto; background: #fff; padding: 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-    h1 { margin: 0 0 6px; font-size: 22px; }
-    p.sub { margin: 0 0 24px; color: #666; font-size: 14px; }
-    label { display: block; font-size: 13px; margin-bottom: 6px; color: #333; }
-    input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
-    button { width: 100%; padding: 12px; background: #0D47A1; color: #fff; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; }
-    button:hover { background: #0a3577; }
-    .error { background: #FFEBEE; color: #B71C1C; padding: 10px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; }
-    .footer { text-align: center; font-size: 12px; color: #888; margin-top: 16px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background: #1a2332;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #2c3e50;
+    }
+
+    .card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      padding: 40px 40px 36px;
+      border-radius: 2px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      border-top: 4px solid #b8935a;
+    }
+
+    /* ---------- Brand / logo ---------- */
+    .brand {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .logo-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      width: 88px;
+      height: 88px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .brand h1 {
+      font-size: 19px;
+      font-weight: 400;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #1a2332;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .brand .divider {
+      width: 60px;
+      height: 1px;
+      background: #b8935a;
+      margin: 14px auto 12px;
+    }
+
+    .brand .tagline {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #8896a8;
+    }
+
+    /* ---------- Form ---------- */
+    form {
+      margin-top: 8px;
+    }
+
+    label {
+      display: block;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #5a6b7f;
+      margin-bottom: 6px;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 14px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      color: #1a2332;
+      background: #fafbfc;
+      border: 1px solid #d4dae0;
+      border-radius: 2px;
+      margin-bottom: 20px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      border-color: #1a2332;
+      box-shadow: 0 0 0 3px rgba(26, 35, 50, 0.08);
+      background: #ffffff;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 13px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #ffffff;
+      background: #1a2332;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 8px;
+    }
+
+    button[type="submit"]:hover {
+      background: #0f1620;
+    }
+
+    button[type="submit"]:active {
+      transform: translateY(1px);
+    }
+
+    /* ---------- Messages / errors ---------- */
+    .messages {
+      margin-bottom: 24px;
+    }
+
+    .message {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 13px;
+      padding: 12px 14px;
+      border-left: 3px solid #7a1f1f;
+      background: #fdf3f3;
+      color: #7a1f1f;
+      margin-bottom: 8px;
+      border-radius: 2px;
+    }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      text-align: center;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid #e8ecf0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 12px;
+      color: #8896a8;
+      line-height: 1.6;
+    }
+
+    .footer a {
+      color: #5a6b7f;
+      text-decoration: none;
+      border-bottom: 1px dotted #8896a8;
+      padding-bottom: 1px;
+    }
+
+    .footer a:hover {
+      color: #1a2332;
+      border-bottom-color: #1a2332;
+    }
+
+    .footer .copyright {
+      margin-top: 16px;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      color: #a8b2be;
+    }
+
+    /* ---------- Mobile ---------- */
+    @media (max-width: 480px) {
+      body { padding: 0; align-items: stretch; }
+      .card {
+        max-width: none;
+        min-height: 100vh;
+        border-radius: 0;
+        border-top: none;
+        border-left: 4px solid #b8935a;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 36px 24px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>School Management</h1>
-    <p class="sub">Sign in to access your dashboard</p>
+
+  <div class="card">
+
+    <div class="brand">
+      <div class="logo-wrap">
+        <img src="/static/img/school-logo.png" alt="School Logo" class="logo">
+      </div>
+      <h1>School Management<br>System</h1>
+      <div class="divider"></div>
+      <div class="tagline">Portal Sign In</div>
+    </div>
 
     {% if messages %}
-      {% for m in messages %}
-        <div class="error">{{ m }}</div>
-      {% endfor %}
+      <div class="messages">
+        {% for m in messages %}
+          <div class="message">{{ m }}</div>
+        {% endfor %}
+      </div>
     {% endif %}
 
-    <form method="post">
+    <form method="post" novalidate>
       {% csrf_token %}
-      <label>Email</label>
-      <input type="email" name="email" required autofocus>
-      <label>Password</label>
-      <input type="password" name="password" required>
-      <button type="submit">Sign in</button>
+
+      <label for="id_email">Email Address</label>
+      <input
+        type="email"
+        id="id_email"
+        name="email"
+        autocomplete="email"
+        required
+        autofocus>
+
+      <label for="id_password">Password</label>
+      <input
+        type="password"
+        id="id_password"
+        name="password"
+        autocomplete="current-password"
+        required>
+
+      <button type="submit">Sign In</button>
     </form>
 
-    <div class="footer">Forgot password? Contact your administrator.</div>
+    <div class="footer">
+      Forgot your password?<br>
+      Contact your <a href="/admin/">school administrator</a>
+      <div class="copyright">© 2026 School Management System</div>
+    </div>
+
   </div>
+
 </body>
 </html>
