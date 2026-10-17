@@ -399,7 +399,7 @@ JAZZMIN_SETTINGS = {
     "navigation_expanded": True,
     "related_modal_active": True,
     "custom_css": "css/custom_admin.css",
-    "custom_js": None,
+    "custom_js": "",
     "show_ui_builder": False,
 
     # UI theme options
