@@ -336,7 +336,6 @@ JAZZMIN_SETTINGS = {
     "site_header": "School Administration",
     "site_brand": "School Management",
     "site_logo": "img/school-logo.webp",
-    "login_logo": "img/school-logo.webp",
     "welcome_sign": "Welcome back, Administrator!",
     "copyright": "School Management System",
 
