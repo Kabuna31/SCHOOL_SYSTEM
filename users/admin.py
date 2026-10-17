@@ -5,12 +5,11 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from django.db import models
 
-from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin
-from import_export.widgets import ForeignKeyWidget
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser, Accountant
+from .resources import CustomUserResource, AccountantResource
 
 
 admin.site.unregister(Group)
@@ -24,44 +23,7 @@ class GroupAdmin(DjangoGroupAdmin):
     }
 
 
-# ---------- CustomUser import/export ----------
-class CustomUserResource(resources.ModelResource):
-    """Safe user import/export — never exports passwords or permissions."""
-
-    school = fields.Field(
-        column_name="school",
-        attribute="school",
-        widget=ForeignKeyWidget(
-            CustomUser._meta.get_field("school").related_model, field="name"
-        ),
-    )
-
-    class Meta:
-        model = CustomUser
-        import_id_fields = ("email",)
-        fields = (
-            "email",
-            "first_name",
-            "middle_name",
-            "last_name",
-            "school",
-            "is_active",
-            "is_accountant",
-            "is_teacher",
-            "is_parent",
-        )
-        export_formats = ("csv", "xlsx")
-        import_formats = ("csv", "xlsx")
-
-    def before_import_row(self, row, **kwargs):
-        # Never import hashed passwords
-        row["password"] = ""
-
-    def after_init_instance(self, instance, new, row, **kwargs):
-        if new and not instance.password:
-            instance.set_unusable_password()
-
-
+# ---------- CustomUser ----------
 @admin.register(CustomUser)
 class CustomUserAdmin(ImportExportModelAdmin, UserAdmin):
     resource_class = CustomUserResource
@@ -151,40 +113,7 @@ class CustomUserAdmin(ImportExportModelAdmin, UserAdmin):
     filter_horizontal = ("groups", "user_permissions")
 
 
-# ---------- Accountant import/export ----------
-class AccountantResource(resources.ModelResource):
-    school = fields.Field(
-        column_name="school",
-        attribute="school",
-        widget=ForeignKeyWidget(
-            Accountant._meta.get_field("school").related_model, field="name"
-        ),
-    )
-    user = fields.Field(
-        column_name="user",
-        attribute="user",
-        widget=ForeignKeyWidget(CustomUser, field="email"),
-    )
-
-    class Meta:
-        model = Accountant
-        import_id_fields = ("email",)
-        fields = (
-            "first_name",
-            "middle_name",
-            "last_name",
-            "email",
-            "school",
-            "empId",
-            "salary",
-            "gender",
-            "tin_number",
-            "user",
-            "inactive",
-        )
-        export_formats = ("csv", "xlsx")
-        import_formats = ("csv", "xlsx")
-
+# ---------- Accountant ----------
 @admin.register(Accountant)
 class AccountantAdmin(ImportExportModelAdmin):
     resource_class = AccountantResource
