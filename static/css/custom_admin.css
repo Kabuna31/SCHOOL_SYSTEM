@@ -224,3 +224,160 @@ ul.object-tools {
     padding: 0 !important;
     margin: 0 !important;
 }
+
+
+
+/* ==========================================================================
+   Admin Login Page — classic professional styling
+   ========================================================================== */
+
+/* Page background */
+body.login {
+    background: #1a2332 !important;
+    min-height: 100vh;
+}
+
+/* Login card */
+body.login .card,
+body.login .login-box,
+body.login .login-card-body,
+body.login .card-body {
+    background: #ffffff !important;
+    border-radius: 2px !important;
+    border-top: 4px solid #b8935a !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4) !important;
+    padding: 40px !important;
+    max-width: 420px !important;
+}
+
+/* Login card container */
+body.login .login-box,
+body.login .login-page .container,
+body.login .container {
+    max-width: 420px !important;
+    margin: 80px auto !important;
+}
+
+/* Logo */
+body.login .login-logo,
+body.login .brand-link,
+body.login .brand-image {
+    text-align: center !important;
+    margin-bottom: 20px !important;
+    padding-bottom: 16px !important;
+    border-bottom: 1px solid #e8ecf0 !important;
+}
+
+body.login .login-logo img,
+body.login .brand-image,
+body.login img.brand-image {
+    max-width: 80px !important;
+    max-height: 80px !important;
+    width: 80px !important;
+    height: 80px !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin: 0 auto 12px auto !important;
+}
+
+/* "Sign in to start your session" heading */
+body.login .login-box-msg,
+body.login .card-body p:first-of-type {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+    font-size: 12px !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    color: #8896a8 !important;
+    text-align: center !important;
+    margin-bottom: 24px !important;
+}
+
+/* Input labels */
+body.login label {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 1.2px !important;
+    text-transform: uppercase !important;
+    color: #5a6b7f !important;
+    display: block !important;
+    margin-bottom: 6px !important;
+}
+
+/* Inputs */
+body.login input[type="text"],
+body.login input[type="password"],
+body.login input[type="email"] {
+    width: 100% !important;
+    padding: 12px 14px !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+    font-size: 14px !important;
+    color: #1a2332 !important;
+    background: #fafbfc !important;
+    border: 1px solid #d4dae0 !important;
+    border-radius: 2px !important;
+    box-shadow: none !important;
+    transition: border-color 0.15s, box-shadow 0.15s !important;
+}
+
+body.login input[type="text"]:focus,
+body.login input[type="password"]:focus,
+body.login input[type="email"]:focus {
+    outline: none !important;
+    border-color: #1a2332 !important;
+    box-shadow: 0 0 0 3px rgba(26, 35, 50, 0.08) !important;
+    background: #ffffff !important;
+}
+
+/* Submit button */
+body.login input[type="submit"],
+body.login button[type="submit"],
+body.login .btn-primary,
+body.login .btn.btn-primary {
+    width: 100% !important;
+    padding: 13px !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    color: #ffffff !important;
+    background: #1a2332 !important;
+    border: none !important;
+    border-radius: 2px !important;
+    cursor: pointer !important;
+    transition: background 0.15s !important;
+    margin-top: 8px !important;
+}
+
+body.login input[type="submit"]:hover,
+body.login button[type="submit"]:hover,
+body.login .btn-primary:hover {
+    background: #0f1620 !important;
+}
+
+/* Error messages */
+body.login .errornote,
+body.login .errorlist,
+body.login .errorlist li {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+    font-size: 13px !important;
+    padding: 12px 14px !important;
+    border-left: 3px solid #7a1f1f !important;
+    background: #fdf3f3 !important;
+    color: #7a1f1f !important;
+    border-radius: 2px !important;
+    margin-bottom: 16px !important;
+    list-style: none !important;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    body.login .login-box,
+    body.login .container,
+    body.login .card,
+    body.login .card-body {
+        margin: 20px auto !important;
+        padding: 32px 24px !important;
+    }
+}
