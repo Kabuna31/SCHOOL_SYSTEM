@@ -82,8 +82,8 @@
 
 /* Hamburger button: not a pill */
 #jazzy-navbar .navbar-nav:not(.ms-auto) li a[data-lte-toggle] {
-    background: none;
-    padding: 0.5rem;
+    background: none !important;
+    padding: 0.5rem !important;
 }
 
 /* Top menu icons (Jazzmin does not render the "icon" setting for top links) */
@@ -117,114 +117,41 @@
 
 
 /* ==========================================================================
-   Import / Export buttons — remove list bullets
+   Import / Export buttons — remove list bullets, keep buttons horizontal
    ========================================================================== */
 
-/* The buttons live in a <div class="object-tools"> containing <ul class="object-tools">.
-   Bullets come from the <li> markers. Kill them everywhere they might appear. */
-
 .object-tools,
-.object-tools *,
-div.object-tools ul,
-div.object-tools ul li,
-ul.object-tools,
+ul.object-tools {
+    list-style: none !important;
+    list-style-type: none !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.object-tools li,
 ul.object-tools li {
     list-style: none !important;
     list-style-type: none !important;
-    list-style-image: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-.object-tools li::before,
-.object-tools li::after,
-ul.object-tools li::before,
-ul.object-tools li::after {
-    content: none !important;
-    display: none !important;
-}
-
+/* Kill ::marker bullets on object-tools only */
 .object-tools li::marker,
 ul.object-tools li::marker {
     content: "" !important;
-    color: transparent !important;
     font-size: 0 !important;
 }
 
-/* Layout: horizontal button row */
-.object-tools,
-ul.object-tools {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 8px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Hide any stray icon that could still render as a bullet */
-.object-tools li > a > i.fa,
-.object-tools li > a > i.fas,
-.object-tools li > a > i.far,
-.object-tools li > a > i.fa-solid {
-    /* keep visible — real FA icons should show */
-}
-
-/* Fallback: nuke bullets from *any* button list inside the admin content area */
-#content .object-tools ul,
-#content-main .object-tools ul,
-.content .object-tools ul {
-    list-style: none !important;
-    padding-left: 0 !important;
-}
-
-
-
-
-/* ==========================================================================
-   FINAL bullet kill — applies to every list item in the admin page
-   ========================================================================== */
-
-/* Global: kill list-style on all lists */
-ul, ol {
-    list-style: none !important;
-    list-style-type: none !important;
-    list-style-image: none !important;
-}
-
-/* Global: kill ::marker on all list items (Chromium, Firefox, Safari) */
-li::marker {
+/* Stop pseudo-bullets on object-tools only (do NOT touch global ::before) */
+.object-tools li::before,
+.object-tools li::after {
     content: none !important;
     display: none !important;
-    color: transparent !important;
-    font-size: 0 !important;
-    visibility: hidden !important;
 }
-
-/* Global: kill pseudo-element bullets (some frameworks inject these) */
-li::before,
-li::after {
-    content: none !important;
-}
-
-/* Restore padding for actual nav lists so layout isn't crushed */
-#jazzy-sidebar ul,
-#jazzy-sidebar ol,
-.main-sidebar ul,
-.main-sidebar ol,
-.navbar-nav,
-.navbar-nav ul {
-    padding-left: 0 !important;
-    margin-left: 0 !important;
-}
-
-/* Keep the object-tools row as horizontal buttons */
-.object-tools,
-ul.object-tools {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 8px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
 
 
 /* ==========================================================================
@@ -258,26 +185,43 @@ body.login .container {
     margin: 80px auto !important;
 }
 
-/* Logo */
+/* Logo container */
 body.login .login-logo,
-body.login .brand-link,
-body.login .brand-image {
+body.login .brand-link {
     text-align: center !important;
     margin-bottom: 20px !important;
     padding-bottom: 16px !important;
     border-bottom: 1px solid #e8ecf0 !important;
+    max-width: 100% !important;
+    width: auto !important;
+    display: block !important;
 }
 
+/* Force logo to be small on admin login — maximum specificity */
+body.login img,
+body.login-page img,
+body.login .card img,
+body.login .card-body img,
+body.login .login-box img,
 body.login .login-logo img,
 body.login .brand-image,
-body.login img.brand-image {
-    max-width: 80px !important;
-    max-height: 80px !important;
-    width: 80px !important;
-    height: 80px !important;
+body.login .brand-link img,
+body.login .brand-link .brand-image,
+.login-page .card img,
+.login-page .login-box img,
+.login-page .brand-image,
+#login-form img,
+.login-card-body img {
+    max-width: 64px !important;
+    max-height: 64px !important;
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
     object-fit: contain !important;
     display: block !important;
-    margin: 0 auto 12px auto !important;
+    margin: 0 auto 16px auto !important;
+    padding: 0 !important;
 }
 
 /* "Sign in to start your session" heading */
@@ -380,51 +324,4 @@ body.login .errorlist li {
         margin: 20px auto !important;
         padding: 32px 24px !important;
     }
-}
-
-
-
-
-/* ==========================================================================
-   FORCE logo to be small on admin login — maximum specificity
-   ========================================================================== */
-
-/* Target every possible logo element inside the login page */
-body.login img,
-body.login-page img,
-body.login .card img,
-body.login .card-body img,
-body.login .login-box img,
-body.login .login-logo img,
-body.login .brand-image,
-body.login .brand-link img,
-body.login .brand-link .brand-image,
-.login-page .card img,
-.login-page .login-box img,
-.login-page .brand-image,
-#login-form img,
-.login-card-body img {
-    max-width: 64px !important;
-    max-height: 64px !important;
-    width: 64px !important;
-    height: 64px !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    object-fit: contain !important;
-    margin: 0 auto 16px auto !important;
-    padding: 0 !important;
-}
-
-/* The container that might be constraining or expanding the logo */
-body.login .login-logo,
-body.login .brand-link,
-body.login .brand-image-link,
-.login-page .login-logo,
-.login-page .brand-link {
-    max-width: 100% !important;
-    width: auto !important;
-    text-align: center !important;
-    display: block !important;
-    padding: 0 !important;
-    margin-bottom: 20px !important;
 }
