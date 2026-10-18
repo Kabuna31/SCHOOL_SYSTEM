@@ -12,6 +12,7 @@ from .models import (
     ClassRoom,
     StudentClassEnrollment,
     AllocatedSubject,
+    School,
 )
 
 
@@ -59,6 +60,12 @@ class SubjectResource(resources.ModelResource):
 
 
 class TeacherResource(resources.ModelResource):
+    school = fields.Field(
+        column_name="school",
+        attribute="school",
+        widget=ForeignKeyWidget(School, "name"),
+    )
+
     class Meta:
         model = Teacher
         fields = (
