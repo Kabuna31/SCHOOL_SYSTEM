@@ -19,6 +19,12 @@ A_LEVEL_RULES = [
 
 
 def seed_scales(apps, schema_editor):
+    # Skip the public schema — GradeScale is a tenant-app table and must only
+    # be seeded inside tenant schemas, where migration 0006 actually added
+    # the `level` column.
+    if schema_editor.connection.schema_name == "public":
+        return
+
     GradeScale = apps.get_model("examination", "GradeScale")
     GradeScaleRule = apps.get_model("examination", "GradeScaleRule")
     School = apps.get_model("administration", "School")
@@ -47,6 +53,9 @@ def seed_scales(apps, schema_editor):
 
 
 def unseed_scales(apps, schema_editor):
+    if schema_editor.connection.schema_name == "public":
+        return
+
     GradeScale = apps.get_model("examination", "GradeScale")
     GradeScale.objects.filter(
         name__in=["New Lower Secondary (UCE)", "Proposed UACE (2028)"]
