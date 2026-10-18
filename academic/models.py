@@ -52,6 +52,12 @@ class Subject(models.Model):
         Department, on_delete=models.CASCADE, blank=True, null=True
     )
 
+    # NEW: mark UACE subsidiary subjects (e.g. General Paper, Sub-Math/ICT).
+    is_subsidiary = models.BooleanField(
+        default=False,
+        help_text="True for UACE subsidiary subjects. Does not count toward principal points.",
+    )
+
     objects = SchoolScopedManager()
     unfiltered_objects = models.Manager()
 
@@ -135,7 +141,6 @@ class Teacher(models.Model):
                 or f"teacher_{self.username or (self.first_name or '') + (self.last_name or '')}@school-system.local"
             ).strip().lower()
 
-            # Reuse an existing CustomUser if one already owns this email.
             user = CustomUser.objects.filter(email__iexact=email).first()
             if user is None:
                 user = CustomUser.objects.create(
@@ -409,12 +414,10 @@ class Parent(models.Model):
             self.email or f"parent_{self.phone_number}@school-system.local"
         ).strip().lower()
 
-        # 1) Match an existing user by phone within this school.
         user = CustomUser.objects.filter(
             school=self.school, phone_number=self.phone_number
         ).first()
 
-        # 2) Fallback: match globally by email (users_customuser.email is globally unique).
         if user is None and self.email:
             user = CustomUser.objects.filter(email__iexact=self.email.strip()).first()
 

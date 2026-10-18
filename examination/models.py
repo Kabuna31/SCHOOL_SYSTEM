@@ -12,23 +12,50 @@ from administration.managers import SchoolScopedManager
 logger = logging.getLogger(__name__)
 
 
+# ---------------------------------------------------------------------------
+# Ugandan grading constants
+# ---------------------------------------------------------------------------
+# O-Level (UCE): New competence-based curriculum (A-E).
+#   CA (20%) + EoC (80%). No divisions. D is the minimum pass for a certificate.
+#
+# A-Level (UACE): Proposed reform (expected ~2028).
+#   Grades A-E (no O/F). Points: A=5, B=4, C=3, D=2, E=1.
+#   Max total score (incl. subsidiaries) expected to be 20.
+#   CA (20%) + National Exam (80%). Final details still being piloted.
+
+
 class GradeScale(models.Model):
-    """Translate a numeric grade to some other scale.
-    Example: Letter grade or 4.0 scale."""
+    """Translate a numeric score to a Ugandan grade scale.
+
+    Supports the new O-Level (UCE) and proposed A-Level (UACE) scales.
+    """
+
+    class Level(models.TextChoices):
+        O_LEVEL = "O", "O-Level (UCE, New Curriculum)"
+        A_LEVEL = "A", "A-Level (UACE, Proposed 2028)"
 
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name="grade_scales")
     name = models.CharField(max_length=255)
+    level = models.CharField(
+        max_length=1,
+        choices=Level.choices,
+        default=Level.O_LEVEL,
+        help_text="O-Level uses A-E; A-Level uses the proposed A-E scale.",
+    )
 
     objects = SchoolScopedManager()
     unfiltered_objects = models.Manager()
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["school", "name"], name="unique_school_grade_scale")
+            models.UniqueConstraint(
+                fields=["school", "name"],
+                name="unique_school_grade_scale",
+            )
         ]
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.get_level_display()})"
 
     def get_rule(self, grade):
         if grade is None:
@@ -37,30 +64,81 @@ class GradeScale(models.Model):
             min_grade__lte=grade, max_grade__gte=grade
         ).first()
         if not rule:
-            logger.debug("No grade scale rule matched a numeric grade.")
+            logger.debug("No grade scale rule matched numeric grade %s.", grade)
         return rule
 
     def to_letter(self, grade):
         rule = self.get_rule(grade)
-        if rule:
-            return rule.letter_grade
-        return None
+        return rule.letter_grade if rule else None
 
     def to_numeric(self, grade):
         rule = self.get_rule(grade)
-        if rule:
-            return rule.numeric_scale
-        return None
+        return rule.numeric_scale if rule else None
+
+    # --- Uganda-specific seed helpers --------------------------------------
+    @classmethod
+    def seed_new_lower_secondary_scale(cls, school, name="New Lower Secondary (UCE)"):
+        """Create the A-E competence-based scale for Uganda's new O-Level curriculum."""
+        scale, _ = cls.objects.get_or_create(
+            school=school, name=name,
+            defaults={"level": cls.Level.O_LEVEL},
+        )
+        rules = [
+            (80.00, 100.00, "A", 5),   # Exceptional
+            (70.00,  79.99, "B", 4),   # Outstanding
+            (60.00,  69.99, "C", 3),   # Satisfactory
+            (50.00,  59.99, "D", 2),   # Basic (minimum pass for certificate)
+            ( 0.00,  49.99, "E", 1),   # Elementary
+        ]
+        for mn, mx, letter, pts in rules:
+            GradeScaleRule.unfiltered_objects.get_or_create(
+                school=school, grade_scale=scale,
+                min_grade=mn, max_grade=mx,
+                defaults={"letter_grade": letter, "numeric_scale": pts},
+            )
+        return scale
+
+    @classmethod
+    def seed_proposed_uace_scale(cls, school, name="Proposed UACE (2028)"):
+        """Create the proposed A-E scale for A-Level (UACE).
+
+        Points: A=5, B=4, C=3, D=2, E=1.
+        Score bands are illustrative; final UNEB cut-offs are TBD.
+        """
+        scale, _ = cls.objects.get_or_create(
+            school=school, name=name,
+            defaults={"level": cls.Level.A_LEVEL},
+        )
+        rules = [
+            (80.00, 100.00, "A", 5),
+            (70.00,  79.99, "B", 4),
+            (60.00,  69.99, "C", 3),
+            (50.00,  59.99, "D", 2),
+            ( 0.00,  49.99, "E", 1),
+        ]
+        for mn, mx, letter, pts in rules:
+            GradeScaleRule.unfiltered_objects.get_or_create(
+                school=school, grade_scale=scale,
+                min_grade=mn, max_grade=mx,
+                defaults={"letter_grade": letter, "numeric_scale": pts},
+            )
+        return scale
 
 
 class GradeScaleRule(models.Model):
-    """One rule for a grade scale."""
+    """One rule for a grade scale (a score band → Ugandan letter + points)."""
 
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name="grade_scale_rules")
     min_grade = models.DecimalField(max_digits=5, decimal_places=2)
     max_grade = models.DecimalField(max_digits=5, decimal_places=2)
-    letter_grade = models.CharField(max_length=50, blank=True, null=True)
-    numeric_scale = models.DecimalField(max_digits=5, decimal_places=2, blank=True)
+    letter_grade = models.CharField(
+        max_length=50, blank=True, null=True,
+        help_text="O-Level: A-E. A-Level: A-E (proposed).",
+    )
+    numeric_scale = models.DecimalField(
+        max_digits=5, decimal_places=2, blank=True, null=True,
+        help_text="Points value. O-Level: 5 (A) - 1 (E). A-Level: 5 (A) - 1 (E).",
+    )
     grade_scale = models.ForeignKey(GradeScale, on_delete=models.CASCADE)
 
     objects = SchoolScopedManager()
@@ -69,8 +147,8 @@ class GradeScaleRule(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["school", "grade_scale", "min_grade", "max_grade"], 
-                name="unique_school_grade_scale_rule"
+                fields=["school", "grade_scale", "min_grade", "max_grade"],
+                name="unique_school_grade_scale_rule",
             )
         ]
         indexes = [
@@ -78,25 +156,31 @@ class GradeScaleRule(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.min_grade}-{self.max_grade} {self.letter_grade} {self.numeric_scale}"
+        return f"{self.min_grade}-{self.max_grade} {self.letter_grade} ({self.numeric_scale} pts)"
 
     def clean(self):
-        if not self.letter_grade and not self.numeric_scale:
+        if not self.letter_grade and self.numeric_scale is None:
             raise ValidationError(
-                "Either a letter grade or numeric scale must be provided."
+                "Either a letter grade or numeric points value must be provided."
             )
         if self.letter_grade and self.numeric_scale is None:
             raise ValidationError(
-                "If a letter grade is provided, numeric scale must also be provided."
+                "If a letter grade is provided, the points value must also be provided."
             )
-        if self.numeric_scale and self.letter_grade is None:
+        if self.numeric_scale is not None and not self.letter_grade:
             raise ValidationError(
-                "If a numeric scale is provided, a letter grade must also be provided."
+                "If a points value is provided, a letter grade must also be provided."
             )
+        if self.grade_scale_id:
+            if not (1 <= float(self.numeric_scale) <= 5):
+                raise ValidationError(
+                    {"numeric_scale": "Points must be between 1 and 5."}
+                )
 
     def save(self, *args, **kwargs):
         if self.min_grade >= self.max_grade:
             raise ValidationError("min_grade must be less than max_grade.")
+        self.clean()
         super().save(*args, **kwargs)
 
 
@@ -115,7 +199,7 @@ class Result(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["school", "student", "academic_year", "term"],
-                name="unique_school_student_term_result"
+                name="unique_school_student_term_result",
             )
         ]
 
@@ -123,16 +207,86 @@ class Result(models.Model):
         return str(self.student)
 
     def clean(self):
-        if self.gpa is not None and (self.gpa < 0.0 or self.gpa > 4.0):
-            raise ValidationError("GPA must be between 0.0 and 4.0.")
-        if self.cat_gpa is not None and (self.cat_gpa < 0.0 or self.cat_gpa > 4.0):
-            raise ValidationError("CAT GPA must be between 0.0 and 4.0.")
+        if self.gpa is not None and (self.gpa < 0.0 or self.gpa > 100.0):
+            raise ValidationError("Overall score must be between 0 and 100.")
+        if self.cat_gpa is not None and (self.cat_gpa < 0.0 or self.cat_gpa > 100.0):
+            raise ValidationError("CAT overall score must be between 0 and 100.")
+
+
+class SubjectResult(models.Model):
+    """Per-subject result combining CA (20%) and final exam (80%).
+
+    New curriculum O-Level and proposed A-Level reform both use
+    CA = 20%, EoC/Exam = 80%. The final score is mapped to a letter and
+    points via the linked GradeScale.
+    """
+
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name="subject_results")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
+    term = models.ForeignKey(Term, on_delete=models.SET_NULL, blank=True, null=True)
+
+    ca_score = models.FloatField(null=True, blank=True)
+    exam_score = models.FloatField(null=True, blank=True)
+    final_score = models.FloatField(null=True, blank=True)
+
+    letter_grade = models.CharField(max_length=5, blank=True, null=True)
+    points = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+
+    grade_scale = models.ForeignKey(
+        GradeScale, on_delete=models.SET_NULL, null=True, blank=True,
+        help_text="Scale used to map final_score to letter_grade and points.",
+    )
+
+    objects = SchoolScopedManager()
+    unfiltered_objects = models.Manager()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["school", "student", "subject", "academic_year", "term"],
+                name="unique_subject_result_scope",
+            )
+        ]
+        ordering = ("student__admission_number", "subject__name")
+
+    def __str__(self):
+        return f"{self.student} - {self.subject} - {self.final_score}"
+
+    def compute_final(self, ca_weight=0.20, exam_weight=0.80):
+        if self.ca_score is None and self.exam_score is None:
+            self.final_score = None
+            return
+        ca = self.ca_score or 0.0
+        ex = self.exam_score or 0.0
+        self.final_score = round(ca * ca_weight + ex * exam_weight, 2)
+
+    def apply_grade_scale(self):
+        if self.final_score is None or not self.grade_scale_id:
+            return
+        rule = self.grade_scale.get_rule(self.final_score)
+        if rule:
+            self.letter_grade = rule.letter_grade
+            self.points = rule.numeric_scale
+
+    def save(self, *args, **kwargs):
+        self.compute_final()
+        self.apply_grade_scale()
+        super().save(*args, **kwargs)
 
 
 class ExaminationListHandler(models.Model):
+    """A scheduled exam / assessment event in a Ugandan secondary school."""
+
     ASSESSMENT_TYPE_CHOICES = (
-        ("AOI", "Assessment of Learning (AOI)"),
+        ("BOT", "Beginning of Term (BOT)"),
+        ("MOT", "Mid of Term (MOT)"),
         ("EOT", "End of Term (EOT)"),
+        ("CA",  "Continuous Assessment (CA)"),
+        ("MOCK", "Mock Examination"),
+        ("UCE", "UCE (National O-Level)"),
+        ("UACE", "UACE (National A-Level)"),
     )
 
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name="examinations")
@@ -145,16 +299,19 @@ class ExaminationListHandler(models.Model):
         blank=True,
     )
     assessment_type = models.CharField(
-        max_length=3,
+        max_length=4,
         choices=ASSESSMENT_TYPE_CHOICES,
         default="EOT",
     )
     start_date = models.DateField()
     ends_date = models.DateField()
-    out_of = models.IntegerField()
+    out_of = models.IntegerField(
+        default=100,
+        help_text="Maximum marks. Ugandan school assessments are normally out of 100.",
+    )
     classrooms = models.ManyToManyField(ClassRoom, related_name="class_exams")
     comments = models.CharField(
-        max_length=200, blank=True, null=True, help_text="Comments Regarding Exam"
+        max_length=200, blank=True, null=True, help_text="Comments regarding the exam."
     )
     created_by = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
     created_on = models.DateTimeField(auto_now_add=True)
@@ -188,7 +345,7 @@ class ExaminationListHandler(models.Model):
             and self.term.academic_year.school_id != self.school_id
         ):
             raise ValidationError("The selected term belongs to another school.")
-        super(ExaminationListHandler, self).clean()
+        super().clean()
 
 
 class MarksManagement(models.Model):
@@ -219,7 +376,7 @@ class MarksManagement(models.Model):
             raise ValidationError(
                 f"Points scored must be between 0 and {self.exam_name.out_of}."
             )
-        super(MarksManagement, self).clean()
+        super().clean()
 
     def _submission_is_locked(self, for_update=False):
         if not all((self.school_id, self.exam_name_id, self.subject_id, self.student_id)):
