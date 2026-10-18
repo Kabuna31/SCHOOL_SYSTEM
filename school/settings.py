@@ -197,6 +197,7 @@ DATABASES = {
 if TENANCY_CONFIGURED:
     DATABASES["default"]["ENGINE"] = "django_tenants.postgresql_backend"
 
+DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
 # ---------------------------------------------------------------------------
 # Password validation
 # ---------------------------------------------------------------------------
