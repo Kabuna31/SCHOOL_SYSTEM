@@ -161,7 +161,7 @@ if TENANCY_CONFIGURED:
 
 if TENANCY_ENABLED:
     PUBLIC_SCHEMA_URLCONF = "school.public_urls"
-    MIDDLEWARE.insert(0, "django_tenants.middleware.subfolder.TenantSubfolderMiddleware")
+    MIDDLEWARE.insert(0, "django_tenants.middleware.main.TenantMainMiddleware")
 
 TEMPLATES = [
     {
