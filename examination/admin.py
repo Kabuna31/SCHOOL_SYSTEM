@@ -29,6 +29,7 @@ from .models import (
     MarksSubmission,
     MarksSubmissionEvent,
     Result,
+    SubjectResult,
 )
 
 
@@ -36,6 +37,30 @@ from .models import (
 enable_import_export(GradeScale)
 enable_import_export(GradeScaleRule)
 enable_import_export(Result)
+
+
+@admin.register(SubjectResult)
+class SubjectResultAdmin(admin.ModelAdmin):
+    list_display = (
+        "student",
+        "subject",
+        "term",
+        "ca_score",
+        "exam_score",
+        "final_score",
+        "letter_grade",
+        "points",
+        "grade_scale",
+    )
+    list_filter = ("academic_year", "term", "letter_grade", "grade_scale")
+    search_fields = (
+        "student__admission_number",
+        "student__first_name",
+        "student__last_name",
+        "subject__name",
+    )
+    readonly_fields = ("final_score", "letter_grade", "points")
+    autocomplete_fields = ("student", "subject")
 
 
 class ExaminationListHandlerResource(resources.ModelResource):
@@ -69,7 +94,6 @@ class ExaminationListHandlerResource(resources.ModelResource):
         import_formats = ("csv", "xlsx")
 
 
-
 @admin.register(ExaminationListHandler)
 class ExaminationListHandlerAdmin(ImportExportModelAdmin):
     resource_class = ExaminationListHandlerResource
@@ -88,8 +112,6 @@ class ExaminationListHandlerAdmin(ImportExportModelAdmin):
 
 
 # ---------- MarksManagement (import/export + custom "Enter marks" view) ----------
-# In examination/admin.py, replace the MarksManagementResource class
-
 class MarksManagementResource(resources.ModelResource):
     student = fields.Field(
         column_name="student",
@@ -127,6 +149,7 @@ class MarksManagementResource(resources.ModelResource):
         )
         export_formats = ("csv", "xlsx")
         import_formats = ("csv", "xlsx")
+
 
 @admin.register(MarksManagement)
 class MarksManagementAdmin(ImportExportModelAdmin):
