@@ -68,6 +68,7 @@ class TeacherResource(resources.ModelResource):
             "email",
             "phone_number",
             "gender",
+            "school",
         )
         export_order = fields
         import_id_fields = ("email",)
