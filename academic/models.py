@@ -130,20 +130,35 @@ class Teacher(models.Model):
             self.username = f"{self.first_name.lower()}{self.last_name.lower()}{get_random_string(4)}"
 
         if not self.user:
-            user = CustomUser.objects.create(
-                first_name=self.first_name,
-                last_name=self.last_name,
-                email=self.email,
-                is_teacher=True,
-                school=self.school,
-            )
-            default_password = f"Complex.{self.empId[-4:] if self.empId and len(self.empId) >= 4 else '0000'}"
-            user.set_password(default_password)
-            user.save()
+            email = (
+                self.email
+                or f"teacher_{self.username or (self.first_name or '') + (self.last_name or '')}@school-system.local"
+            ).strip().lower()
+
+            # Reuse an existing CustomUser if one already owns this email.
+            user = CustomUser.objects.filter(email__iexact=email).first()
+            if user is None:
+                user = CustomUser.objects.create(
+                    first_name=self.first_name,
+                    last_name=self.last_name,
+                    email=email,
+                    is_teacher=True,
+                    school=self.school,
+                )
+                default_password = (
+                    f"Complex.{self.empId[-4:] if self.empId and len(self.empId) >= 4 else '0000'}"
+                )
+                user.set_password(default_password)
+                user.save()
+            elif not user.is_teacher:
+                user.is_teacher = True
+                user.save(update_fields=["is_teacher"])
+
             self.user = user
 
             group, _ = Group.objects.get_or_create(name="teacher")
-            user.groups.add(group)
+            if not user.groups.filter(name="teacher").exists():
+                user.groups.add(group)
 
         super().save(*args, **kwargs)
 
@@ -390,21 +405,43 @@ class Parent(models.Model):
         return f"{self.first_name} {self.last_name} ({self.email})"
 
     def save(self, *args, **kwargs):
-        user, created = CustomUser.objects.get_or_create(
-            phone_number=self.phone_number,
-            school=self.school,
-            defaults={
-                "first_name": self.first_name,
-                "last_name": self.last_name,
-                "email": self.email,
-                "is_parent": True,
-            },
-        )
+        email = (
+            self.email or f"parent_{self.phone_number}@school-system.local"
+        ).strip().lower()
 
-        if created:
+        # 1) Match an existing user by phone within this school.
+        user = CustomUser.objects.filter(
+            school=self.school, phone_number=self.phone_number
+        ).first()
+
+        # 2) Fallback: match globally by email (users_customuser.email is globally unique).
+        if user is None and self.email:
+            user = CustomUser.objects.filter(email__iexact=self.email.strip()).first()
+
+        if user is not None:
+            changed_fields = []
+            if not user.email:
+                user.email = email
+                changed_fields.append("email")
+            if not user.is_parent:
+                user.is_parent = True
+                changed_fields.append("is_parent")
+            if changed_fields:
+                user.save(update_fields=changed_fields)
+        else:
+            user = CustomUser.objects.create(
+                school=self.school,
+                phone_number=self.phone_number,
+                first_name=self.first_name or "",
+                last_name=self.last_name or "",
+                email=email,
+                is_parent=True,
+            )
             user.set_password("Complex.0000")
             user.save()
-            group, _ = Group.objects.get_or_create(name="parent")
+
+        group, _ = Group.objects.get_or_create(name="parent")
+        if not user.groups.filter(name="parent").exists():
             user.groups.add(group)
 
         self.user = user
