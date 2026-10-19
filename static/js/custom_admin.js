@@ -1,34 +1,468 @@
-/* Rockland S.S. — admin polish */
+/* ==========================================================================
+   Rockland S.S. — Admin design system (lux theme)
+   Clean, professional, scoped to avoid breaking Django admin internals.
+   ========================================================================== */
 
-(function () {
-    "use strict";
+:root {
+    --brand-primary: #1e3a5f;
+    --brand-accent: #2563eb;
+    --brand-surface: #f4f6f9;
+    --brand-border: #e5e7eb;
+    --brand-text: #1f2937;
+    --brand-muted: #6b7280;
+    --brand-radius: 8px;
+    --brand-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
 
-    document.addEventListener("DOMContentLoaded", function () {
-        // Remember the last-clicked sidebar link across reloads
-        var links = document.querySelectorAll(".nav-sidebar .nav-link");
-        links.forEach(function (link) {
-            link.addEventListener("click", function () {
-                try {
-                    sessionStorage.setItem("lastActiveNav", link.getAttribute("href"));
-                } catch (e) {
-                    /* sessionStorage disabled — ignore */
-                }
-            });
-        });
+/* ---------- Typography ---------- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, sans-serif;
+    color: var(--brand-text);
+    background: var(--brand-surface);
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
 
-        // Highlight the current section on reload
-        try {
-            var lastActive = sessionStorage.getItem("lastActiveNav");
-            if (lastActive) {
-                var match = document.querySelector(
-                    '.nav-sidebar a[href="' + lastActive + '"]'
-                );
-                if (match) {
-                    match.classList.add("active");
-                }
-            }
-        } catch (e) {
-            /* sessionStorage disabled — ignore */
-        }
-    });
-})();
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.015em;
+}
+
+/* ==========================================================================
+   TOP NAVBAR — force visibility on every theme
+   ========================================================================== */
+#jazzy-navbar {
+    background-color: #0d1b3e !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+}
+
+#jazzy-navbar .navbar-brand,
+#jazzy-navbar .brand-link,
+#jazzy-navbar .brand-text {
+    color: #ffffff !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px !important;
+}
+
+#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-radius: 6px !important;
+    margin: 4px 3px !important;
+    padding: 6px 14px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-weight: 500 !important;
+    font-size: 0.85rem !important;
+    transition: background 0.15s ease !important;
+}
+
+#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.16) !important;
+    color: #ffffff !important;
+}
+
+#jazzy-navbar .navbar-nav:not(.ms-auto) .nav-link i {
+    color: #ffffff !important;
+    opacity: 0.9 !important;
+    margin-right: 4px !important;
+}
+
+#jazzy-navbar .navbar-nav.ms-auto .nav-link,
+#jazzy-navbar .navbar-nav.ms-auto .nav-link i,
+#jazzy-navbar .navbar-nav.ms-auto .nav-link span {
+    color: #ffffff !important;
+}
+
+#jazzy-navbar .navbar-nav.ms-auto .dropdown-menu {
+    background-color: #142842 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+#jazzy-navbar .navbar-nav.ms-auto .dropdown-item {
+    color: #ffffff !important;
+}
+
+#jazzy-navbar .navbar-nav.ms-auto .dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar,
+.app-sidebar {
+    box-shadow: 1px 0 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.nav-sidebar .nav-header {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 0.9rem 1rem 0.4rem;
+    margin-top: 0.5rem;
+}
+
+.nav-sidebar .nav-link {
+    border-radius: var(--brand-radius);
+    margin: 1px 8px;
+    padding: 0.55rem 0.85rem;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.nav-sidebar .nav-link.active {
+    background: rgba(255, 255, 255, 0.12) !important;
+    font-weight: 500;
+}
+
+.nav-sidebar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.nav-sidebar .nav-link i.nav-icon {
+    font-size: 0.9rem;
+    width: 1.2rem;
+    text-align: center;
+    margin-right: 0.5rem;
+    opacity: 0.85;
+}
+
+/* ---------- Content area ---------- */
+.content-wrapper {
+    background: var(--brand-surface) !important;
+}
+
+.content-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--brand-text);
+    margin-bottom: 0.25rem;
+}
+
+/* ---------- Cards & modules ---------- */
+.card {
+    border: 1px solid var(--brand-border);
+    border-radius: var(--brand-radius);
+    box-shadow: var(--brand-shadow);
+    background: #ffffff;
+}
+
+.card-header {
+    background: #ffffff;
+    border-bottom: 1px solid var(--brand-border);
+    font-weight: 600;
+    padding: 0.9rem 1.15rem;
+}
+
+.card-body {
+    padding: 1.15rem;
+}
+
+/* ---------- Changelist table ---------- */
+#result_list {
+    border-radius: var(--brand-radius);
+    overflow: hidden;
+    border: 1px solid var(--brand-border);
+    box-shadow: var(--brand-shadow);
+}
+
+#result_list thead th {
+    background: #f3f4f6;
+    color: var(--brand-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 0.75rem 0.85rem;
+    border-bottom: 1px solid var(--brand-border);
+}
+
+#result_list tbody td,
+#result_list tbody th {
+    padding: 0.7rem 0.85rem;
+    border-bottom: 1px solid var(--brand-border);
+    font-size: 0.875rem;
+}
+
+#result_list tbody tr:hover {
+    background: #f9fafb;
+}
+
+#result_list tbody tr.selected {
+    background: #eff6ff;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+    border-radius: var(--brand-radius);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    padding: 0.45rem 1rem;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-primary {
+    background: var(--brand-accent) !important;
+    border-color: var(--brand-accent) !important;
+    color: #ffffff !important;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--brand-primary);
+    border: 1px solid var(--brand-border);
+}
+
+.btn-secondary:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+/* ---------- Form inputs ---------- */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="url"],
+textarea,
+select {
+    border: 1px solid var(--brand-border);
+    border-radius: var(--brand-radius);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    background: #ffffff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--brand-accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    outline: none;
+}
+
+/* ---------- Import / Export buttons — kill ALL bullets in content ---------- */
+#content ul,
+#content ol,
+#content-main ul,
+#content-main ol,
+.content ul,
+.content ol {
+    list-style: none !important;
+    list-style-type: none !important;
+    list-style-image: none !important;
+}
+
+#content ul li,
+#content ol li,
+#content-main ul li,
+#content-main ol li,
+.content ul li,
+.content ol li {
+    list-style: none !important;
+    list-style-type: none !important;
+}
+
+#content li::marker,
+#content-main li::marker,
+.content li::marker {
+    content: none !important;
+    color: transparent !important;
+    font-size: 0 !important;
+}
+
+#content ul li::before,
+#content ul li::after,
+#content-main ul li::before,
+#content-main ul li::after {
+    content: none !important;
+    display: none !important;
+}
+
+.object-tools,
+ul.object-tools,
+.object-tools-items,
+ul.object-tools-items {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    padding: 0 !important;
+    margin: 0 0 1rem 0 !important;
+}
+
+.object-tools li a,
+.object-tools-items li a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.45rem 1rem;
+    border-radius: var(--brand-radius);
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+/* ---------- Messages ---------- */
+.messagelist li {
+    border-radius: var(--brand-radius);
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* ---------- Breadcrumbs ---------- */
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+    font-size: 0.85rem;
+    color: var(--brand-muted);
+}
+
+.breadcrumb a {
+    color: var(--brand-accent);
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   Login page
+   ========================================================================== */
+body.login {
+    background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%) !important;
+    min-height: 100vh;
+}
+
+body.login .login-box {
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+body.login .login-logo {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding: 0;
+}
+
+/* Hide duplicate logo (Jazzmin renders logo-light AND logo-dark) */
+body.login .login-logo img.logo-dark,
+body.login img.logo-dark {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    pointer-events: none !important;
+}
+
+/* Size the single visible logo */
+body.login .login-logo img.logo-light,
+body.login .login-logo img {
+    max-width: 120px !important;
+    max-height: 120px !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin: 0 auto 1rem auto !important;
+    padding: 0 !important;
+}
+
+/* Login card */
+body.login .card,
+body.login .login-card-body {
+    border-radius: 12px !important;
+    border-top: 4px solid var(--brand-accent) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+    padding: 2.25rem !important;
+    background: #ffffff !important;
+}
+
+body.login .login-box-msg {
+    font-size: 0.75rem !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    color: var(--brand-muted) !important;
+    text-align: center !important;
+    margin-bottom: 1.75rem !important;
+}
+
+body.login label {
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    color: var(--brand-muted) !important;
+    margin-bottom: 0.35rem !important;
+    display: block !important;
+}
+
+body.login .form-control {
+    padding: 0.75rem 0.9rem !important;
+    font-size: 0.9rem !important;
+    background: #f9fafb !important;
+    border: 1px solid var(--brand-border) !important;
+    border-radius: var(--brand-radius) !important;
+}
+
+body.login .form-control:focus {
+    background: #ffffff !important;
+    border-color: var(--brand-accent) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+}
+
+body.login .input-group-text {
+    background: #ffffff !important;
+    border: 1px solid var(--brand-border) !important;
+    color: var(--brand-muted) !important;
+}
+
+body.login input[type="submit"],
+body.login .btn-primary {
+    padding: 0.75rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    background: var(--brand-primary) !important;
+    border: none !important;
+    border-radius: var(--brand-radius) !important;
+    color: #ffffff !important;
+}
+
+body.login input[type="submit"]:hover,
+body.login .btn-primary:hover {
+    background: #142842 !important;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 991px) {
+    .nav-sidebar .nav-link {
+        margin: 1px 4px;
+    }
+
+    .content-header h1 {
+        font-size: 1.25rem;
+    }
+
+    body.login .login-logo img {
+        max-width: 100px !important;
+        max-height: 100px !important;
+    }
+}
