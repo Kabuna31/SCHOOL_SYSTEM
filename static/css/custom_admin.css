@@ -158,15 +158,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-primary {
-    background: var(--brand-accent);
-    border-color: var(--brand-accent);
-    color: #ffffff;
+    background: var(--brand-accent) !important;
+    border-color: var(--brand-accent) !important;
+    color: #ffffff !important;
 }
 
 .btn-primary:hover {
-    background: #1d4ed8;
-    border-color: #1d4ed8;
-    color: #ffffff;
+    background: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
 }
 
 .btn-secondary {
@@ -293,7 +293,7 @@ ul.object-tools-items {
    Login page
    ========================================================================== */
 body.login {
-    background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
+    background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%) !important;
     min-height: 100vh;
 }
 
@@ -306,12 +306,12 @@ body.login .login-logo {
     text-align: center;
     margin-bottom: 1.5rem;
     padding: 0;
-    line-height: 1;
 }
 
-/* Jazzmin renders BOTH logo-light and logo-dark in the same .login-logo.
-   Hide the dark variant in light mode so only ONE logo shows. */
-body.login .login-logo .logo-dark {
+/* Hide the duplicate logo — .logo-dark is Jazzmin's dark-mode variant.
+   In light mode (default), only .logo-light should show. */
+body.login .login-logo img.logo-dark,
+body.login img.logo-dark {
     display: none !important;
     visibility: hidden !important;
     width: 0 !important;
@@ -322,9 +322,9 @@ body.login .login-logo .logo-dark {
 }
 
 /* In dark mode, flip: show dark logo, hide light one. */
-html[data-bs-theme="dark"] body.login .login-logo .logo-light,
-html[data-theme="dark"] body.login .login-logo .logo-light,
-body.login.dark-mode .login-logo .logo-light {
+html[data-bs-theme="dark"] body.login .login-logo img.logo-light,
+html[data-theme="dark"] body.login .login-logo img.logo-light,
+body.login.dark-mode .login-logo img.logo-light {
     display: none !important;
     visibility: hidden !important;
     width: 0 !important;
@@ -334,9 +334,9 @@ body.login.dark-mode .login-logo .logo-light {
     pointer-events: none !important;
 }
 
-html[data-bs-theme="dark"] body.login .login-logo .logo-dark,
-html[data-theme="dark"] body.login .login-logo .logo-dark,
-body.login.dark-mode .login-logo .logo-dark {
+html[data-bs-theme="dark"] body.login .login-logo img.logo-dark,
+html[data-theme="dark"] body.login .login-logo img.logo-dark,
+body.login.dark-mode .login-logo img.logo-dark {
     display: block !important;
     visibility: visible !important;
     width: auto !important;
@@ -346,84 +346,85 @@ body.login.dark-mode .login-logo .logo-dark {
     pointer-events: auto !important;
 }
 
-/* Size the single visible logo — fit within max box, preserve aspect ratio */
+/* Size the single visible logo */
+body.login .login-logo img.logo-light,
 body.login .login-logo img {
-    max-width: 180px !important;
-    max-height: 80px !important;
+    max-width: 120px !important;
+    max-height: 120px !important;
     width: auto !important;
     height: auto !important;
     min-width: 0 !important;
     min-height: 0 !important;
     object-fit: contain !important;
     display: block !important;
-    margin: 0 auto 1.25rem auto !important;
+    margin: 0 auto 1rem auto !important;
     padding: 0 !important;
 }
 
 /* Login card */
 body.login .card,
 body.login .login-card-body {
-    border-radius: 12px;
-    border-top: 4px solid var(--brand-accent);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    padding: 2.25rem;
+    border-radius: 12px !important;
+    border-top: 4px solid var(--brand-accent) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+    padding: 2.25rem !important;
 }
 
 body.login .login-box-msg {
-    font-size: 0.75rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--brand-muted);
-    text-align: center;
-    margin-bottom: 1.75rem;
+    font-size: 0.75rem !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    color: var(--brand-muted) !important;
+    text-align: center !important;
+    margin-bottom: 1.75rem !important;
 }
 
 body.login label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--brand-muted);
-    margin-bottom: 0.35rem;
-    display: block;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    color: var(--brand-muted) !important;
+    margin-bottom: 0.35rem !important;
+    display: block !important;
 }
 
 body.login .form-control {
-    padding: 0.75rem 0.9rem;
-    font-size: 0.9rem;
-    background: #f9fafb;
-    border: 1px solid var(--brand-border);
-    border-radius: var(--brand-radius);
+    padding: 0.75rem 0.9rem !important;
+    font-size: 0.9rem !important;
+    background: #f9fafb !important;
+    border: 1px solid var(--brand-border) !important;
+    border-radius: var(--brand-radius) !important;
 }
 
 body.login .form-control:focus {
-    background: #ffffff;
-    border-color: var(--brand-accent);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    background: #ffffff !important;
+    border-color: var(--brand-accent) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
 }
 
 body.login .input-group-text {
-    background: #ffffff;
-    border: 1px solid var(--brand-border);
-    color: var(--brand-muted);
+    background: #ffffff !important;
+    border: 1px solid var(--brand-border) !important;
+    color: var(--brand-muted) !important;
 }
 
 body.login input[type="submit"],
 body.login .btn-primary {
-    padding: 0.75rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    background: var(--brand-primary);
-    border: none;
-    border-radius: var(--brand-radius);
-    color: #ffffff;
+    padding: 0.75rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    background: var(--brand-primary) !important;
+    border: none !important;
+    border-radius: var(--brand-radius) !important;
+    color: #ffffff !important;
 }
 
 body.login input[type="submit"]:hover,
 body.login .btn-primary:hover {
-    background: #142842;
+    background: #142842 !important;
 }
 
 /* ---------- Responsive ---------- */
@@ -437,7 +438,7 @@ body.login .btn-primary:hover {
     }
 
     body.login .login-logo img {
-        max-width: 140px !important;
-        max-height: 64px !important;
+        max-width: 100px !important;
+        max-height: 100px !important;
     }
 }
