@@ -1,115 +1,138 @@
-{% extends "admin/base_site.html" %}
-{% load static %}
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Log in | Rockland Secondary School</title>
+    <link rel="icon" href="{% static 'img/school-logo.webp' %}">
+    <style>
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+        }
+        .login-logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .login-logo img {
+            max-width: 120px;
+            max-height: 120px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+        .login-card {
+            background: #ffffff;
+            border-radius: 12px;
+            border-top: 4px solid #2563eb;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            padding: 32px;
+        }
+        .login-heading {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #6b7280;
+            text-align: center;
+            margin: 0 0 24px 0;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 6px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+        }
+        input:focus {
+            outline: none;
+            background: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            background: #1e3a5f;
+            border: none;
+            border-radius: 8px;
+            color: #ffffff;
+            cursor: pointer;
+            transition: background 0.15s;
+            margin-top: 8px;
+        }
+        .btn-login:hover {
+            background: #142842;
+        }
+        .alert-error {
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #991b1b;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-left: 4px solid #dc2626;
+            border-radius: 6px;
+        }
+        .footer-note {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-logo">
+            <img src="{% static 'img/school-logo.webp' %}" alt="Rockland S.S.">
+        </div>
 
-{% block title %}Log in | Rockland Secondary School{% endblock %}
-{% block bodyclass %}login{% endblock %}
-{% block nav-breadcrumbs %}{% endblock %}
-{% block content_title %}{% endblock %}
-
-{% block extrastyle %}
-{{ block.super }}
-<style>
-    body.login {
-        background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    body.login .login-box {
-        max-width: 420px;
-        width: 100%;
-        margin: 0 auto;
-    }
-    body.login .login-logo {
-        text-align: center;
-        margin-bottom: 1.5rem;
-    }
-    body.login .login-logo img {
-        max-width: 120px;
-        max-height: 120px;
-        width: auto;
-        height: auto;
-        object-fit: contain;
-    }
-    body.login .card {
-        border-radius: 12px;
-        border-top: 4px solid #2563eb;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        padding: 2rem;
-        background: #ffffff;
-    }
-    body.login .login-box-msg {
-        font-size: 0.75rem;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: #6b7280;
-        text-align: center;
-        margin-bottom: 1.5rem;
-    }
-    body.login label {
-        font-size: 0.7rem;
-        font-weight: 600;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        color: #6b7280;
-        margin-bottom: 0.35rem;
-        display: block;
-    }
-    body.login input[type="text"],
-    body.login input[type="password"],
-    body.login input[type="email"] {
-        width: 100%;
-        padding: 0.75rem 0.9rem;
-        font-size: 0.9rem;
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-    }
-    body.login input:focus {
-        background: #ffffff;
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-        outline: none;
-    }
-    body.login input[type="submit"],
-    body.login .btn-primary {
-        width: 100%;
-        padding: 0.75rem;
-        font-size: 0.8rem;
-        font-weight: 600;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        background: #1e3a5f;
-        border: none;
-        border-radius: 8px;
-        color: #ffffff;
-        cursor: pointer;
-    }
-    body.login input[type="submit"]:hover,
-    body.login .btn-primary:hover {
-        background: #142842;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="login-box">
-    <div class="login-logo">
-        <img src="{% static 'img/school-logo.webp' %}" alt="Rockland S.S.">
-    </div>
-
-    <div class="card">
-        <div class="card-body login-card-body">
-            <p class="login-box-msg">Welcome back, Administrator!</p>
+        <div class="login-card">
+            <h1 class="login-heading">Welcome back, Administrator!</h1>
 
             <form action="{{ app_path }}" method="post" id="login-form">
                 {% csrf_token %}
 
                 {% if form.errors %}
-                <div class="alert alert-danger" role="alert">
-                    Please enter a correct email and password.
+                <div class="alert-error" role="alert">
+                    Please enter a correct email and password. Note that both fields may be case-sensitive.
                 </div>
                 {% endif %}
 
@@ -122,7 +145,6 @@
                     <input type="text"
                            name="username"
                            id="id_username"
-                           class="form-control"
                            placeholder="Email address"
                            autocomplete="username"
                            autofocus
@@ -134,20 +156,19 @@
                     <input type="password"
                            name="password"
                            id="id_password"
-                           class="form-control"
                            placeholder="Password"
                            autocomplete="current-password"
                            required>
                     <input type="hidden" name="this_is_the_login_form" value="1">
                 </div>
 
-                <div class="d-grid mt-3">
-                    <button type="submit" class="btn btn-primary">
-                        Log in
-                    </button>
-                </div>
+                <button type="submit" class="btn-login">
+                    Log in
+                </button>
             </form>
         </div>
+
+        <p class="footer-note">© 2026 Rockland Secondary School</p>
     </div>
-</div>
-{% endblock %}
+</body>
+</html>
