@@ -29,21 +29,21 @@ from .models import (
     MarksSubmission,
     MarksSubmissionEvent,
     Result,
-    SubjectResult,
 )
 
 
 # ---------- Simple models: one-line import/export ----------
 enable_import_export(GradeScale)
 enable_import_export(GradeScaleRule)
-enable_import_export(Result)
 
 
-@admin.register(SubjectResult)
-class SubjectResultAdmin(admin.ModelAdmin):
+# ---------- Result (per-subject, canonical) ----------
+@admin.register(Result)
+class ResultAdmin(admin.ModelAdmin):
     list_display = (
         "student",
         "subject",
+        "academic_year",
         "term",
         "ca_score",
         "exam_score",
@@ -61,6 +61,7 @@ class SubjectResultAdmin(admin.ModelAdmin):
     )
     readonly_fields = ("final_score", "letter_grade", "points")
     autocomplete_fields = ("student", "subject")
+    list_select_related = ("student", "subject", "grade_scale")
 
 
 class ExaminationListHandlerResource(resources.ModelResource):
@@ -111,7 +112,7 @@ class ExaminationListHandlerAdmin(ImportExportModelAdmin):
     filter_horizontal = ("classrooms",)
 
 
-# ---------- MarksManagement (import/export + custom "Enter marks" view) ----------
+# ---------- MarksManagement ----------
 class MarksManagementResource(resources.ModelResource):
     student = fields.Field(
         column_name="student",
