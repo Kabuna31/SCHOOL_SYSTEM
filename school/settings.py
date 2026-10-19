@@ -328,8 +328,7 @@ if not DEBUG:
     X_FRAME_OPTIONS = "DENY"
 
 # ---------------------------------------------------------------------------
-# Jazzmin configuration — cleaned up for a professional, alphabetically
-# ordered admin.
+# Jazzmin configuration — grouped priority ordering + litera theme
 # ---------------------------------------------------------------------------
 JAZZMIN_SETTINGS = {
     # Title & Branding
@@ -401,9 +400,37 @@ JAZZMIN_SETTINGS = {
     "navigation_expanded": True,
     "hide_apps": [],
     "hide_models": [],
-    # NOTE: order_with_respect_to removed on purpose. Without it, Django
-    # sorts apps and models alphabetically — clean, predictable, no
-    # maintenance overhead. Re-add only if you truly need custom order.
+
+    # Grouped priority ordering — puts daily-use apps first, keeps related
+    # models together. Every examination/academic model is listed so none
+    # fall back to alphabetical within their app.
+    "order_with_respect_to": [
+        "academic",
+        "academic.student",
+        "academic.teacher",
+        "academic.parent",
+        "academic.classlevel",
+        "academic.classroom",
+        "academic.subject",
+        "academic.allocatedsubject",
+        "examination",
+        "examination.result",
+        "examination.marksmanagement",
+        "examination.markssubmission",
+        "examination.examinationlisthandler",
+        "examination.gradescale",
+        "examination.gradescalerule",
+        "examination.markssubmissionevent",
+        "finance",
+        "reports",
+        "attendance",
+        "administration",
+        "authentication and authorization",
+        "automation and notifications",
+        "notes",
+        "timetable",
+        "users",
+    ],
     "related_modal_active": True,
     "custom_css": "css/custom_admin.css",
     "custom_js": "",
@@ -411,7 +438,7 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": False,
 
     # UI theme options
-    "theme": "cosmo",
+    "theme": "litera",
     "default_theme_mode": "auto",
     "changeform_format": "horizontal_tabs",
     "changeform_format_overrides": {
