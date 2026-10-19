@@ -1,17 +1,17 @@
 /* ==========================================================================
-   Rockland S.S. — Admin design system
+   Rockland S.S. — Admin design system (lux theme)
    Clean, professional, scoped to avoid breaking Django admin internals.
    ========================================================================== */
 
 :root {
     --brand-primary: #1e3a5f;
     --brand-accent: #2563eb;
-    --brand-surface: #f8f9fb;
+    --brand-surface: #f4f6f9;
     --brand-border: #e5e7eb;
     --brand-text: #1f2937;
     --brand-muted: #6b7280;
-    --brand-radius: 6px;
-    --brand-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --brand-radius: 8px;
+    --brand-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 /* ---------- Typography ---------- */
@@ -19,16 +19,18 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, sans-serif;
     color: var(--brand-text);
     background: var(--brand-surface);
+    font-size: 0.875rem;
+    line-height: 1.5;
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
 }
 
 /* ---------- Navbar ---------- */
 .navbar {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -44,7 +46,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ---------- Sidebar ---------- */
 .sidebar {
-    box-shadow: 1px 0 3px rgba(0, 0, 0, 0.04);
+    box-shadow: 1px 0 3px rgba(0, 0, 0, 0.05);
 }
 
 .nav-sidebar .nav-header {
@@ -61,7 +63,7 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: var(--brand-radius);
     margin: 1px 8px;
     padding: 0.55rem 0.85rem;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease;
 }
 
 .nav-sidebar .nav-link.active {
@@ -90,6 +92,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--brand-text);
+    margin-bottom: 0.25rem;
 }
 
 /* ---------- Cards & modules ---------- */
@@ -116,6 +119,7 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: var(--brand-radius);
     overflow: hidden;
     border: 1px solid var(--brand-border);
+    box-shadow: var(--brand-shadow);
 }
 
 #result_list thead th {
@@ -150,16 +154,30 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 500;
     letter-spacing: 0.01em;
     padding: 0.45rem 1rem;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-primary {
     background: var(--brand-accent);
     border-color: var(--brand-accent);
+    color: #ffffff;
 }
 
 .btn-primary:hover {
     background: #1d4ed8;
     border-color: #1d4ed8;
+    color: #ffffff;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--brand-primary);
+    border: 1px solid var(--brand-border);
+}
+
+.btn-secondary:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
 }
 
 /* ---------- Form inputs ---------- */
@@ -174,6 +192,7 @@ select {
     border-radius: var(--brand-radius);
     padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
+    background: #ffffff;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -181,27 +200,61 @@ input:focus,
 textarea:focus,
 select:focus {
     border-color: var(--brand-accent);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     outline: none;
 }
 
-/* ---------- Object tools (Import/Export buttons) ---------- */
-.object-tools {
+/* ---------- Import / Export buttons — kill ALL bullets in content ---------- */
+#content ul,
+#content ol,
+#content-main ul,
+#content-main ol,
+.content ul,
+.content ol {
     list-style: none !important;
+    list-style-type: none !important;
+    list-style-image: none !important;
+}
+
+#content ul li,
+#content ol li,
+#content-main ul li,
+#content-main ol li,
+.content ul li,
+.content ol li {
+    list-style: none !important;
+    list-style-type: none !important;
+}
+
+#content li::marker,
+#content-main li::marker,
+.content li::marker {
+    content: none !important;
+    color: transparent !important;
+    font-size: 0 !important;
+}
+
+#content ul li::before,
+#content ul li::after,
+#content-main ul li::before,
+#content-main ul li::after {
+    content: none !important;
+    display: none !important;
+}
+
+.object-tools,
+ul.object-tools,
+.object-tools-items,
+ul.object-tools-items {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
     padding: 0 !important;
     margin: 0 0 1rem 0 !important;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
 }
 
-.object-tools li {
-    list-style: none !important;
-    margin: 0;
-    padding: 0;
-}
-
-.object-tools li a {
+.object-tools li a,
+.object-tools-items li a {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -238,27 +291,53 @@ select:focus {
 
 /* ---------- Login page ---------- */
 body.login {
-    background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+    background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
     min-height: 100vh;
 }
 
 body.login .card,
-body.login .login-box .card {
-    border-radius: 10px;
+body.login .login-box .card,
+body.login .login-card-body {
+    border-radius: 12px;
     border-top: 4px solid var(--brand-accent);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-    padding: 2rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    padding: 2.25rem;
     max-width: 420px;
     margin: 0 auto;
 }
 
+/* Login logo — small, single, centered */
+body.login img,
+body.login-page img,
 body.login .login-logo img,
-body.login .brand-image {
-    max-width: 64px;
-    max-height: 64px;
-    object-fit: contain;
-    margin: 0 auto 1rem;
-    display: block;
+body.login .login-box img,
+body.login .card img,
+body.login .card-body img,
+body.login .brand-image,
+body.login .brand-link img,
+body.login .brand-link .brand-image,
+.login-page .brand-image,
+.login-page .login-box img,
+#login-form img,
+.login-card-body img {
+    max-width: 72px !important;
+    max-height: 72px !important;
+    width: 72px !important;
+    height: 72px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin: 0 auto 1.25rem auto !important;
+    padding: 0 !important;
+}
+
+body.login .login-logo img ~ img,
+body.login .brand-link img ~ img,
+body.login .login-logo .brand-image + .brand-image,
+body.login .login-logo + .login-logo,
+body.login .card-body .login-logo:not(:first-child) {
+    display: none !important;
 }
 
 body.login .login-box-msg {
@@ -267,7 +346,7 @@ body.login .login-box-msg {
     text-transform: uppercase;
     color: var(--brand-muted);
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
 }
 
 body.login label {
@@ -302,16 +381,12 @@ body.login .btn-primary {
     background: var(--brand-primary);
     border: none;
     border-radius: var(--brand-radius);
+    color: #ffffff;
 }
 
 body.login input[type="submit"]:hover,
 body.login .btn-primary:hover {
     background: #142842;
-}
-
-/* ---------- Safety: scoped list styling ---------- */
-ul:not(.nav):not(.navbar-nav):not(.object-tools) li {
-    list-style-position: inside;
 }
 
 /* ---------- Responsive ---------- */
