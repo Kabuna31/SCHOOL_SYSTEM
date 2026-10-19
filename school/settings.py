@@ -167,8 +167,8 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
-            os.path.join(BASE_DIR, "static/dist"),
             os.path.join(BASE_DIR, "templates"),
+            os.path.join(BASE_DIR, "static/dist"),
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -309,6 +309,13 @@ AUTH_USER_MODEL = "users.CustomUser"
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+# ---------------------------------------------------------------------------
+# Authentication URLs — stops portal login redirecting to admin
+# ---------------------------------------------------------------------------
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/portal/"
+LOGOUT_REDIRECT_URL = "/login/"
 
 # ---------------------------------------------------------------------------
 # Production security (only when DEBUG is False)
@@ -471,8 +478,8 @@ JAZZMIN_SETTINGS = {
         "users",
     ],
     "related_modal_active": True,
-    "custom_css": "css/custom_admin.css",
-    "custom_js": "js/custom_admin.js",
+    "custom_css": "/static/css/custom_admin.css",
+    "custom_js": "/static/js/custom_admin.js",
     "use_google_fonts_cdn": True,
     "show_ui_builder": False,
 
