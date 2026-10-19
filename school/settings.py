@@ -477,7 +477,7 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": False,
 
     # ---------- Theme ----------
-    "theme": "flatly",
+    "theme": "lux",
     "default_theme_mode": "light",
     "changeform_format": "horizontal_tabs",
     "changeform_format_overrides": {
