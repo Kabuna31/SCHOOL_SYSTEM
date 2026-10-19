@@ -328,7 +328,6 @@ if not DEBUG:
     X_FRAME_OPTIONS = "DENY"
 
 # ---------------------------------------------------------------------------
-# ---------------------------------------------------------------------------
 # Jazzmin configuration
 # ---------------------------------------------------------------------------
 JAZZMIN_SETTINGS = {
@@ -340,13 +339,14 @@ JAZZMIN_SETTINGS = {
     "login_logo": "img/school-logo.webp",
     "welcome_sign": "Welcome back, Administrator!",
     "copyright": "School Management System",
+    "site_icon": "img/school-logo.webp",
 
     # Search model configuration
     "search_model": ["users.customuser", "academic.classlevel"],
 
     # Top Menu Links
     "topmenu_links": [
-        {"name": "Home", "url": "/admin/", "icon": "fas fa-home"},
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
         {"name": "Dashboard", "url": "/reports/dashboard/", "icon": "fas fa-chart-pie"},
         {"name": "Reports", "url": "/reports/", "icon": "fas fa-file-alt"},
     ],
@@ -354,7 +354,10 @@ JAZZMIN_SETTINGS = {
     # User Menu
     "usermenu_links": [
         {
-           "name": "Profile & Account", "url": "/admin/users/customuser/", "icon": "fas fa-user-shield"},
+            "name": "Profile & Account",
+            "url": "/admin/users/customuser/",
+            "icon": "fas fa-user-shield",
+        },
     ],
 
     # Sidebar icon mapping
@@ -380,7 +383,9 @@ JAZZMIN_SETTINGS = {
         "attendance.studentattendance": "fas fa-user-check",
         "attendance.teachersattendance": "fas fa-user-clock",
         "examination": "fas fa-file-alt",
-        "examination.result": "fas fa-poll",
+        "examination.result": "fas fa-clipboard-check",
+        "examination.gradescale": "fas fa-layer-group",
+        "examination.gradescalerule": "fas fa-ruler-combined",
         "finance": "fas fa-wallet",
         "finance.payment": "fas fa-money-bill-wave",
         "finance.receipt": "fas fa-receipt",
@@ -393,65 +398,104 @@ JAZZMIN_SETTINGS = {
     # UI tweaks & layout
     "show_sidebar": True,
     "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+    "order_with_respect_to": [
+        "academic",
+        "academic.student",
+        "academic.teacher",
+        "academic.parent",
+        "academic.classlevel",
+        "examination",
+        "examination.result",
+        "examination.markssubmission",
+        "finance",
+        "reports",
+        "attendance",
+    ],
     "related_modal_active": True,
     "custom_css": "css/custom_admin.css",
     "custom_js": "",
+    "use_google_fonts_cdn": True,
     "show_ui_builder": False,
 
     # UI theme options
-    "theme": "default",
+    "theme": "flatly",
     "default_theme_mode": "auto",
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",
+        "auth.group": "vertical_tabs",
+    },
 
     # Custom sidebar sections
     "custom_links": {
-        "reports": [{
-            "name": "Attendance",
-            "url": "/reports/attendance/",
-            "icon": "fas fa-user-check",
-        }, {
-            "name": "Fee Trends",
-            "url": "/reports/fee-trends/",
-            "icon": "fas fa-chart-line",
-        }, {
-            "name": "Marksheets",
-            "url": "/reports/marksheet-picker/",
-            "icon": "fas fa-table",
-        }, {
-            "name": "Analysis",
-            "url": "/reports/analysis-picker/",
-            "icon": "fas fa-chart-bar",
-        }, {
-            "name": "Mid-Term Reports",
-            "url": "/reports/report-card-picker/?type=AOI",
-            "icon": "fas fa-clipboard-check",
-        }, {
-            "name": "Fee Defaulters",
-            "url": "/reports/defaulters/",
-            "icon": "fas fa-exclamation-triangle",
-        }],
+        "reports": [
+            {
+                "name": "Attendance",
+                "url": "/reports/attendance/",
+                "icon": "fas fa-user-check",
+            },
+            {
+                "name": "Fee Trends",
+                "url": "/reports/fee-trends/",
+                "icon": "fas fa-chart-line",
+            },
+            {
+                "name": "Marksheets",
+                "url": "/reports/marksheet-picker/",
+                "icon": "fas fa-table",
+            },
+            {
+                "name": "Analysis",
+                "url": "/reports/analysis-picker/",
+                "icon": "fas fa-chart-bar",
+            },
+            {
+                "name": "Mid-Term Reports",
+                "url": "/reports/report-card-picker/?type=AOI",
+                "icon": "fas fa-clipboard-check",
+            },
+            {
+                "name": "Fee Defaulters",
+                "url": "/reports/defaulters/",
+                "icon": "fas fa-exclamation-triangle",
+            },
+        ],
     },
 }
 
 JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": False,
-    "footer_small_text": False,
+    "footer_small_text": True,
     "body_small_text": False,
     "brand_small_text": False,
     "brand_colour": "navbar-navy",
-    "accent": "accent-primary",
+    "accent": "accent-info",
     "navbar": "navbar-dark navbar-navy",
-    "no_navbar_border": False,
+    "no_navbar_border": True,
     "navbar_fixed": True,
     "layout_fixed": True,
     "footer_fixed": False,
     "sidebar_fixed": True,
     "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
     "sidebar_nav_child_indent": True,
-    "sidebar_nav_compact_style": False,
+    "sidebar_nav_compact_style": True,
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
+    "theme": "flatly",
+    "dark_mode_theme": "darkly",
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
 }
-
 
 # ---------------------------------------------------------------------------
 # Logging — surface errors to Render logs
@@ -488,6 +532,3 @@ LOGGING = {
         },
     },
 }
-
-
-
