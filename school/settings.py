@@ -328,7 +328,8 @@ if not DEBUG:
     X_FRAME_OPTIONS = "DENY"
 
 # ---------------------------------------------------------------------------
-# Jazzmin configuration
+# Jazzmin configuration — cleaned up for a professional, alphabetically
+# ordered admin.
 # ---------------------------------------------------------------------------
 JAZZMIN_SETTINGS = {
     # Title & Branding
@@ -400,19 +401,9 @@ JAZZMIN_SETTINGS = {
     "navigation_expanded": True,
     "hide_apps": [],
     "hide_models": [],
-    "order_with_respect_to": [
-        "academic",
-        "academic.student",
-        "academic.teacher",
-        "academic.parent",
-        "academic.classlevel",
-        "examination",
-        "examination.result",
-        "examination.markssubmission",
-        "finance",
-        "reports",
-        "attendance",
-    ],
+    # NOTE: order_with_respect_to removed on purpose. Without it, Django
+    # sorts apps and models alphabetically — clean, predictable, no
+    # maintenance overhead. Re-add only if you truly need custom order.
     "related_modal_active": True,
     "custom_css": "css/custom_admin.css",
     "custom_js": "",
@@ -420,7 +411,7 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": False,
 
     # UI theme options
-    "theme": "flatly",
+    "theme": "cosmo",
     "default_theme_mode": "auto",
     "changeform_format": "horizontal_tabs",
     "changeform_format_overrides": {
@@ -485,7 +476,6 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_compact_style": True,
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
-    "theme": "flatly",
     "dark_mode_theme": "darkly",
     "button_classes": {
         "primary": "btn-primary",
