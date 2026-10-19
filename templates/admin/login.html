@@ -1,21 +1,95 @@
 {% extends "admin/base_site.html" %}
 {% load static %}
 
+{% block title %}Log in | Rockland Secondary School{% endblock %}
+{% block bodyclass %}login{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+{% block content_title %}{% endblock %}
+
 {% block extrastyle %}
 {{ block.super }}
 <style>
     body.login {
         background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-    .login-logo img {
+    body.login .login-box {
+        max-width: 420px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    body.login .login-logo {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    body.login .login-logo img {
         max-width: 120px;
         max-height: 120px;
         width: auto;
         height: auto;
         object-fit: contain;
     }
-    .login-logo .logo-dark {
-        display: none;
+    body.login .card {
+        border-radius: 12px;
+        border-top: 4px solid #2563eb;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        padding: 2rem;
+        background: #ffffff;
+    }
+    body.login .login-box-msg {
+        font-size: 0.75rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #6b7280;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    body.login label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #6b7280;
+        margin-bottom: 0.35rem;
+        display: block;
+    }
+    body.login input[type="text"],
+    body.login input[type="password"],
+    body.login input[type="email"] {
+        width: 100%;
+        padding: 0.75rem 0.9rem;
+        font-size: 0.9rem;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    body.login input:focus {
+        background: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        outline: none;
+    }
+    body.login input[type="submit"],
+    body.login .btn-primary {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        background: #1e3a5f;
+        border: none;
+        border-radius: 8px;
+        color: #ffffff;
+        cursor: pointer;
+    }
+    body.login input[type="submit"]:hover,
+    body.login .btn-primary:hover {
+        background: #142842;
     }
 </style>
 {% endblock %}
@@ -25,13 +99,53 @@
     <div class="login-logo">
         <img src="{% static 'img/school-logo.webp' %}" alt="Rockland S.S.">
     </div>
+
     <div class="card">
         <div class="card-body login-card-body">
             <p class="login-box-msg">Welcome back, Administrator!</p>
-            <form method="post">
+
+            <form action="{{ app_path }}" method="post" id="login-form">
                 {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary btn-block">Log in</button>
+
+                {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                    Please enter a correct email and password.
+                </div>
+                {% endif %}
+
+                {% if next %}
+                <input type="hidden" name="next" value="{{ next }}">
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="id_username">Email address:</label>
+                    <input type="text"
+                           name="username"
+                           id="id_username"
+                           class="form-control"
+                           placeholder="Email address"
+                           autocomplete="username"
+                           autofocus
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_password">Password:</label>
+                    <input type="password"
+                           name="password"
+                           id="id_password"
+                           class="form-control"
+                           placeholder="Password"
+                           autocomplete="current-password"
+                           required>
+                    <input type="hidden" name="this_is_the_login_form" value="1">
+                </div>
+
+                <div class="d-grid mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        Log in
+                    </button>
+                </div>
             </form>
         </div>
     </div>
