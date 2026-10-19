@@ -19,9 +19,6 @@ A_LEVEL_RULES = [
 
 
 def seed_scales(apps, schema_editor):
-    # Skip the public schema — GradeScale is a tenant-app table and must only
-    # be seeded inside tenant schemas, where migration 0006 actually added
-    # the `level` column.
     if schema_editor.connection.schema_name == "public":
         return
 
@@ -65,7 +62,7 @@ def unseed_scales(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("examination", "0006_gradescale_level_and_more"),
+        ("examination", "0007_rebuild_result_table"),
         ("administration", "0003_school_class_teacher_signature_and_more"),
     ]
 
