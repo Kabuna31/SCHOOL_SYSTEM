@@ -289,37 +289,58 @@ ul.object-tools-items {
     text-decoration: underline;
 }
 
-/* ---------- Login page ---------- */
+/* ==========================================================================
+   Login page
+   ========================================================================== */
 body.login {
     background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
     min-height: 100vh;
 }
 
-body.login .card,
-body.login .login-box .card,
-body.login .login-card-body {
-    border-radius: 12px;
-    border-top: 4px solid var(--brand-accent);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    padding: 2.25rem;
+body.login .login-box {
     max-width: 420px;
     margin: 0 auto;
 }
 
-/* Login logo — small, single, centered */
-body.login img,
-body.login-page img,
-body.login .login-logo img,
-body.login .login-box img,
-body.login .card img,
-body.login .card-body img,
-body.login .brand-image,
-body.login .brand-link img,
-body.login .brand-link .brand-image,
-.login-page .brand-image,
-.login-page .login-box img,
-#login-form img,
-.login-card-body img {
+body.login .login-logo {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding: 0;
+}
+
+/* Jazzmin renders BOTH logo-light and logo-dark in the same .login-logo.
+   Hide the dark variant in light mode so only ONE logo shows. */
+body.login .login-logo .logo-dark {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+}
+
+/* In dark mode, flip: show dark logo, hide light one. */
+html[data-bs-theme="dark"] body.login .login-logo .logo-light,
+html[data-theme="dark"] body.login .login-logo .logo-light,
+body.login.dark-mode .login-logo .logo-light {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+}
+
+html[data-bs-theme="dark"] body.login .login-logo .logo-dark,
+html[data-theme="dark"] body.login .login-logo .logo-dark,
+body.login.dark-mode .login-logo .logo-dark {
+    display: block !important;
+    visibility: visible !important;
+    width: auto !important;
+    height: auto !important;
+    opacity: 1 !important;
+}
+
+/* Size the single visible logo */
+body.login .login-logo img {
     max-width: 72px !important;
     max-height: 72px !important;
     width: 72px !important;
@@ -328,16 +349,17 @@ body.login .brand-link .brand-image,
     min-height: 0 !important;
     object-fit: contain !important;
     display: block !important;
-    margin: 0 auto 1.25rem auto !important;
+    margin: 0 auto !important;
     padding: 0 !important;
 }
 
-body.login .login-logo img ~ img,
-body.login .brand-link img ~ img,
-body.login .login-logo .brand-image + .brand-image,
-body.login .login-logo + .login-logo,
-body.login .card-body .login-logo:not(:first-child) {
-    display: none !important;
+/* Login card */
+body.login .card,
+body.login .login-card-body {
+    border-radius: 12px;
+    border-top: 4px solid var(--brand-accent);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    padding: 2.25rem;
 }
 
 body.login .login-box-msg {
@@ -359,20 +381,28 @@ body.login label {
     display: block;
 }
 
-body.login input[type="text"],
-body.login input[type="password"] {
-    width: 100%;
+body.login .form-control {
     padding: 0.75rem 0.9rem;
     font-size: 0.9rem;
     background: #f9fafb;
     border: 1px solid var(--brand-border);
     border-radius: var(--brand-radius);
-    margin-bottom: 1rem;
+}
+
+body.login .form-control:focus {
+    background: #ffffff;
+    border-color: var(--brand-accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+body.login .input-group-text {
+    background: #ffffff;
+    border: 1px solid var(--brand-border);
+    color: var(--brand-muted);
 }
 
 body.login input[type="submit"],
 body.login .btn-primary {
-    width: 100%;
     padding: 0.75rem;
     font-size: 0.8rem;
     font-weight: 600;
