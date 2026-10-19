@@ -328,82 +328,121 @@ if not DEBUG:
     X_FRAME_OPTIONS = "DENY"
 
 # ---------------------------------------------------------------------------
-# Jazzmin configuration — grouped priority ordering + litera theme
+# Jazzmin configuration — grouped sidebar + professional theme
 # ---------------------------------------------------------------------------
 JAZZMIN_SETTINGS = {
-    # Title & Branding
+    # ---------- Branding ----------
     "site_title": "School Management Portal",
     "site_header": "School Administration",
-    "site_brand": "School Management",
+    "site_brand": "Rockland S.S.",
     "site_logo": "",
+    "site_logo_classes": "img-circle",
     "login_logo": "img/school-logo.webp",
-    "welcome_sign": "Welcome back, Administrator!",
-    "copyright": "School Management System",
+    "login_logo_dark": None,
     "site_icon": "img/school-logo.webp",
+    "welcome_sign": "Welcome back, Administrator!",
+    "copyright": "Rockland Secondary School",
+    "search_model": ["users.customuser", "academic.student"],
 
-    # Search model configuration
-    "search_model": ["users.customuser", "academic.classlevel"],
-
-    # Top Menu Links
+    # ---------- Top menu ----------
     "topmenu_links": [
         {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
         {"name": "Dashboard", "url": "/reports/dashboard/", "icon": "fas fa-chart-pie"},
         {"name": "Reports", "url": "/reports/", "icon": "fas fa-file-alt"},
     ],
-
-    # User Menu
     "usermenu_links": [
-        {
-            "name": "Profile & Account",
-            "url": "/admin/users/customuser/",
-            "icon": "fas fa-user-shield",
-        },
+        {"name": "Profile & Account", "url": "/admin/users/customuser/", "icon": "fas fa-user-shield"},
     ],
 
-    # Sidebar icon mapping
+    # ---------- Icons ----------
     "icons": {
+        # Auth
         "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user-shield",
+        "auth.group": "fas fa-users",
+        # Users
         "users.customuser": "fas fa-user-shield",
         "users.accountant": "fas fa-calculator",
-        "administration.school": "fas fa-school",
-        "academic.allocatedsubject": "fas fa-book-open",
+        # Academic
+        "academic": "fas fa-graduation-cap",
+        "academic.student": "fas fa-user-graduate",
+        "academic.teacher": "fas fa-chalkboard-teacher",
+        "academic.parent": "fas fa-user-friends",
         "academic.classlevel": "fas fa-layer-group",
         "academic.classroom": "fas fa-door-open",
         "academic.classyear": "fas fa-calendar-alt",
         "academic.department": "fas fa-building",
+        "academic.subject": "fas fa-book",
+        "academic.allocatedsubject": "fas fa-book-open",
         "academic.dormitory": "fas fa-bed",
         "academic.dormitoryallocation": "fas fa-clipboard-list",
         "academic.gradelevel": "fas fa-award",
-        "academic.parent": "fas fa-user-friends",
         "academic.messagetoparent": "fas fa-sms",
         "academic.messagetoteacher": "fas fa-comments",
-        "academic.subject": "fas fa-book",
-        "academic.teacher": "fas fa-chalkboard-teacher",
+        "academic.reasonleft": "fas fa-sign-out-alt",
+        "academic.stream": "fas fa-water",
+        "academic.studentclassenrollment": "fas fa-user-plus",
+        "academic.studentfile": "fas fa-folder-open",
+        "academic.studenthealthrecord": "fas fa-notes-medical",
+        "academic.studentsmedicalhistory": "fas fa-file-medical",
+        "academic.studentspreviousacademichistory": "fas fa-history",
+        "academic.subtopic": "fas fa-sitemap",
+        "academic.topic": "fas fa-tags",
+        # Attendance
         "attendance": "fas fa-user-check",
+        "attendance.attendancestatus": "fas fa-clipboard-check",
+        "attendance.periodattendance": "fas fa-clock",
         "attendance.studentattendance": "fas fa-user-check",
         "attendance.teachersattendance": "fas fa-user-clock",
+        # Examination
         "examination": "fas fa-file-alt",
         "examination.result": "fas fa-clipboard-check",
+        "examination.marksmanagement": "fas fa-marker",
+        "examination.markssubmission": "fas fa-paper-plane",
+        "examination.examinationlisthandler": "fas fa-list",
         "examination.gradescale": "fas fa-layer-group",
         "examination.gradescalerule": "fas fa-ruler-combined",
+        "examination.markssubmissionevent": "fas fa-stream",
+        # Finance
         "finance": "fas fa-wallet",
         "finance.payment": "fas fa-money-bill-wave",
+        "finance.paymentallocation": "fas fa-coins",
         "finance.receipt": "fas fa-receipt",
+        "finance.receiptallocation": "fas fa-file-invoice-dollar",
+        # Reports
+        "reports": "fas fa-chart-bar",
+        # Notes
         "notes": "fas fa-sticky-note",
         "notes.assignment": "fas fa-tasks",
+        "notes.choice": "fas fa-list-ul",
+        "notes.concept": "fas fa-lightbulb",
+        "notes.gradedassignment": "fas fa-star",
+        "notes.note": "fas fa-pen",
+        "notes.question": "fas fa-question-circle",
+        "notes.specificexplanation": "fas fa-info-circle",
+        # Administration
+        "administration": "fas fa-school",
+        "administration.school": "fas fa-school",
+        "administration.academicyear": "fas fa-calendar",
+        "administration.term": "fas fa-calendar-week",
+        "administration.schoolevent": "fas fa-calendar-day",
+        "administration.article": "fas fa-newspaper",
+        "administration.carouselimage": "fas fa-images",
+        # Automation
+        "automation": "fas fa-robot",
+        # Timetable / Schedule
+        "timetable": "fas fa-table",
+        "schedule": "fas fa-table",
+        "schedule.period": "fas fa-clock",
+        # SIS
         "sis": "fas fa-graduation-cap",
-        "sis.student": "fas fa-user-graduate",
     },
 
-    # UI tweaks & layout
+    # ---------- Layout ----------
     "show_sidebar": True,
-    "navigation_expanded": True,
+    "navigation_expanded": False,
     "hide_apps": [],
     "hide_models": [],
-
-    # Grouped priority ordering — puts daily-use apps first, keeps related
-    # models together. Every examination/academic model is listed so none
-    # fall back to alphabetical within their app.
     "order_with_respect_to": [
         "academic",
         "academic.student",
@@ -433,69 +472,52 @@ JAZZMIN_SETTINGS = {
     ],
     "related_modal_active": True,
     "custom_css": "css/custom_admin.css",
-    "custom_js": "",
+    "custom_js": "js/custom_admin.js",
     "use_google_fonts_cdn": True,
     "show_ui_builder": False,
 
-    # UI theme options
-    "theme": "litera",
-    "default_theme_mode": "auto",
+    # ---------- Theme ----------
+    "theme": "flatly",
+    "default_theme_mode": "light",
     "changeform_format": "horizontal_tabs",
     "changeform_format_overrides": {
         "auth.user": "collapsible",
         "auth.group": "vertical_tabs",
     },
 
-    # Custom sidebar sections
+    # ---------- Custom sidebar links ----------
     "custom_links": {
         "reports": [
-            {
-                "name": "Attendance",
-                "url": "/reports/attendance/",
-                "icon": "fas fa-user-check",
-            },
-            {
-                "name": "Fee Trends",
-                "url": "/reports/fee-trends/",
-                "icon": "fas fa-chart-line",
-            },
-            {
-                "name": "Marksheets",
-                "url": "/reports/marksheet-picker/",
-                "icon": "fas fa-table",
-            },
-            {
-                "name": "Analysis",
-                "url": "/reports/analysis-picker/",
-                "icon": "fas fa-chart-bar",
-            },
-            {
-                "name": "Mid-Term Reports",
-                "url": "/reports/report-card-picker/?type=AOI",
-                "icon": "fas fa-clipboard-check",
-            },
-            {
-                "name": "Fee Defaulters",
-                "url": "/reports/defaulters/",
-                "icon": "fas fa-exclamation-triangle",
-            },
+            {"name": "Attendance", "url": "/reports/attendance/", "icon": "fas fa-user-check"},
+            {"name": "Fee Trends", "url": "/reports/fee-trends/", "icon": "fas fa-chart-line"},
+            {"name": "Marksheets", "url": "/reports/marksheet-picker/", "icon": "fas fa-table"},
+            {"name": "Analysis", "url": "/reports/analysis-picker/", "icon": "fas fa-chart-bar"},
+            {"name": "Mid-Term Reports", "url": "/reports/report-card-picker/?type=AOI", "icon": "fas fa-clipboard-check"},
+            {"name": "Fee Defaulters", "url": "/reports/defaulters/", "icon": "fas fa-exclamation-triangle"},
         ],
     },
 }
 
 JAZZMIN_UI_TWEAKS = {
+    # ---------- Typography ----------
     "navbar_small_text": False,
     "footer_small_text": True,
     "body_small_text": False,
     "brand_small_text": False,
-    "brand_colour": "navbar-navy",
-    "accent": "accent-info",
-    "navbar": "navbar-dark navbar-navy",
+
+    # ---------- Colors ----------
+    "brand_colour": "navbar-dark",
+    "accent": "accent-primary",
+    "navbar": "navbar-dark",
     "no_navbar_border": True,
+
+    # ---------- Layout ----------
     "navbar_fixed": True,
     "layout_fixed": True,
     "footer_fixed": False,
     "sidebar_fixed": True,
+
+    # ---------- Sidebar ----------
     "sidebar": "sidebar-dark-primary",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
@@ -503,10 +525,14 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_compact_style": True,
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
+
+    # ---------- Dark mode ----------
     "dark_mode_theme": "darkly",
+
+    # ---------- Buttons ----------
     "button_classes": {
         "primary": "btn-primary",
-        "secondary": "btn-secondary",
+        "secondary": "btn-outline-secondary",
         "info": "btn-info",
         "warning": "btn-warning",
         "danger": "btn-danger",
