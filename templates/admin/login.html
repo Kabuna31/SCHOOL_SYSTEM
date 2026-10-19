@@ -1,0 +1,39 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    body.login {
+        background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
+    }
+    .login-logo img {
+        max-width: 120px;
+        max-height: 120px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+    }
+    .login-logo .logo-dark {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-box">
+    <div class="login-logo">
+        <img src="{% static 'img/school-logo.webp' %}" alt="Rockland S.S.">
+    </div>
+    <div class="card">
+        <div class="card-body login-card-body">
+            <p class="login-box-msg">Welcome back, Administrator!</p>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary btn-block">Log in</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
