@@ -306,6 +306,7 @@ body.login .login-logo {
     text-align: center;
     margin-bottom: 1.5rem;
     padding: 0;
+    line-height: 1;
 }
 
 /* Jazzmin renders BOTH logo-light and logo-dark in the same .login-logo.
@@ -316,6 +317,8 @@ body.login .login-logo .logo-dark {
     width: 0 !important;
     height: 0 !important;
     opacity: 0 !important;
+    position: absolute !important;
+    pointer-events: none !important;
 }
 
 /* In dark mode, flip: show dark logo, hide light one. */
@@ -327,6 +330,8 @@ body.login.dark-mode .login-logo .logo-light {
     width: 0 !important;
     height: 0 !important;
     opacity: 0 !important;
+    position: absolute !important;
+    pointer-events: none !important;
 }
 
 html[data-bs-theme="dark"] body.login .login-logo .logo-dark,
@@ -337,19 +342,21 @@ body.login.dark-mode .login-logo .logo-dark {
     width: auto !important;
     height: auto !important;
     opacity: 1 !important;
+    position: static !important;
+    pointer-events: auto !important;
 }
 
-/* Size the single visible logo */
+/* Size the single visible logo — fit within max box, preserve aspect ratio */
 body.login .login-logo img {
-    max-width: 72px !important;
-    max-height: 72px !important;
-    width: 72px !important;
-    height: 72px !important;
+    max-width: 180px !important;
+    max-height: 80px !important;
+    width: auto !important;
+    height: auto !important;
     min-width: 0 !important;
     min-height: 0 !important;
     object-fit: contain !important;
     display: block !important;
-    margin: 0 auto !important;
+    margin: 0 auto 1.25rem auto !important;
     padding: 0 !important;
 }
 
@@ -427,5 +434,10 @@ body.login .btn-primary:hover {
 
     .content-header h1 {
         font-size: 1.25rem;
+    }
+
+    body.login .login-logo img {
+        max-width: 140px !important;
+        max-height: 64px !important;
     }
 }
