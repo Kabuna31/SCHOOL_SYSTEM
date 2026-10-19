@@ -75,7 +75,6 @@ class GradeScale(models.Model):
         rule = self.get_rule(grade)
         return rule.numeric_scale if rule else None
 
-    # --- Uganda-specific seed helpers --------------------------------------
     @classmethod
     def seed_new_lower_secondary_scale(cls, school, name="New Lower Secondary (UCE)"):
         """Create the A-E competence-based scale for Uganda's new O-Level curriculum."""
@@ -84,11 +83,11 @@ class GradeScale(models.Model):
             defaults={"level": cls.Level.O_LEVEL},
         )
         rules = [
-            (80.00, 100.00, "A", 5),   # Exceptional
-            (70.00,  79.99, "B", 4),   # Outstanding
-            (60.00,  69.99, "C", 3),   # Satisfactory
-            (50.00,  59.99, "D", 2),   # Basic (minimum pass for certificate)
-            ( 0.00,  49.99, "E", 1),   # Elementary
+            (80.00, 100.00, "A", 5),
+            (70.00,  79.99, "B", 4),
+            (60.00,  69.99, "C", 3),
+            (50.00,  59.99, "D", 2),
+            ( 0.00,  49.99, "E", 1),
         ]
         for mn, mx, letter, pts in rules:
             GradeScaleRule.unfiltered_objects.get_or_create(
@@ -100,11 +99,7 @@ class GradeScale(models.Model):
 
     @classmethod
     def seed_proposed_uace_scale(cls, school, name="Proposed UACE (2028)"):
-        """Create the proposed A-E scale for A-Level (UACE).
-
-        Points: A=5, B=4, C=3, D=2, E=1.
-        Score bands are illustrative; final UNEB cut-offs are TBD.
-        """
+        """Create the proposed A-E scale for A-Level (UACE)."""
         scale, _ = cls.objects.get_or_create(
             school=school, name=name,
             defaults={"level": cls.Level.A_LEVEL},
@@ -185,43 +180,14 @@ class GradeScaleRule(models.Model):
 
 
 class Result(models.Model):
-    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name="results")
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    gpa = models.FloatField(null=True)
-    cat_gpa = models.FloatField(null=True)
-    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
-    term = models.ForeignKey(Term, on_delete=models.SET_NULL, blank=True, null=True)
-
-    objects = SchoolScopedManager()
-    unfiltered_objects = models.Manager()
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["school", "student", "academic_year", "term"],
-                name="unique_school_student_term_result",
-            )
-        ]
-
-    def __str__(self):
-        return str(self.student)
-
-    def clean(self):
-        if self.gpa is not None and (self.gpa < 0.0 or self.gpa > 100.0):
-            raise ValidationError("Overall score must be between 0 and 100.")
-        if self.cat_gpa is not None and (self.cat_gpa < 0.0 or self.cat_gpa > 100.0):
-            raise ValidationError("CAT overall score must be between 0 and 100.")
-
-
-class SubjectResult(models.Model):
     """Per-subject result combining CA (20%) and final exam (80%).
 
-    New curriculum O-Level and proposed A-Level reform both use
-    CA = 20%, EoC/Exam = 80%. The final score is mapped to a letter and
-    points via the linked GradeScale.
+    This is the canonical results model — one row per (student, subject,
+    academic_year, term). Replaces both the old per-term `Result` and the
+    intermediate `SubjectResult`.
     """
 
-    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name="subject_results")
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name="results")
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
@@ -246,7 +212,7 @@ class SubjectResult(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["school", "student", "subject", "academic_year", "term"],
-                name="unique_subject_result_scope",
+                name="unique_school_student_term_result",
             )
         ]
         ordering = ("student__admission_number", "subject__name")
@@ -519,3 +485,4 @@ class MarksSubmissionEvent(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Submission history entries cannot be deleted.")
+# rebuild trigger 20261019105406
