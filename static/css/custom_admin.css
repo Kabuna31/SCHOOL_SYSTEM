@@ -1,6 +1,5 @@
 /* ==========================================================================
-   Rockland S.S. — Admin design system (lux theme)
-   Clean, professional, scoped to avoid breaking Django admin internals.
+   Rockland S.S. — Admin design system
    ========================================================================== */
 
 :root {
@@ -14,7 +13,7 @@
     --brand-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
-/* ---------- Typography ---------- */
+/* ---------- Base typography ---------- */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, sans-serif;
     color: var(--brand-text);
@@ -28,20 +27,39 @@ h1, h2, h3, h4, h5, h6 {
     letter-spacing: -0.015em;
 }
 
-/* ---------- Navbar ---------- */
-.navbar {
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+/* ---------- Navbar (force dark, fix bg-body invisibility) ---------- */
+#jazzy-navbar.navbar {
+    background-color: #1a2332 !important;
+    background-image: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important;
 }
 
-.brand-link {
-    font-weight: 600;
-    letter-spacing: 0.5px;
+#jazzy-navbar .navbar-nav .nav-link,
+#jazzy-navbar .navbar-nav .nav-link i,
+#jazzy-navbar .navbar-brand,
+#jazzy-navbar .brand-text {
+    color: #ffffff !important;
 }
 
-.brand-text {
-    font-weight: 600;
-    letter-spacing: 0.3px;
+#jazzy-navbar .navbar-nav .nav-link:hover,
+#jazzy-navbar .navbar-nav .nav-link:hover i {
+    color: #b8935a !important;
+}
+
+#jazzy-navbar .form-control-navbar {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
+#jazzy-navbar .form-control-navbar::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+#jazzy-navbar .btn-navbar {
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 /* ---------- Sidebar ---------- */
@@ -83,7 +101,7 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0.85;
 }
 
-/* ---------- Content area ---------- */
+/* ---------- Content ---------- */
 .content-wrapper {
     background: var(--brand-surface);
 }
@@ -95,7 +113,7 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 0.25rem;
 }
 
-/* ---------- Cards & modules ---------- */
+/* ---------- Cards ---------- */
 .card {
     border: 1px solid var(--brand-border);
     border-radius: var(--brand-radius);
@@ -204,44 +222,7 @@ select:focus {
     outline: none;
 }
 
-/* ---------- Import / Export buttons — kill ALL bullets in content ---------- */
-#content ul,
-#content ol,
-#content-main ul,
-#content-main ol,
-.content ul,
-.content ol {
-    list-style: none !important;
-    list-style-type: none !important;
-    list-style-image: none !important;
-}
-
-#content ul li,
-#content ol li,
-#content-main ul li,
-#content-main ol li,
-.content ul li,
-.content ol li {
-    list-style: none !important;
-    list-style-type: none !important;
-}
-
-#content li::marker,
-#content-main li::marker,
-.content li::marker {
-    content: none !important;
-    color: transparent !important;
-    font-size: 0 !important;
-}
-
-#content ul li::before,
-#content ul li::after,
-#content-main ul li::before,
-#content-main ul li::after {
-    content: none !important;
-    display: none !important;
-}
-
+/* ---------- Import / Export button row ---------- */
 .object-tools,
 ul.object-tools,
 .object-tools-items,
@@ -251,6 +232,17 @@ ul.object-tools-items {
     gap: 8px !important;
     padding: 0 !important;
     margin: 0 0 1rem 0 !important;
+    list-style: none !important;
+}
+
+.object-tools li,
+.object-tools-items li {
+    list-style: none !important;
+}
+
+.object-tools li::marker,
+.object-tools-items li::marker {
+    content: none !important;
 }
 
 .object-tools li a,
@@ -308,8 +300,7 @@ body.login .login-logo {
     padding: 0;
 }
 
-/* Hide the duplicate logo — .logo-dark is Jazzmin's dark-mode variant.
-   In light mode (default), only .logo-light should show. */
+/* In light mode: hide logo-dark, show logo-light */
 body.login .login-logo img.logo-dark,
 body.login img.logo-dark {
     display: none !important;
@@ -321,7 +312,7 @@ body.login img.logo-dark {
     pointer-events: none !important;
 }
 
-/* In dark mode, flip: show dark logo, hide light one. */
+/* In dark mode: flip */
 html[data-bs-theme="dark"] body.login .login-logo img.logo-light,
 html[data-theme="dark"] body.login .login-logo img.logo-light,
 body.login.dark-mode .login-logo img.logo-light {
@@ -346,8 +337,7 @@ body.login.dark-mode .login-logo img.logo-dark {
     pointer-events: auto !important;
 }
 
-/* Size the single visible logo */
-body.login .login-logo img.logo-light,
+/* Size the visible logo */
 body.login .login-logo img {
     max-width: 120px !important;
     max-height: 120px !important;
@@ -361,7 +351,6 @@ body.login .login-logo img {
     padding: 0 !important;
 }
 
-/* Login card */
 body.login .card,
 body.login .login-card-body {
     border-radius: 12px !important;
@@ -441,42 +430,4 @@ body.login .btn-primary:hover {
         max-width: 100px !important;
         max-height: 100px !important;
     }
-}
-
-
-/* ==========================================================================
-   Fix invisible navbar: navbar-dark + bg-body = white on white
-   Override with a solid dark background
-   ========================================================================== */
-
-#jazzy-navbar.navbar {
-    background-color: #1a2332 !important;
-    background-image: none !important;
-}
-
-#jazzy-navbar .navbar-nav .nav-link,
-#jazzy-navbar .navbar-nav .nav-link i,
-#jazzy-navbar .navbar-brand {
-    color: #ffffff !important;
-}
-
-#jazzy-navbar .navbar-nav .nav-link:hover,
-#jazzy-navbar .navbar-nav .nav-link:hover i {
-    color: #b8935a !important;
-}
-
-/* Form inputs in navbar */
-#jazzy-navbar .form-control-navbar {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
-    color: #ffffff !important;
-}
-
-#jazzy-navbar .form-control-navbar::placeholder {
-    color: rgba(255, 255, 255, 0.6) !important;
-}
-
-#jazzy-navbar .btn-navbar {
-    color: #ffffff !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
 }
