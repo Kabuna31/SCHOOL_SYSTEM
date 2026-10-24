@@ -161,7 +161,8 @@ if TENANCY_CONFIGURED:
 
 if TENANCY_ENABLED:
     PUBLIC_SCHEMA_URLCONF = "school.public_urls"
-    MIDDLEWARE.insert(0, "django_tenants.middleware.main.TenantMainMiddleware")
+    # CORRECTED: use subfolder middleware to match TENANT_SUBFOLDER_PREFIX
+    MIDDLEWARE.insert(0, "django_tenants.middleware.subfolder.TenantSubfolderMiddleware")
 
 TEMPLATES = [
     {
@@ -327,13 +328,8 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 60
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-
-    # Cookie security — controlled by env vars so we can debug CSRF issues
-    # without a full redeploy. Default: True. Set CSRF_COOKIE_SECURE=False
-    # in Render env vars if CSRF cookies are not being set.
-    SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=True)
-    CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", default=True)
-
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
     SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -344,7 +340,6 @@ if not DEBUG:
 # Jazzmin configuration — tenant-agnostic branding
 # ---------------------------------------------------------------------------
 JAZZMIN_SETTINGS = {
-    # ---------- Branding (generic — works for every tenant) ----------
     "site_title": "School Management Portal",
     "site_header": "School Administration",
     "site_brand": "School Management",
@@ -357,7 +352,6 @@ JAZZMIN_SETTINGS = {
     "copyright": "School Management System",
     "search_model": ["users.customuser", "academic.student"],
 
-    # ---------- Top menu ----------
     "topmenu_links": [
         {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
         {"name": "Dashboard", "url": "/reports/dashboard/", "icon": "fas fa-chart-pie"},
@@ -367,7 +361,6 @@ JAZZMIN_SETTINGS = {
         {"name": "Profile & Account", "url": "/admin/users/customuser/", "icon": "fas fa-user-shield"},
     ],
 
-    # ---------- Icons ----------
     "icons": {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user-shield",
@@ -439,7 +432,6 @@ JAZZMIN_SETTINGS = {
         "sis": "fas fa-graduation-cap",
     },
 
-    # ---------- Layout ----------
     "show_sidebar": True,
     "navigation_expanded": False,
     "hide_apps": [],
@@ -473,14 +465,12 @@ JAZZMIN_SETTINGS = {
     ],
     "related_modal_active": True,
 
-    # ---------- Static files (CORRECTED — no /static/ prefix) ----------
     "custom_css": "css/custom_admin.css",
     "custom_js": None,
 
     "use_google_fonts_cdn": True,
     "show_ui_builder": False,
 
-    # ---------- Theme ----------
     "theme": "lux",
     "default_theme_mode": "light",
     "changeform_format": "horizontal_tabs",
@@ -489,7 +479,6 @@ JAZZMIN_SETTINGS = {
         "auth.group": "vertical_tabs",
     },
 
-    # ---------- Custom sidebar links ----------
     "custom_links": {
         "reports": [
             {"name": "Attendance", "url": "/reports/attendance/", "icon": "fas fa-user-check"},
