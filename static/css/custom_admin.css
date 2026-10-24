@@ -1,5 +1,6 @@
 /* ==========================================================================
-   Rockland S.S. — Admin design system
+   School Management System — Admin design system
+   Applies to every tenant. No tenant-specific references.
    ========================================================================== */
 
 :root {
@@ -27,7 +28,7 @@ h1, h2, h3, h4, h5, h6 {
     letter-spacing: -0.015em;
 }
 
-/* ---------- Navbar (force dark, fix bg-body invisibility) ---------- */
+/* ---------- Navbar ---------- */
 #jazzy-navbar.navbar {
     background-color: #1a2332 !important;
     background-image: none !important;
@@ -282,7 +283,7 @@ ul.object-tools-items {
 }
 
 /* ==========================================================================
-   Login page
+   Login page — applies to every tenant's admin login
    ========================================================================== */
 body.login {
     background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%) !important;
@@ -300,7 +301,6 @@ body.login .login-logo {
     padding: 0;
 }
 
-/* In light mode: hide logo-dark, show logo-light */
 body.login .login-logo img.logo-dark,
 body.login img.logo-dark {
     display: none !important;
@@ -312,7 +312,6 @@ body.login img.logo-dark {
     pointer-events: none !important;
 }
 
-/* In dark mode: flip */
 html[data-bs-theme="dark"] body.login .login-logo img.logo-light,
 html[data-theme="dark"] body.login .login-logo img.logo-light,
 body.login.dark-mode .login-logo img.logo-light {
@@ -337,7 +336,6 @@ body.login.dark-mode .login-logo img.logo-dark {
     pointer-events: auto !important;
 }
 
-/* Size the visible logo */
 body.login .login-logo img {
     max-width: 120px !important;
     max-height: 120px !important;
@@ -416,6 +414,117 @@ body.login .btn-primary:hover {
     background: #142842 !important;
 }
 
+/* ==========================================================================
+   Dashboard — stacked boxed modules (works for every tenant)
+   ========================================================================== */
+
+/* Force #content-main to be a simple vertical stack — NO grid */
+#content-main {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Every app module is a full-width card */
+#content-main > div[class^="app-"],
+#content-main > div.module,
+#content-main > .module {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 0 1.5rem 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    border: 1px solid var(--brand-border) !important;
+    border-radius: var(--brand-radius) !important;
+    box-shadow: var(--brand-shadow) !important;
+    overflow: hidden !important;
+    float: none !important;
+}
+
+/* Table inside each module fills it */
+#content-main > div[class^="app-"] > table,
+#content-main > div.module > table {
+    display: table !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-collapse: collapse !important;
+    table-layout: auto !important;
+}
+
+/* App name = dark header bar */
+#content-main > div[class^="app-"] > table > caption,
+#content-main > div.module > table > caption,
+#content-main caption.tenant-app {
+    display: table-caption !important;
+    caption-side: top !important;
+    width: 100% !important;
+    background: var(--brand-primary) !important;
+    color: #ffffff !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 1rem !important;
+    margin: 0 !important;
+    text-align: left !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+
+#content-main > div[class^="app-"] > table > caption a,
+#content-main caption.tenant-app a {
+    color: #ffffff !important;
+    text-decoration: none !important;
+}
+
+#content-main > div[class^="app-"] > table > caption a:hover {
+    text-decoration: underline !important;
+}
+
+/* Rows inside the module */
+#content-main > div[class^="app-"] > table > tbody > tr {
+    display: table-row !important;
+}
+
+#content-main > div[class^="app-"] > table > tbody > tr > th,
+#content-main > div[class^="app-"] > table > tbody > tr > td {
+    display: table-cell !important;
+    padding: 0.6rem 1rem !important;
+    border-bottom: 1px solid var(--brand-border) !important;
+    vertical-align: middle !important;
+    text-align: left !important;
+    font-weight: 400 !important;
+}
+
+#content-main > div[class^="app-"] > table > tbody > tr > th {
+    font-weight: 500 !important;
+}
+
+#content-main > div[class^="app-"] > table > tbody > tr:last-child > th,
+#content-main > div[class^="app-"] > table > tbody > tr:last-child > td {
+    border-bottom: none !important;
+}
+
+/* Add / Change links: right-aligned, compact */
+#content-main > div[class^="app-"] > table > tbody > tr > td:last-child {
+    text-align: right !important;
+    white-space: nowrap !important;
+    width: 1% !important;
+}
+
+#content-main > div[class^="app-"] > table > tbody > tr > td a,
+#content-main > div[class^="app-"] > table > tbody > tr > th a {
+    color: var(--brand-accent) !important;
+    text-decoration: none !important;
+}
+
+#content-main > div[class^="app-"] > table > tbody > tr > td a:hover,
+#content-main > div[class^="app-"] > table > tbody > tr > th a:hover {
+    text-decoration: underline !important;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 991px) {
     .nav-sidebar .nav-link {
@@ -429,91 +538,5 @@ body.login .btn-primary:hover {
     body.login .login-logo img {
         max-width: 100px !important;
         max-height: 100px !important;
-    }
-}
-
-
-
-/* ==========================================================================
-   Restore admin dashboard module layout
-   ========================================================================== */
-
-/* Dashboard app modules — the boxes that group models by app */
-#content-main .module,
-.dashboard .module,
-.app-list .module {
-    background: #ffffff;
-    border: 1px solid var(--brand-border);
-    border-radius: var(--brand-radius);
-    box-shadow: var(--brand-shadow);
-    margin-bottom: 1.5rem;
-    padding: 0;
-    overflow: hidden;
-}
-
-#content-main .module > h2,
-.dashboard .module > h2,
-#content-main .module > caption,
-.dashboard .module > caption {
-    background: var(--brand-surface);
-    border-bottom: 1px solid var(--brand-border);
-    font-size: 0.9rem;
-    font-weight: 600;
-    padding: 0.75rem 1rem;
-    margin: 0;
-    color: var(--brand-text);
-}
-
-#content-main .module table,
-.dashboard .module table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 0;
-}
-
-#content-main .module table th,
-#content-main .module table td,
-.dashboard .module table th,
-.dashboard .module table td {
-    padding: 0.6rem 1rem;
-    border-bottom: 1px solid var(--brand-border);
-    text-align: left;
-    vertical-align: middle;
-    font-size: 0.875rem;
-}
-
-#content-main .module table tr:last-child th,
-#content-main .module table tr:last-child td {
-    border-bottom: none;
-}
-
-#content-main .module table th a,
-#content-main .module table td a {
-    color: var(--brand-accent);
-    text-decoration: none;
-}
-
-#content-main .module table th a:hover,
-#content-main .module table td a:hover {
-    text-decoration: underline;
-}
-
-/* The "Add" / "Change" links sit right of each model — right-align them */
-#content-main .module table td:last-child,
-.dashboard .module table td:last-child {
-    text-align: right;
-    white-space: nowrap;
-}
-
-/* App modules as cards in a grid (nicer on wide screens) */
-@media (min-width: 1200px) {
-    #content-main {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-    }
-
-    #content-main .module {
-        margin-bottom: 0;
     }
 }
