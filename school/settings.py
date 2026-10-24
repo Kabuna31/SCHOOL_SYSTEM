@@ -312,11 +312,11 @@ INTERNAL_IPS = [
 ]
 
 # ---------------------------------------------------------------------------
-# Authentication URLs — stops portal login redirecting to admin
+# Authentication URLs — point to the real portal login page
 # ---------------------------------------------------------------------------
-LOGIN_URL = "/login/"
+LOGIN_URL = "/portal/login/"
 LOGIN_REDIRECT_URL = "/portal/"
-LOGOUT_REDIRECT_URL = "/login/"
+LOGOUT_REDIRECT_URL = "/portal/login/"
 
 # ---------------------------------------------------------------------------
 # Production security (only when DEBUG is False)
@@ -327,8 +327,13 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 60
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+
+    # Cookie security — controlled by env vars so we can debug CSRF issues
+    # without a full redeploy. Default: True. Set CSRF_COOKIE_SECURE=False
+    # in Render env vars if CSRF cookies are not being set.
+    SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=True)
+    CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", default=True)
+
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
     SECURE_CONTENT_TYPE_NOSNIFF = True
