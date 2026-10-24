@@ -442,3 +442,41 @@ body.login .btn-primary:hover {
         max-height: 100px !important;
     }
 }
+
+
+/* ==========================================================================
+   Fix invisible navbar: navbar-dark + bg-body = white on white
+   Override with a solid dark background
+   ========================================================================== */
+
+#jazzy-navbar.navbar {
+    background-color: #1a2332 !important;
+    background-image: none !important;
+}
+
+#jazzy-navbar .navbar-nav .nav-link,
+#jazzy-navbar .navbar-nav .nav-link i,
+#jazzy-navbar .navbar-brand {
+    color: #ffffff !important;
+}
+
+#jazzy-navbar .navbar-nav .nav-link:hover,
+#jazzy-navbar .navbar-nav .nav-link:hover i {
+    color: #b8935a !important;
+}
+
+/* Form inputs in navbar */
+#jazzy-navbar .form-control-navbar {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
+#jazzy-navbar .form-control-navbar::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+#jazzy-navbar .btn-navbar {
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
