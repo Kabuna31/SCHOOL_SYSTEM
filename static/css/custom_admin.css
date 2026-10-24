@@ -547,38 +547,38 @@ body.login .btn-primary:hover {
 
 
 
-
 /* ==========================================================================
-   Import/Export buttons — nuclear specificity override
+   Import/Export buttons — max specificity override
    ========================================================================== */
 
-/* Force list-style off at every level with maximum specificity */
-html body ul.object-tools,
-html body ul.object-tools li,
-html body div.object-tools ul,
-html body div.object-tools ul li,
-html body .object-tools li,
-html body .object-tools-items li {
+html body #content-main ul.object-tools,
+html body #content-main ul.object-tools li,
+html body #content ul.object-tools,
+html body #content ul.object-tools li,
+html body #content-main .object-tools li,
+html body #content .object-tools li,
+html body div.object-tools ul li {
     list-style: none !important;
     list-style-type: none !important;
     list-style-image: none !important;
+    padding-left: 0 !important;
 }
 
-/* Kill the ::marker pseudo-element */
-html body ul.object-tools li::marker,
-html body div.object-tools ul li::marker,
-html body .object-tools li::marker {
+html body #content-main ul.object-tools li::marker,
+html body #content ul.object-tools li::marker,
+html body #content-main .object-tools li::marker,
+html body #content .object-tools li::marker,
+html body div.object-tools ul li::marker {
     content: none !important;
     display: none !important;
     color: transparent !important;
     font-size: 0 !important;
 }
 
-/* Kill any ::before/::after pseudo-elements that could render as bullets */
-html body ul.object-tools li::before,
-html body ul.object-tools li::after,
-html body div.object-tools ul li::before,
-html body div.object-tools ul li::after,
+html body #content-main ul.object-tools li::before,
+html body #content-main ul.object-tools li::after,
+html body #content ul.object-tools li::before,
+html body #content ul.object-tools li::after,
 html body .object-tools li::before,
 html body .object-tools li::after {
     content: none !important;
@@ -587,9 +587,9 @@ html body .object-tools li::after {
     height: 0 !important;
 }
 
-/* Ensure the container is a horizontal flex row */
-html body .object-tools,
-html body ul.object-tools {
+/* Force horizontal layout */
+html body #content-main ul.object-tools,
+html body #content ul.object-tools {
     display: flex !important;
     flex-wrap: wrap !important;
     gap: 8px !important;
