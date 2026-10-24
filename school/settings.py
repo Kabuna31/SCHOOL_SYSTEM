@@ -198,6 +198,7 @@ if TENANCY_CONFIGURED:
     DATABASES["default"]["ENGINE"] = "django_tenants.postgresql_backend"
 
 DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
+
 # ---------------------------------------------------------------------------
 # Password validation
 # ---------------------------------------------------------------------------
@@ -335,20 +336,20 @@ if not DEBUG:
     X_FRAME_OPTIONS = "DENY"
 
 # ---------------------------------------------------------------------------
-# Jazzmin configuration — grouped sidebar + professional theme
+# Jazzmin configuration — tenant-agnostic branding
 # ---------------------------------------------------------------------------
 JAZZMIN_SETTINGS = {
-    # ---------- Branding ----------
+    # ---------- Branding (generic — works for every tenant) ----------
     "site_title": "School Management Portal",
     "site_header": "School Administration",
-    "site_brand": "Rockland S.S.",
+    "site_brand": "School Management",
     "site_logo": "",
     "site_logo_classes": "img-circle",
     "login_logo": "img/school-logo.webp",
     "login_logo_dark": None,
     "site_icon": "img/school-logo.webp",
     "welcome_sign": "Welcome back, Administrator!",
-    "copyright": "Rockland Secondary School",
+    "copyright": "School Management System",
     "search_model": ["users.customuser", "academic.student"],
 
     # ---------- Top menu ----------
@@ -363,14 +364,11 @@ JAZZMIN_SETTINGS = {
 
     # ---------- Icons ----------
     "icons": {
-        # Auth
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user-shield",
         "auth.group": "fas fa-users",
-        # Users
         "users.customuser": "fas fa-user-shield",
         "users.accountant": "fas fa-calculator",
-        # Academic
         "academic": "fas fa-graduation-cap",
         "academic.student": "fas fa-user-graduate",
         "academic.teacher": "fas fa-chalkboard-teacher",
@@ -395,13 +393,11 @@ JAZZMIN_SETTINGS = {
         "academic.studentspreviousacademichistory": "fas fa-history",
         "academic.subtopic": "fas fa-sitemap",
         "academic.topic": "fas fa-tags",
-        # Attendance
         "attendance": "fas fa-user-check",
         "attendance.attendancestatus": "fas fa-clipboard-check",
         "attendance.periodattendance": "fas fa-clock",
         "attendance.studentattendance": "fas fa-user-check",
         "attendance.teachersattendance": "fas fa-user-clock",
-        # Examination
         "examination": "fas fa-file-alt",
         "examination.result": "fas fa-clipboard-check",
         "examination.marksmanagement": "fas fa-marker",
@@ -410,15 +406,12 @@ JAZZMIN_SETTINGS = {
         "examination.gradescale": "fas fa-layer-group",
         "examination.gradescalerule": "fas fa-ruler-combined",
         "examination.markssubmissionevent": "fas fa-stream",
-        # Finance
         "finance": "fas fa-wallet",
         "finance.payment": "fas fa-money-bill-wave",
         "finance.paymentallocation": "fas fa-coins",
         "finance.receipt": "fas fa-receipt",
         "finance.receiptallocation": "fas fa-file-invoice-dollar",
-        # Reports
         "reports": "fas fa-chart-bar",
-        # Notes
         "notes": "fas fa-sticky-note",
         "notes.assignment": "fas fa-tasks",
         "notes.choice": "fas fa-list-ul",
@@ -427,7 +420,6 @@ JAZZMIN_SETTINGS = {
         "notes.note": "fas fa-pen",
         "notes.question": "fas fa-question-circle",
         "notes.specificexplanation": "fas fa-info-circle",
-        # Administration
         "administration": "fas fa-school",
         "administration.school": "fas fa-school",
         "administration.academicyear": "fas fa-calendar",
@@ -435,13 +427,10 @@ JAZZMIN_SETTINGS = {
         "administration.schoolevent": "fas fa-calendar-day",
         "administration.article": "fas fa-newspaper",
         "administration.carouselimage": "fas fa-images",
-        # Automation
         "automation": "fas fa-robot",
-        # Timetable / Schedule
         "timetable": "fas fa-table",
         "schedule": "fas fa-table",
         "schedule.period": "fas fa-clock",
-        # SIS
         "sis": "fas fa-graduation-cap",
     },
 
@@ -478,8 +467,11 @@ JAZZMIN_SETTINGS = {
         "users",
     ],
     "related_modal_active": True,
-    "custom_css": "/static/css/custom_admin.css",
-    "custom_js": "/static/js/custom_admin.js",
+
+    # ---------- Static files (CORRECTED — no /static/ prefix) ----------
+    "custom_css": "css/custom_admin.css",
+    "custom_js": None,
+
     "use_google_fonts_cdn": True,
     "show_ui_builder": False,
 
@@ -506,25 +498,18 @@ JAZZMIN_SETTINGS = {
 }
 
 JAZZMIN_UI_TWEAKS = {
-    # ---------- Typography ----------
     "navbar_small_text": False,
     "footer_small_text": True,
     "body_small_text": False,
     "brand_small_text": False,
-
-    # ---------- Colors ----------
     "brand_colour": "navbar-dark",
     "accent": "accent-primary",
     "navbar": "navbar-dark",
     "no_navbar_border": True,
-
-    # ---------- Layout ----------
     "navbar_fixed": True,
     "layout_fixed": True,
     "footer_fixed": False,
     "sidebar_fixed": True,
-
-    # ---------- Sidebar ----------
     "sidebar": "sidebar-dark-primary",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
@@ -532,11 +517,6 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_compact_style": True,
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
-
-    # ---------- Dark mode ----------
-    "dark_mode_theme": "darkly",
-
-    # ---------- Buttons ----------
     "button_classes": {
         "primary": "btn-primary",
         "secondary": "btn-outline-secondary",
