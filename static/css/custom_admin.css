@@ -431,3 +431,89 @@ body.login .btn-primary:hover {
         max-height: 100px !important;
     }
 }
+
+
+
+/* ==========================================================================
+   Restore admin dashboard module layout
+   ========================================================================== */
+
+/* Dashboard app modules — the boxes that group models by app */
+#content-main .module,
+.dashboard .module,
+.app-list .module {
+    background: #ffffff;
+    border: 1px solid var(--brand-border);
+    border-radius: var(--brand-radius);
+    box-shadow: var(--brand-shadow);
+    margin-bottom: 1.5rem;
+    padding: 0;
+    overflow: hidden;
+}
+
+#content-main .module > h2,
+.dashboard .module > h2,
+#content-main .module > caption,
+.dashboard .module > caption {
+    background: var(--brand-surface);
+    border-bottom: 1px solid var(--brand-border);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    margin: 0;
+    color: var(--brand-text);
+}
+
+#content-main .module table,
+.dashboard .module table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+#content-main .module table th,
+#content-main .module table td,
+.dashboard .module table th,
+.dashboard .module table td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--brand-border);
+    text-align: left;
+    vertical-align: middle;
+    font-size: 0.875rem;
+}
+
+#content-main .module table tr:last-child th,
+#content-main .module table tr:last-child td {
+    border-bottom: none;
+}
+
+#content-main .module table th a,
+#content-main .module table td a {
+    color: var(--brand-accent);
+    text-decoration: none;
+}
+
+#content-main .module table th a:hover,
+#content-main .module table td a:hover {
+    text-decoration: underline;
+}
+
+/* The "Add" / "Change" links sit right of each model — right-align them */
+#content-main .module table td:last-child,
+.dashboard .module table td:last-child {
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* App modules as cards in a grid (nicer on wide screens) */
+@media (min-width: 1200px) {
+    #content-main {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    #content-main .module {
+        margin-bottom: 0;
+    }
+}
