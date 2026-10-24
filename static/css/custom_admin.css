@@ -596,3 +596,42 @@ html body #content ul.object-tools {
     padding: 0 !important;
     margin: 0 0 1rem 0 !important;
 }
+
+
+
+
+
+
+
+/* ==========================================================================
+   NUCLEAR: kill bullets on ANY list in the admin content area
+   ========================================================================== */
+
+html body #content li,
+html body #content-main li,
+html body .content-wrapper li,
+html body .main-content li,
+html body .container-fluid li {
+    list-style: none !important;
+    list-style-type: none !important;
+    list-style-image: none !important;
+}
+
+html body #content li::marker,
+html body #content-main li::marker,
+html body .content-wrapper li::marker {
+    content: none !important;
+    display: none !important;
+    color: transparent !important;
+    font-size: 0 !important;
+}
+
+html body #content li::before,
+html body #content li::after,
+html body #content-main li::before,
+html body #content-main li::after {
+    content: none !important;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
