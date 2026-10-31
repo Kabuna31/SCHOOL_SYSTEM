@@ -184,13 +184,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "school.wsgi.application"
 
+
+
 # ---------------------------------------------------------------------------
 # Database
 # ---------------------------------------------------------------------------
+
 DATABASES = {
     "default": dj_database_url.parse(
         env("DATABASE_URL"),
-        conn_max_age=600,
+        conn_max_age=0,          # Close connections after each request
         ssl_require=not DEBUG,
     )
 }
@@ -198,6 +201,12 @@ if TENANCY_CONFIGURED:
     DATABASES["default"]["ENGINE"] = "django_tenants.postgresql_backend"
 
 DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
+
+# --- Add these two lines ---
+DATABASES["default"]["CONN_MAX_AGE"] = 0
+DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
+
+
 
 # ---------------------------------------------------------------------------
 # Password validation
