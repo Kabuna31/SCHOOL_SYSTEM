@@ -30,7 +30,9 @@ class StudentResource(resources.ModelResource):
 
     class Meta:
         model = Student
+        # include id so re-imports from export don't fail
         fields = (
+            "id",
             "admission_number",
             "first_name",
             "middle_name",
@@ -45,17 +47,30 @@ class StudentResource(resources.ModelResource):
             "class_level",
             "class_of_year",
         )
-        export_order = fields
+        # don't export the internal id
+        export_order = (
+            "admission_number",
+            "first_name",
+            "middle_name",
+            "last_name",
+            "gender",
+            "date_of_birth",
+            "parent_contact",
+            "region",
+            "city",
+            "street",
+            "blood_group",
+            "class_level",
+            "class_of_year",
+        )
         import_id_fields = ("admission_number",)
-        export_formats = ("csv", "xlsx")
-        import_formats = ("csv", "xlsx")
 
 
 class SubjectResource(resources.ModelResource):
     class Meta:
         model = Subject
-        fields = ("name",)
-        export_order = fields
+        fields = ("id", "name")
+        export_order = ("name",)
         import_id_fields = ("name",)
 
 
@@ -69,6 +84,7 @@ class TeacherResource(resources.ModelResource):
     class Meta:
         model = Teacher
         fields = (
+            "id",
             "first_name",
             "middle_name",
             "last_name",
@@ -77,39 +93,47 @@ class TeacherResource(resources.ModelResource):
             "gender",
             "school",
         )
-        export_order = fields
+        export_order = (
+            "first_name",
+            "middle_name",
+            "last_name",
+            "email",
+            "phone_number",
+            "gender",
+            "school",
+        )
         import_id_fields = ("email",)
 
 
 class ParentResource(resources.ModelResource):
     class Meta:
         model = Parent
-        fields = ("first_name", "last_name", "email", "phone_number")
-        export_order = fields
+        fields = ("id", "first_name", "last_name", "email", "phone_number")
+        export_order = ("first_name", "last_name", "email", "phone_number")
         import_id_fields = ("email",)
 
 
 class ClassLevelResource(resources.ModelResource):
     class Meta:
         model = ClassLevel
-        fields = ("name",)
-        export_order = fields
+        fields = ("id", "name")
+        export_order = ("name",)
         import_id_fields = ("name",)
 
 
 class ClassYearResource(resources.ModelResource):
     class Meta:
         model = ClassYear
-        fields = ("year", "full_name")
-        export_order = fields
+        fields = ("id", "year", "full_name")
+        export_order = ("year", "full_name")
         import_id_fields = ("year",)
 
 
 class StreamResource(resources.ModelResource):
     class Meta:
         model = Stream
-        fields = ("name",)
-        export_order = fields
+        fields = ("id", "name")
+        export_order = ("name",)
         import_id_fields = ("name",)
 
 
@@ -127,8 +151,10 @@ class ClassRoomResource(resources.ModelResource):
 
     class Meta:
         model = ClassRoom
-        fields = ("class_level", "stream", "capacity")
-        export_order = fields
+        fields = ("id", "class_level", "stream", "capacity")
+        export_order = ("class_level", "stream", "capacity")
+        # use the natural combination to identify existing rooms
+        import_id_fields = ("class_level", "stream")
 
 
 class StudentClassEnrollmentResource(resources.ModelResource):
@@ -140,8 +166,9 @@ class StudentClassEnrollmentResource(resources.ModelResource):
 
     class Meta:
         model = StudentClassEnrollment
-        fields = ("student", "academic_year", "classroom")
-        export_order = fields
+        fields = ("id", "student", "academic_year", "classroom")
+        export_order = ("student", "academic_year", "classroom")
+        import_id_fields = ("student", "academic_year")
 
 
 class AllocatedSubjectResource(resources.ModelResource):
@@ -158,5 +185,6 @@ class AllocatedSubjectResource(resources.ModelResource):
 
     class Meta:
         model = AllocatedSubject
-        fields = ("teacher", "subject", "class_room")
-        export_order = fields
+        fields = ("id", "teacher", "subject", "class_room")
+        export_order = ("teacher", "subject", "class_room")
+        import_id_fields = ("teacher", "subject", "class_room")
