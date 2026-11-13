@@ -224,7 +224,7 @@ class ClassRoomResource(resources.ModelResource):
     class_teacher = fields.Field(
         column_name="class_teacher",
         attribute="class_teacher",
-        widget=ForeignKeyWidget(Teacher, "email"),
+        widget=ForeignKeyWidget(Teacher, "user__email"),
     )
 
     class Meta:
@@ -293,7 +293,7 @@ class AllocatedSubjectResource(resources.ModelResource):
     teacher = fields.Field(
         column_name="teacher",
         attribute="teacher_name",
-        widget=ForeignKeyWidget(Teacher, "email"),
+        widget=ForeignKeyWidget(Teacher, "user__email"),
     )
     subject = fields.Field(
         column_name="subject",
@@ -440,7 +440,7 @@ class MessageToTeacherResource(resources.ModelResource):
     teacher = fields.Field(
         column_name="teacher",
         attribute="teacher",
-        widget=ForeignKeyWidget(Teacher, "email"),
+        widget=ForeignKeyWidget(Teacher, "user__email"),
     )
 
     class Meta:
