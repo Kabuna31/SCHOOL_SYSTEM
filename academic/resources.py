@@ -44,7 +44,6 @@ class StudentResource(resources.ModelResource):
     class Meta:
         model = Student
         fields = (
-            "id",
             "school",
             "admission_number",
             "first_name",
@@ -65,27 +64,7 @@ class StudentResource(resources.ModelResource):
             "prems_number",
             "std_vii_number",
         )
-        export_order = (
-            "school",
-            "admission_number",
-            "first_name",
-            "middle_name",
-            "last_name",
-            "gender",
-            "religion",
-            "date_of_birth",
-            "graduation_date",
-            "class_level",
-            "class_of_year",
-            "parent_contact",
-            "parent_guardian",
-            "region",
-            "city",
-            "street",
-            "blood_group",
-            "prems_number",
-            "std_vii_number",
-        )
+        export_order = fields
         import_id_fields = ("admission_number",)
 
 
@@ -98,8 +77,8 @@ class SubjectResource(resources.ModelResource):
 
     class Meta:
         model = Subject
-        fields = ("id", "school", "name")
-        export_order = ("school", "name")
+        fields = ("school", "name")
+        export_order = fields
         import_id_fields = ("school", "name")
 
 
@@ -113,7 +92,6 @@ class TeacherResource(resources.ModelResource):
     class Meta:
         model = Teacher
         fields = (
-            "id",
             "school",
             "first_name",
             "middle_name",
@@ -123,16 +101,7 @@ class TeacherResource(resources.ModelResource):
             "gender",
             "date_of_birth",
         )
-        export_order = (
-            "school",
-            "first_name",
-            "middle_name",
-            "last_name",
-            "email",
-            "phone_number",
-            "gender",
-            "date_of_birth",
-        )
+        export_order = fields
         import_id_fields = ("email",)
 
 
@@ -146,20 +115,13 @@ class ParentResource(resources.ModelResource):
     class Meta:
         model = Parent
         fields = (
-            "id",
             "school",
             "first_name",
             "last_name",
             "email",
             "phone_number",
         )
-        export_order = (
-            "school",
-            "first_name",
-            "last_name",
-            "email",
-            "phone_number",
-        )
+        export_order = fields
         import_id_fields = ("email",)
 
 
@@ -172,8 +134,8 @@ class ClassLevelResource(resources.ModelResource):
 
     class Meta:
         model = ClassLevel
-        fields = ("id", "school", "name")
-        export_order = ("school", "name")
+        fields = ("school", "name")
+        export_order = fields
         import_id_fields = ("school", "name")
 
 
@@ -186,8 +148,8 @@ class ClassYearResource(resources.ModelResource):
 
     class Meta:
         model = ClassYear
-        fields = ("id", "school", "year", "full_name")
-        export_order = ("school", "year", "full_name")
+        fields = ("school", "year", "full_name")
+        export_order = fields
         import_id_fields = ("school", "year")
 
 
@@ -200,8 +162,8 @@ class StreamResource(resources.ModelResource):
 
     class Meta:
         model = Stream
-        fields = ("id", "school", "name")
-        export_order = ("school", "name")
+        fields = ("school", "name")
+        export_order = fields
         import_id_fields = ("school", "name")
 
 
@@ -230,7 +192,6 @@ class ClassRoomResource(resources.ModelResource):
     class Meta:
         model = ClassRoom
         fields = (
-            "id",
             "school",
             "class_level",
             "stream",
@@ -238,14 +199,7 @@ class ClassRoomResource(resources.ModelResource):
             "capacity",
             "occupied_sits",
         )
-        export_order = (
-            "school",
-            "class_level",
-            "stream",
-            "class_teacher",
-            "capacity",
-            "occupied_sits",
-        )
+        export_order = fields
         import_id_fields = ("school", "class_level", "stream")
 
 
@@ -269,18 +223,12 @@ class StudentClassEnrollmentResource(resources.ModelResource):
     class Meta:
         model = StudentClassEnrollment
         fields = (
-            "id",
             "school",
             "student",
             "classroom",
             "academic_year",
         )
-        export_order = (
-            "school",
-            "student",
-            "classroom",
-            "academic_year",
-        )
+        export_order = fields
         import_id_fields = ("student", "academic_year")
 
 
@@ -304,7 +252,6 @@ class AllocatedSubjectResource(resources.ModelResource):
     class Meta:
         model = AllocatedSubject
         fields = (
-            "id",
             "school",
             "teacher",
             "subject",
@@ -312,14 +259,7 @@ class AllocatedSubjectResource(resources.ModelResource):
             "term",
             "academic_year",
         )
-        export_order = (
-            "school",
-            "teacher",
-            "subject",
-            "class_room",
-            "term",
-            "academic_year",
-        )
+        export_order = fields
         import_id_fields = ("teacher", "subject", "class_room", "term")
 
 
@@ -332,8 +272,8 @@ class DepartmentResource(resources.ModelResource):
 
     class Meta:
         model = Department
-        fields = ("id", "school", "name")
-        export_order = ("school", "name")
+        fields = ("school", "name")
+        export_order = fields
         import_id_fields = ("school", "name")
 
 
@@ -346,8 +286,8 @@ class GradeLevelResource(resources.ModelResource):
 
     class Meta:
         model = GradeLevel
-        fields = ("id", "school", "name")
-        export_order = ("school", "name")
+        fields = ("school", "name")
+        export_order = fields
         import_id_fields = ("school", "name")
 
 
@@ -360,8 +300,8 @@ class TopicResource(resources.ModelResource):
 
     class Meta:
         model = Topic
-        fields = ("id", "school", "name", "subject")
-        export_order = ("school", "name", "subject")
+        fields = ("school", "name", "subject")
+        export_order = fields
         import_id_fields = ("school", "name")
 
 
@@ -374,8 +314,8 @@ class SubTopicResource(resources.ModelResource):
 
     class Meta:
         model = SubTopic
-        fields = ("id", "school", "name", "topic")
-        export_order = ("school", "name", "topic")
+        fields = ("school", "name", "topic")
+        export_order = fields
         import_id_fields = ("school", "name")
 
 
@@ -388,8 +328,8 @@ class DormitoryResource(resources.ModelResource):
 
     class Meta:
         model = Dormitory
-        fields = ("id", "school", "name", "capacity", "occupied_beds")
-        export_order = ("school", "name", "capacity", "occupied_beds")
+        fields = ("school", "name", "capacity", "occupied_beds")
+        export_order = fields
         import_id_fields = ("school", "name")
 
 
@@ -407,8 +347,8 @@ class DormitoryAllocationResource(resources.ModelResource):
 
     class Meta:
         model = DormitoryAllocation
-        fields = ("id", "school", "student", "dormitory")
-        export_order = ("school", "student", "dormitory")
+        fields = ("school", "student", "dormitory")
+        export_order = fields
         import_id_fields = ("school", "student")
 
 
@@ -426,8 +366,8 @@ class MessageToParentResource(resources.ModelResource):
 
     class Meta:
         model = MessageToParent
-        fields = ("id", "school", "parent", "subject", "message", "sent_at")
-        export_order = ("school", "parent", "subject", "message", "sent_at")
+        fields = ("school", "parent", "subject", "message", "sent_at")
+        export_order = fields
         import_id_fields = ("school", "parent", "sent_at")
 
 
@@ -445,6 +385,6 @@ class MessageToTeacherResource(resources.ModelResource):
 
     class Meta:
         model = MessageToTeacher
-        fields = ("id", "school", "teacher", "subject", "message", "sent_at")
-        export_order = ("school", "teacher", "subject", "message", "sent_at")
+        fields = ("school", "teacher", "subject", "message", "sent_at")
+        export_order = fields
         import_id_fields = ("school", "teacher", "sent_at")
